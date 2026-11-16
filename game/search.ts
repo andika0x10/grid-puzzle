@@ -64,6 +64,7 @@ export interface Search {
   frontier(): number[];
   advance(budget: number): number;
   step(): void;
+  update?(start: Point, goal: Point, terrain: Terrain[]): void;
 }
 export function neighbors(cell: number, width: number, height: number, terrain: Terrain[]): number[] {
   const x = cell % width,
@@ -82,14 +83,14 @@ export function neighbors(cell: number, width: number, height: number, terrain: 
   return out;
 }
 const point = (cell: number, width: number): Point => ({ x: cell % width, y: Math.floor(cell / width) });
-abstract class MeteredSearch implements Search {
+export abstract class MeteredSearch implements Search {
   done = false;
   path: Point[] | null = null;
   expanded = 0;
   memory = 1;
   operations = 0;
   visited = new Set<number>();
-  private work: Work | null = null;
+  protected work: Work | null = null;
   abstract frontier(): number[];
   protected abstract run(): Work;
   advance(budget: number) {
@@ -142,6 +143,7 @@ abstract class MeteredSearch implements Search {
 class ForwardSearch extends MeteredSearch {
   private heap = new Heap();
   private stack: Entry[] = [];
+  private queueHead = 0;
   private scores: Float64Array;
   private parent: Int32Array;
   private sequence = 0;
@@ -161,9 +163,11 @@ class ForwardSearch extends MeteredSearch {
   private *push(cell: number, g: number): Work {
     let h = 0,
       priority = 0;
-    if (this.algorithm !== "dfs") {
-      h = Math.abs((cell % this.width) - (this.goal % this.width)) + Math.abs(Math.floor(cell / this.width) - Math.floor(this.goal / this.width));
-      yield;
+    if (this.algorithm !== "dfs" && this.algorithm !== "bfs") {
+      if (this.algorithm !== "dijkstra") {
+        h = Math.abs((cell % this.width) - (this.goal % this.width)) + Math.abs(Math.floor(cell / this.width) - Math.floor(this.goal / this.width));
+        yield;
+      }
       priority = h;
       if (this.algorithm === "weighted-astar") {
         priority *= 1.5;
@@ -175,21 +179,21 @@ class ForwardSearch extends MeteredSearch {
       }
     }
     const item = { cell, g, priority, h, order: this.sequence++ };
-    if (this.algorithm === "dfs") {
+    if (this.algorithm === "dfs" || this.algorithm === "bfs") {
       this.stack.push(item);
       yield;
     } else yield* this.heap.push(item);
   }
   frontier() {
-    return [...new Set((this.algorithm === "dfs" ? this.stack : this.heap.items).map((n) => n.cell))];
+    return [...new Set((this.algorithm === "bfs" ? this.stack.slice(this.queueHead) : this.algorithm === "dfs" ? this.stack : this.heap.items).map((n) => n.cell))];
   }
   protected *run(): Work {
     yield* this.push(this.start, 0);
     while (true) {
       let current: Entry | undefined;
       do {
-        if (this.algorithm === "dfs") {
-          current = this.stack.pop();
+        if (this.algorithm === "dfs" || this.algorithm === "bfs") {
+          current = this.algorithm === "bfs" ? this.stack[this.queueHead++] : this.stack.pop();
           yield;
         } else current = yield* this.heap.pop();
         yield;
@@ -218,7 +222,8 @@ class ForwardSearch extends MeteredSearch {
       for (const cell of next) {
         const g = current.g + terrainCost(this.terrain[cell]);
         yield;
-        const better = this.scores[cell] === Infinity || ((this.algorithm === "astar" || this.algorithm === "weighted-astar") && g < this.scores[cell]);
+        const better =
+          this.scores[cell] === Infinity || ((this.algorithm === "astar" || this.algorithm === "weighted-astar" || this.algorithm === "dijkstra") && g < this.scores[cell]);
         yield;
         if (better) {
           this.scores[cell] = g;
@@ -334,8 +339,213 @@ class BidirectionalSearch extends MeteredSearch {
     }
   }
 }
+// Backward incremental search (Koenig & Likhachev, D* Lite). Lazy heap entries
+// let updates invalidate a key without an unmetered remove/decrease-key scan.
+export class DStarLiteSearch extends MeteredSearch {
+  private g: Float64Array;
+  private rhs: Float64Array;
+  private heap = new Heap();
+  private queued = new Map<number, Entry>();
+  private initialized = false;
+  private pending: Terrain[] | null = null;
+  private queuedUpdate: { start: Point; goal: Point; terrain: Terrain[] } | null = null;
+  private start: number;
+  private goal: number;
+  private km = 0;
+  private sequence = 0;
+  private known = new Set<number>();
+  constructor(
+    private width: number,
+    private height: number,
+    private terrain: Terrain[],
+    start: Point,
+    goal: Point
+  ) {
+    super();
+    this.terrain = [...terrain];
+    this.start = start.y * width + start.x;
+    this.goal = goal.y * width + goal.x;
+    this.g = new Float64Array(terrain.length).fill(Infinity);
+    this.rhs = new Float64Array(terrain.length).fill(Infinity);
+    this.rhs[this.goal] = 0;
+  }
+  private distance(a: number, b: number) {
+    return Math.abs((a % this.width) - (b % this.width)) + Math.abs(Math.floor(a / this.width) - Math.floor(b / this.width));
+  }
+  private key(cell: number): [number, number] {
+    const v = Math.min(this.g[cell], this.rhs[cell]);
+    return [v + this.distance(this.start, cell) + this.km, v];
+  }
+  private before(a: [number, number], b: [number, number]) {
+    return a[0] < b[0] || (a[0] === b[0] && a[1] < b[1]);
+  }
+  private *adjacent(cell: number): Work<number[]> {
+    const out: number[] = [],
+      x = cell % this.width,
+      y = Math.floor(cell / this.width);
+    for (const [dx, dy] of [
+      [1, 0],
+      [0, -1],
+      [-1, 0],
+      [0, 1],
+    ]) {
+      const nx = x + dx,
+        ny = y + dy;
+      if (nx >= 0 && nx < this.width && ny >= 0 && ny < this.height) out.push(ny * this.width + nx);
+      yield;
+    }
+    return out;
+  }
+  private cost(from: number, to: number) {
+    return isWalkable(this.terrain[from]) && isWalkable(this.terrain[to]) ? terrainCost(this.terrain[to]) : Infinity;
+  }
+  private *insert(cell: number): Work {
+    const [priority, h] = this.key(cell);
+    yield;
+    const entry = { cell, priority, h, g: 0, order: this.sequence++ };
+    this.queued.set(cell, entry);
+    yield* this.heap.push(entry);
+  }
+  private *updateVertex(cell: number): Work {
+    if (cell !== this.goal) {
+      let best = Infinity;
+      for (const n of yield* this.adjacent(cell)) {
+        best = Math.min(best, this.cost(cell, n) + this.g[n]);
+        yield;
+      }
+      this.rhs[cell] = best;
+    }
+    this.queued.delete(cell);
+    yield;
+    if (this.g[cell] !== this.rhs[cell]) yield* this.insert(cell);
+  }
+  private *top(): Work<Entry | undefined> {
+    while (this.heap.items.length) {
+      const entry = this.heap.items[0];
+      yield;
+      if (this.queued.get(entry.cell) === entry) return entry;
+      yield* this.heap.pop();
+    }
+    return undefined;
+  }
+  frontier() {
+    return [...this.queued.keys()];
+  }
+  update(start: Point, goal: Point, terrain: Terrain[]) {
+    const next = start.y * this.width + start.x,
+      to = goal.y * this.width + goal.x;
+    // A generator can be paused halfway through a heap swap or predecessor
+    // update. Finish that search before repairing the graph, and never expose
+    // its stale result. Changing the goal resets all state and is safe at once.
+    if (to === this.goal && !this.done && this.work) {
+      this.queuedUpdate = { start: { ...start }, goal: { ...goal }, terrain: [...terrain] };
+      return;
+    }
+    this.queuedUpdate = null;
+    if (to !== this.goal) {
+      this.g.fill(Infinity);
+      this.rhs.fill(Infinity);
+      this.rhs[to] = 0;
+      this.goal = to;
+      this.heap = new Heap();
+      this.queued.clear();
+      this.known.clear();
+      this.km = 0;
+      this.initialized = false;
+    } else this.km += this.distance(this.start, next);
+    this.start = next;
+    this.pending = [...terrain];
+    this.done = false;
+    this.path = null;
+    this.work = null;
+    this.visited.clear();
+  }
+  advance(budget: number) {
+    const used = super.advance(budget);
+    if (this.done && this.queuedUpdate) {
+      const pending = this.queuedUpdate;
+      this.update(pending.start, pending.goal, pending.terrain);
+    }
+    return used;
+  }
+  protected *run(): Work {
+    if (!this.initialized) {
+      yield* this.insert(this.goal);
+      this.initialized = true;
+    }
+    if (this.pending) {
+      const next = this.pending;
+      this.pending = null;
+      const changed: number[] = [];
+      for (let i = 0; i < next.length; i++) {
+        if (this.terrain[i] !== next[i]) changed.push(i);
+        yield;
+      }
+      this.terrain = next;
+      for (const cell of changed) {
+        yield* this.updateVertex(cell);
+        for (const n of yield* this.adjacent(cell)) yield* this.updateVertex(n);
+      }
+    }
+    while (true) {
+      const top = yield* this.top(),
+        desired = this.key(this.start);
+      yield;
+      if ((!top || !this.before([top.priority, top.h], desired)) && this.rhs[this.start] === this.g[this.start]) break;
+      if (!top) break;
+      yield* this.heap.pop();
+      this.queued.delete(top.cell);
+      const u = top.cell,
+        updated = this.key(u);
+      yield;
+      if (this.before([top.priority, top.h], updated)) yield* this.insert(u);
+      else {
+        this.expanded++;
+        this.visited.add(u);
+        this.known.add(u);
+        if (this.g[u] > this.rhs[u]) this.g[u] = this.rhs[u];
+        else {
+          this.g[u] = Infinity;
+          yield* this.updateVertex(u);
+        }
+        for (const p of yield* this.adjacent(u)) yield* this.updateVertex(p);
+      }
+      this.memory = Math.max(this.memory, this.known.size + this.queued.size);
+    }
+    if (!Number.isFinite(this.g[this.start]) || !isWalkable(this.terrain[this.start]) || !isWalkable(this.terrain[this.goal])) {
+      yield* this.complete(null, this.width);
+      return;
+    }
+    const cells = [this.start],
+      seen = new Set(cells);
+    while (cells.at(-1) !== this.goal) {
+      const current = cells.at(-1)!;
+      let best = -1,
+        value = Infinity;
+      for (const n of yield* this.adjacent(current)) {
+        const cost = this.cost(current, n) + this.g[n];
+        if (cost < value) {
+          value = cost;
+          best = n;
+        }
+        yield;
+      }
+      if (best < 0 || seen.has(best)) {
+        yield* this.complete(null, this.width);
+        return;
+      }
+      cells.push(best);
+      seen.add(best);
+      yield;
+    }
+    yield* this.complete(cells, this.width);
+  }
+}
+
 export function createSearch(width: number, height: number, terrain: Terrain[], start: Point, goal: Point, algorithm: AlgorithmId): Search {
   const from = start.y * width + start.x,
     to = goal.y * width + goal.x;
+  if (algorithm === "dstar-lite") return new DStarLiteSearch(width, height, terrain, start, goal);
+  if (algorithm === "random" || algorithm === "mcts") throw new Error("Algoritma ini memakai controller tindakan, bukan pencarian rute.");
   return algorithm === "bidirectional" ? new BidirectionalSearch(width, height, terrain, from, to) : new ForwardSearch(width, height, terrain, from, to, algorithm);
 }

@@ -6,6 +6,7 @@ import Header from "./Header";
 import Modal from "./Modal";
 import ResultDialog, { resultHeadline } from "./ResultDialog";
 import BoardCanvas from "./BoardCanvas";
+import RuleRibbon from "./RuleRibbon";
 import { getLevel, levels, sections } from "../game/provider";
 import { algorithms, BOT_COLORS, getAlgorithm, unavailableReason, type AlgorithmId, type MatchConfig } from "../game/algorithms";
 import { emptyProgress, isLevelUnlocked, readProgress, recordMatch, subscribeProgress } from "../game/progress";
@@ -14,10 +15,13 @@ import { SimulationController } from "../game/simulation";
 import { themes } from "../game/themes";
 import { TICK_MS, type BotStatus } from "../game/engine";
 import { SEARCH_OPERATIONS_PER_TICK } from "../game/search";
+import { botMetricText, isRaceMode, modeInfo } from "../game/modes";
 
 const statusText: Record<BotStatus, string> = {
   searching: "Menghitung rute",
   moving: "Bergerak",
+  waiting: "Menunggu",
+  eliminated: "Tereliminasi",
   finished: "Selesai",
   unreachable: "Jalan terputus",
   timeout: "Waktu habis",
@@ -241,28 +245,31 @@ function GameSession({ levelId }: { levelId: string }) {
                 onClick={() => setFocused(bot.id)}
                 aria-pressed={bot.id === focused}
                 aria-label={`Amati ${getAlgorithm(bot.algorithm).name}${bot.player ? ", karakter saya" : ""}`}
+                aria-describedby={hasStarted ? `participant-metric-${bot.id}` : undefined}
               >
                 <span className="participant-name">
                   <i>{i + 1}</i>
-                  <strong>
-                    {getAlgorithm(bot.algorithm).short}
-                    {bot.player && hasStarted && <small className="own-bot-label">Kamu</small>}
-                  </strong>
+                  <span className="participant-label">
+                    <strong>{getAlgorithm(bot.algorithm).short}</strong>
+                    <small className="participant-owner">{bot.player ? "Kamu" : "Lawan"}</small>
+                  </span>
                 </span>
-                <span className="participant-score">
-                  {hasStarted
-                    ? level.mode === "gems"
-                      ? `${bot.score} gem`
-                      : bot.status === "stopped"
-                        ? "Belum finis"
-                        : `${(((bot.finishTick ?? state.frame.tick) * TICK_MS) / 1000).toFixed(2)} dtk`
-                    : bot.player
-                      ? "Kamu"
-                      : "Lawan"}
+                <span className="participant-score" id={`participant-metric-${bot.id}`}>
+                  {hasStarted && (
+                    <>
+                      <span className="participant-value">{botMetricText(level.mode, bot, state.frame.tick, level.mode === "cargo" || state.phase === "finished")}</span>
+                      {level.mode === "cargo" && (
+                        <span className="participant-detail">
+                          Tas {bot.inventory}/{level.cargoCapacity}
+                        </span>
+                      )}
+                    </>
+                  )}
                 </span>
               </button>
             ))}
           </div>
+          <RuleRibbon level={level} frame={state.frame} />
           <div className="arena-meta">
             <span style={{ color: theme.color }}>
               <i style={{ background: theme.color }} />
@@ -296,7 +303,7 @@ function GameSession({ levelId }: { levelId: string }) {
                 <p>
                   {state.phase === "ready"
                     ? "Tekan Mulai untuk menjalankan pertandingan."
-                    : `${getAlgorithm(observed.algorithm).short}: ${statusText[observed.status].toLowerCase()} · ${observed.computeOps} operasi`}
+                    : `${getAlgorithm(observed.algorithm).short}: ${statusText[observed.status].toLowerCase()}${level.mode === "race" && level.board.checkpoints.length ? ` · ${observed.checkpoints.length}/${level.board.checkpoints.length} pos` : level.mode === "keys" ? ` · ${observed.keys.length}/${level.board.keys.length} kunci` : level.mode === "cargo" ? ` · tas ${observed.inventory}/${level.cargoCapacity}` : ""} · ${observed.computeOps} operasi`}
                 </p>
               </div>
             </div>
@@ -320,8 +327,12 @@ function GameSession({ levelId }: { levelId: string }) {
             <div>
               <strong>{resultTitle}</strong>
               <p>
-                {winners ? `${winners} ${state.frame.winners.length > 1 ? "berbagi posisi teratas" : "menang"}.` : "Belum ada penjelajah yang mencapai finis."}{" "}
-                {level.mode === "gems" ? `Kamu mendapat ${player.score} gem.` : ""}
+                {winners
+                  ? `${winners} ${state.frame.winners.length > 1 ? "berbagi posisi teratas" : "menang"}.`
+                  : isRaceMode(level.mode)
+                    ? "Belum ada penjelajah yang mencapai finis."
+                    : "Belum ada poin yang diperoleh."}{" "}
+                {!isRaceMode(level.mode) ? `Hasilmu: ${botMetricText(level.mode, player, state.frame.tick, true)}.` : ""}
               </p>
             </div>
             <button className="button secondary next-level" onClick={() => setShowResult(true)}>
@@ -411,7 +422,7 @@ function GameSession({ levelId }: { levelId: string }) {
       </footer>
       {panel && (
         <Modal title="Pilih peserta" onClose={() => setPanel(false)}>
-          <p className="modal-intro">Pilih algoritmamu dan satu sampai tiga lawan.</p>
+          <p className="modal-intro">Pilih algoritmamu dan satu sampai tiga lawan. Setiap peserta memakai algoritma berbeda.</p>
           {participantsAdjusted && (
             <p className="modal-note" role="status">
               Pilihan tersimpan disesuaikan karena Bidirectional BFS membutuhkan medan dengan biaya gerak seragam. Periksa peserta sebelum menekan Save.
@@ -427,7 +438,7 @@ function GameSession({ levelId }: { levelId: string }) {
       )}
       {stats && (
         <Modal title="Statistik pertandingan" onClose={() => setStats(false)}>
-          <p className="modal-intro">Waktu finis = waktu menghitung + perjalanan. Setiap bot mendapat {SEARCH_OPERATIONS_PER_TICK} operasi per tick (0,05 detik).</p>
+          <p className="modal-intro">Waktu pertandingan mencakup menghitung dan perjalanan. Setiap bot mendapat {SEARCH_OPERATIONS_PER_TICK} operasi per tick (0,05 detik).</p>
           <div className="stat-table-wrap">
             <table className="stat-table">
               <thead>
@@ -480,11 +491,8 @@ function GameSession({ levelId }: { levelId: string }) {
       )}
       {help && (
         <Modal title={`Arena ${theme.name.toLowerCase()}`} onClose={() => setHelp(false)}>
-          <p>
-            {level.mode === "race"
-              ? "Cari jalan lalu capai bendera finis. Waktu menghitung ikut dihitung. Pertandingan berhenti pada tick finis pertama; bot yang finis pada tick yang sama berbagi kemenangan."
-              : "Satu gem hanya punya satu pemilik dan memberi satu poin. Bot yang kehilangan target harus menghitung ulang. Jika tiba pada tick yang sama, prioritas ditentukan oleh seed pertandingan, bukan urutan peserta."}
-          </p>
+          <p>{modeInfo[level.mode].help}</p>
+          {level.briefing && <p className="modal-note">{level.briefing}</p>}
           <div className="terrain-guide">
             {(
               [

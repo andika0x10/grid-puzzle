@@ -36,6 +36,7 @@
   "scripts": {
     "test": "vitest run --config vitest.config.ts",
     "test:visual": "node scripts/visual-review.mjs",
+    "test:participants": "node scripts/review-participants.mjs",
     "typecheck": "tsc --noEmit",
     "validate:levels": "tsx scripts/validate-levels.ts",
     "content:build": "tsx scripts/build-content.ts",

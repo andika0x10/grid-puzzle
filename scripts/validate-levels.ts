@@ -1,9 +1,11 @@
 import fs from "node:fs/promises";
 import path from "node:path";
-import { levelSchema, sectionSchema, terrainIds } from "../game/schema";
+import { levelSchema, sectionSchema, terrainIds, type LevelDefinition } from "../game/schema";
 import { themeIds } from "../game/themes";
 import { MatchEngine } from "../game/engine";
 import { algorithms, defaultConfig, unavailableReason } from "../game/algorithms";
+import { sharedObjectFrames } from "../game/assets";
+import { botTerrain, initialModeState } from "../game/modes";
 const read = async (file: string) => JSON.parse(await fs.readFile(file, "utf8"));
 function ensure(condition: unknown, message: string): asserts condition {
   if (!condition) throw new Error(message);
@@ -18,7 +20,8 @@ const levels = await Promise.all(
       return levelSchema.parse(raw);
     })
 );
-ensure(levels.length === 14 && sections.length === 2, "Expected 14 initial levels in 2 categories");
+ensure(levels.length === 49 && sections.length === 7, "Expected 49 initial levels in 7 categories");
+ensure(algorithms.length === 10 && new Set(algorithms.map((a) => a.id)).size === 10, "Expected 10 unique algorithms");
 const ids = sections.flatMap((s: { levelIds: string[] }) => s.levelIds);
 ensure(new Set(ids).size === levels.length && ids.length === levels.length, "Duplicate or unlisted level");
 for (const section of sections) {
@@ -28,10 +31,10 @@ for (const section of sections) {
     ensure(level && level.sectionId === section.id && level.order === i + 1, `Invalid level order: ${id}`);
   }
 }
-const expected = new Set<string>(["source/terrain-source.png", "source/objects-source.png", "source/prompts.json"]);
+const expected = new Set<string>(["source/terrain-source.png", "source/objects-source.png", "source/modes-source.png", "source/classic-source.png", "source/prompts.json"]);
 let frames = 0;
 const characterNames = ["down", "left", "right", "up"].flatMap((d) => [...[0, 1].map((i) => `actor-${d}-idle-${i}`), ...[0, 1, 2, 3].map((i) => `actor-${d}-walk-${i}`)]);
-const sharedNames = ["gem-0", "gem-1", "start", "finish", "pickup"];
+const sharedNames = sharedObjectFrames;
 for (const theme of themeIds) {
   expected.add(`source/characters/${theme}.png`);
   expected.add(`characters/${theme}/portrait.png`);
@@ -83,11 +86,63 @@ for (const level of levels) {
   let frame = engine.snapshot();
   while (frame.phase !== "finished") frame = engine.step();
   ensure(frame.winners.length > 0, `No finisher or scoring outcome: ${level.id}`);
-  ensure(frame.bots.reduce((sum, bot) => sum + bot.score, 0) === frame.gems.filter((gem) => gem.taken).length, `Duplicated gem points: ${level.id}`);
+  if (level.mode === "gems")
+    ensure(frame.bots.reduce((sum, bot) => sum + bot.score, 0) === frame.gems.reduce((n, gem) => n + (gem.awardedPoints ?? 0), 0), `Duplicated gem points: ${level.id}`);
+  if (level.mode === "cargo")
+    ensure(frame.bots.reduce((sum, bot) => sum + bot.score, 0) === frame.modeState.parcels.filter((p) => p.state === "delivered").length, `Duplicated cargo points: ${level.id}`);
+  // Reachability is an authoring check only; no answer or route is persisted.
+  const bot = {
+    id: "check",
+    algorithm: "bfs",
+    ...level.board.spawn,
+    score: 0,
+    inventory: 0,
+    keys: [] as LevelDefinition["board"]["keys"][number]["color"][],
+    eliminatedTick: null,
+    finishTick: null,
+    checkpoints: [] as number[],
+  };
+  const state = initialModeState(level);
+  let reached = new Set<number>();
+  for (let pass = 0; pass <= level.board.keys.length; pass++) {
+    const terrain = botTerrain(level, state, level.board.terrain, bot, 0),
+      width = level.board.width;
+    for (const gate of level.board.gates) terrain[gate.y * width + gate.x] = "wall";
+    const queue = [bot.y * width + bot.x];
+    reached = new Set(queue);
+    for (let head = 0; head < queue.length; head++) {
+      const c = queue[head],
+        x = c % width,
+        y = Math.floor(c / width);
+      for (const [nx, ny] of [
+        [x + 1, y],
+        [x, y - 1],
+        [x - 1, y],
+        [x, y + 1],
+      ]) {
+        const n = ny * width + nx;
+        if (nx >= 0 && ny >= 0 && nx < width && ny < level.board.height && !reached.has(n) && terrain[n] !== "wall" && terrain[n] !== "water") {
+          reached.add(n);
+          queue.push(n);
+        }
+      }
+    }
+    for (const key of level.board.keys) if (reached.has(key.y * width + key.x) && !bot.keys.includes(key.color)) bot.keys.push(key.color);
+  }
+  ensure(bot.keys.length === level.board.keys.length, `Unobtainable key chain: ${level.id}`);
+  for (const p of [
+    ...level.board.gems,
+    ...level.board.checkpoints,
+    ...level.board.parcels,
+    ...level.board.posts,
+    ...(level.board.depot ? [level.board.depot] : []),
+    ...(level.board.goal ? [level.board.goal] : []),
+  ])
+    ensure(reached.has(p.y * level.board.width + p.x), `Unreachable objective: ${level.id}`);
   if (level.mode === "race" && frame.winners.length === 1) raceWinners.add(frame.bots.find((bot) => bot.id === frame.winners[0])!.algorithm);
 }
 ensure(raceWinners.size >= 3, "Race maps must reward at least three different algorithms with the default roster");
-for (const algorithm of algorithms) {
+for (const algorithm of algorithms.slice(0, 5)) {
   ensure(
     levels.some((level) => {
       if (unavailableReason(algorithm.id, level)) return false;

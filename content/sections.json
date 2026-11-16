@@ -3,7 +3,7 @@
     "id": "navigation",
     "order": 1,
     "title": "Balap rute",
-    "subtitle": "Capai finis lebih dulu dari lawan.",
+    "subtitle": "Pilih urutan pos dan taklukkan gerbang berjadwal.",
     "levelIds": [
       "navigation-1",
       "navigation-2",
@@ -18,7 +18,7 @@
     "id": "gems",
     "order": 2,
     "title": "Perebutan gem",
-    "subtitle": "Ambil gem sebanyak mungkin.",
+    "subtitle": "Buru gem berharga, baca gelombang, rebut bonus ganda.",
     "levelIds": [
       "gems-1",
       "gems-2",
@@ -27,6 +27,81 @@
       "gems-5",
       "gems-6",
       "gems-7"
+    ]
+  },
+  {
+    "id": "cargo",
+    "order": 3,
+    "title": "Kurir kargo",
+    "subtitle": "Antar barang sebanyak mungkin ke depot.",
+    "levelIds": [
+      "cargo-1",
+      "cargo-2",
+      "cargo-3",
+      "cargo-4",
+      "cargo-5",
+      "cargo-6",
+      "cargo-7"
+    ]
+  },
+  {
+    "id": "territory",
+    "order": 4,
+    "title": "Rebut wilayah",
+    "subtitle": "Kuasai petak terbanyak sebelum waktu habis.",
+    "levelIds": [
+      "territory-1",
+      "territory-2",
+      "territory-3",
+      "territory-4",
+      "territory-5",
+      "territory-6",
+      "territory-7"
+    ]
+  },
+  {
+    "id": "survival",
+    "order": 5,
+    "title": "Zona selamat",
+    "subtitle": "Hindari bahaya dan bertahan paling lama.",
+    "levelIds": [
+      "survival-1",
+      "survival-2",
+      "survival-3",
+      "survival-4",
+      "survival-5",
+      "survival-6",
+      "survival-7"
+    ]
+  },
+  {
+    "id": "keys",
+    "order": 6,
+    "title": "Kunci dan pintu",
+    "subtitle": "Kumpulkan semua kunci, lalu capai pintu keluar.",
+    "levelIds": [
+      "keys-1",
+      "keys-2",
+      "keys-3",
+      "keys-4",
+      "keys-5",
+      "keys-6",
+      "keys-7"
+    ]
+  },
+  {
+    "id": "outposts",
+    "order": 7,
+    "title": "Rebut pos",
+    "subtitle": "Kuasai pos dan kumpulkan poin terbanyak.",
+    "levelIds": [
+      "outposts-1",
+      "outposts-2",
+      "outposts-3",
+      "outposts-4",
+      "outposts-5",
+      "outposts-6",
+      "outposts-7"
     ]
   }
 ]

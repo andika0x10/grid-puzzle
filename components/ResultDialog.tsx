@@ -2,7 +2,9 @@
 import type { CSSProperties } from "react";
 import Link from "next/link";
 import { BOT_COLORS, getAlgorithm } from "../game/algorithms";
-import { TICK_MS, type MatchFrame } from "../game/engine";
+import type { MatchFrame } from "../game/engine";
+import type { GameMode } from "../game/schema";
+import { botMetricText, isRaceMode, modeInfo } from "../game/modes";
 import Modal from "./Modal";
 import Icon from "./Icon";
 
@@ -23,7 +25,7 @@ export default function ResultDialog({
   saved,
 }: {
   frame: MatchFrame;
-  mode: "race" | "gems";
+  mode: GameMode;
   onClose: () => void;
   onReplay: () => void;
   onSettings: () => void;
@@ -34,12 +36,20 @@ export default function ResultDialog({
   const winners = frame.bots.filter((b) => frame.winners.includes(b.id));
   const playerWon = frame.winners.includes(player.id);
   const winnerNames = winners.map((b) => getAlgorithm(b.algorithm).name).join(" dan ");
-  const ordered = [...frame.bots].sort((a, b) => (mode === "gems" ? b.score - a.score : (a.finishTick ?? Infinity) - (b.finishTick ?? Infinity)));
+  const ordered = [...frame.bots].sort((a, b) =>
+    isRaceMode(mode)
+      ? (a.finishTick ?? Infinity) - (b.finishTick ?? Infinity)
+      : mode === "survival"
+        ? (b.eliminatedTick ?? frame.tick) - (a.eliminatedTick ?? frame.tick)
+        : b.score - a.score
+  );
   const outcome =
     winners.length === 0
-      ? mode === "race"
+      ? isRaceMode(mode)
         ? "Tidak ada bot yang mencapai finis."
-        : "Belum ada gem yang berhasil direbut."
+        : mode === "gems"
+          ? "Belum ada gem yang berhasil direbut."
+          : `Belum ada ${modeInfo[mode].unit} yang diperoleh.`
       : winners.length > 1
         ? `${winnerNames} berbagi kemenangan.${playerWon ? " Bot kamu ikut menang." : ""}`
         : playerWon
@@ -72,17 +82,7 @@ export default function ResultDialog({
                   {won ? " · Pemenang" : ""}
                 </span>
               </div>
-              <b className="result-value">
-                {mode === "gems"
-                  ? `${bot.score} gem`
-                  : bot.finishTick !== null
-                    ? `${((bot.finishTick * TICK_MS) / 1000).toLocaleString("id-ID", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} dtk`
-                    : bot.status === "unreachable"
-                      ? "Jalan terputus"
-                      : bot.status === "timeout"
-                        ? "Waktu habis"
-                        : "Belum finis"}
-              </b>
+              <b className="result-value">{botMetricText(mode, bot, frame.tick, true)}</b>
             </li>
           );
         })}

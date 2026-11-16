@@ -5,6 +5,9 @@ const root = path.resolve("public/assets/game");
 const themeIds = ["farm", "desert", "forest", "snow", "volcano", "factory", "space"];
 const terrainNames = ["ground", "path", "slow", "water", "wall", "bridge-h", "bridge-v", "decor"];
 const directions = ["down", "left", "right", "up"];
+const sharedOnly = process.argv.includes("--shared-only");
+const modeObjects = ["parcel", "depot", "key-red", "key-blue", "key-gold", "door-red", "door-blue", "door-gold", "door-open", "outpost", "hazard-warning", "hazard-active"];
+const classicObjects = ["checkpoint-idle", "checkpoint-done", "gate-open", "gate-closed", "gem-blue", "gem-red", "gem-dormant", "gem-fever"];
 // The painted terrain sheet has uneven rows. Equal divisions pick up pixels
 // from the neighbouring theme (snow edges appeared on every volcanic tile).
 const terrainGrid = {
@@ -75,30 +78,38 @@ async function atlas(directory, sprites, animations = {}) {
     JSON.stringify({ frames, animations, meta: { image: "atlas.png", size: { w: columns * 32, h: rows * 32 }, scale: "1" } }, null, 2) + "\n"
   );
 }
-for (const [row, theme] of themeIds.entries()) {
-  const sprites = [];
-  for (const [column, name] of terrainNames.entries()) sprites.push({ name, buffer: await cell("terrain-source.png", 8, 7, column, row, column < 7) });
-  await atlas(`themes/${theme}`, sprites);
-  await fs.writeFile(path.join(root, `themes/${theme}/decor.png`), sprites[7].buffer);
-}
-for (const theme of themeIds) {
-  const sprites = [],
-    animations = {};
-  for (const [row, direction] of directions.entries()) {
-    for (let column = 0; column < 6; column++) {
-      const name = `actor-${direction}-${column < 2 ? `idle-${column}` : `walk-${column - 2}`}`;
-      sprites.push({ name, buffer: await cell(`characters/${theme}.png`, 6, 4, column, row, false, true) });
-    }
-    for (const [kind, count] of [
-      ["idle", 2],
-      ["walk", 4],
-    ])
-      animations[`actor-${direction}-${kind}`] = Array.from({ length: count }, (_, i) => `actor-${direction}-${kind}-${i}`);
+if (!sharedOnly)
+  for (const [row, theme] of themeIds.entries()) {
+    const sprites = [];
+    for (const [column, name] of terrainNames.entries()) sprites.push({ name, buffer: await cell("terrain-source.png", 8, 7, column, row, column < 7) });
+    await atlas(`themes/${theme}`, sprites);
+    await fs.writeFile(path.join(root, `themes/${theme}/decor.png`), sprites[7].buffer);
   }
-  await atlas(`characters/${theme}`, sprites, animations);
-  await fs.writeFile(path.join(root, `characters/${theme}/portrait.png`), sprites[0].buffer);
-}
+if (!sharedOnly)
+  for (const theme of themeIds) {
+    const sprites = [],
+      animations = {};
+    for (const [row, direction] of directions.entries()) {
+      for (let column = 0; column < 6; column++) {
+        const name = `actor-${direction}-${column < 2 ? `idle-${column}` : `walk-${column - 2}`}`;
+        sprites.push({ name, buffer: await cell(`characters/${theme}.png`, 6, 4, column, row, false, true) });
+      }
+      for (const [kind, count] of [
+        ["idle", 2],
+        ["walk", 4],
+      ])
+        animations[`actor-${direction}-${kind}`] = Array.from({ length: count }, (_, i) => `actor-${direction}-${kind}-${i}`);
+    }
+    await atlas(`characters/${theme}`, sprites, animations);
+    await fs.writeFile(path.join(root, `characters/${theme}/portrait.png`), sprites[0].buffer);
+  }
 const shared = [];
 for (const [column, name] of ["gem-0", "gem-1", "start", "finish", "pickup"].entries()) shared.push({ name, buffer: await cell("objects-source.png", 5, 1, column, 0, false) });
+for (const [index, name] of modeObjects.entries()) shared.push({ name, buffer: await cell("modes-source.png", 4, 3, index % 4, Math.floor(index / 4), false) });
+for (const [index, name] of classicObjects.entries()) shared.push({ name, buffer: await cell("classic-source.png", 4, 2, index % 4, Math.floor(index / 4), false) });
 await atlas("shared", shared);
-console.log("Packed 7 world atlases, 7 human character atlases, 1 shared object atlas, and 14 UI sprites.");
+console.log(
+  sharedOnly
+    ? `Packed shared object atlas with ${shared.length} frames.`
+    : `Packed 7 world atlases, 7 human character atlases, 1 shared object atlas (${shared.length} frames), and 14 UI sprites.`
+);

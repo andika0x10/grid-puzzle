@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
+import { gemActive, gemPending } from "../game/classic";
 import type { LevelDefinition } from "../game/schema";
 import type { MatchFrame } from "../game/engine";
 import type { BoardRenderer } from "../game/renderer";
@@ -76,8 +77,16 @@ export default function BoardCanvas({
         </div>
       )}
       <p className="sr-only">
-        Tick {frame.tick}. {frame.gems.filter((g) => !g.taken).length} gem tersisa.{" "}
-        {frame.bots.map((b) => `${b.algorithm}: kolom ${b.x + 1}, baris ${b.y + 1}, ${b.score} gem`).join(". ")}
+        Tick {frame.tick}. {level.mission}{" "}
+        {level.mode === "gems"
+          ? `${frame.gems.filter((g) => gemActive(g, frame.tick)).length} gem aktif dan ${frame.gems.filter((g) => gemPending(g, frame.tick)).length} gem akan muncul.`
+          : ""}{" "}
+        {frame.bots
+          .map(
+            (b) =>
+              `${b.algorithm}: kolom ${b.x + 1}, baris ${b.y + 1}, skor ${b.score}, ${b.checkpoints.length}/${b.checkpointTotal} pos, tas ${b.inventory}, ${b.keys.length} kunci${b.eliminatedTick !== null ? ", tereliminasi" : ""}`
+          )
+          .join(". ")}
       </p>
     </div>
   );

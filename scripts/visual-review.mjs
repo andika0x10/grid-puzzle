@@ -2,14 +2,22 @@ import assert from "node:assert/strict";
 import fs from "node:fs/promises";
 import { chromium } from "playwright";
 import sharp from "sharp";
+import { assertParticipantLayout } from "./participant-layout.mjs";
 const root = process.argv[2] ?? "http://127.0.0.1:5173",
   output = "artifacts/arena-review";
+const viewportFilter = Number(process.argv.find((arg) => arg.startsWith("--viewport="))?.split("=")[1]) || null;
+const levelFilter = process.argv.find((arg) => arg.startsWith("--level="))?.split("=")[1] ?? null;
+const classicOnly = process.argv.includes("--classic");
 await fs.mkdir(output, { recursive: true });
 const catalog = JSON.parse(await fs.readFile("content/catalog.json", "utf8"));
 const browser = await chromium.launch({ headless: true, args: ["--enable-unsafe-swiftshader"] });
 const errors = [],
   checks = [],
   replayRequests = [];
+const seenViewports = new Set(),
+  seenBoards = new Set(),
+  seenModes = new Set(),
+  seenThemes = new Set();
 function observe(page) {
   page.on("pageerror", (e) => errors.push(e.message));
   page.on("request", (r) => {
@@ -32,6 +40,7 @@ async function layout(page, name) {
     dialog: document.querySelector("dialog[open]")?.getBoundingClientRect().toJSON(),
   }));
   assert.ok(data.documentWidth <= data.width, `${name}: horizontal overflow`);
+  await assertParticipantLayout(page, name);
   if (data.dialog) {
     assert.ok(data.dialog.top >= 0 && data.dialog.bottom <= data.height, `${name}: dialog outside viewport`);
     assert.ok(data.dialog.left >= 0 && data.dialog.right <= data.width, `${name}: dialog wider than viewport`);
@@ -53,10 +62,28 @@ async function layout(page, name) {
   checks.push({ name, ...data });
   await page.screenshot({ path: `${output}/${name}.png` });
 }
-const complete = { version: 3, levels: Object.fromEntries(catalog.levels.map((l) => [l.id, { completed: true, matches: 1, wins: 0, bestTicks: null, bestGems: 0 }])) };
+const complete = { version: 4, levels: Object.fromEntries(catalog.levels.map((l) => [l.id, { completed: true, matches: 1, wins: 0, bestTicks: null, bestGems: 0 }])) };
+const algorithmNames = {
+  astar: "A*",
+  "weighted-astar": "Weighted A*",
+  greedy: "Greedy Best-First",
+  dfs: "Depth-First Search",
+  bidirectional: "Bidirectional BFS",
+  bfs: "Breadth-First Search",
+  dijkstra: "Dijkstra",
+  "dstar-lite": "D* Lite",
+  random: "Random Walk",
+  mcts: "Monte Carlo Tree Search",
+};
 async function resultPopup(page) {
   const dialog = page.getByRole("dialog").filter({ has: page.getByRole("list", { name: "Hasil peserta" }) });
-  await dialog.waitFor({ timeout: 25000 });
+  try {
+    await dialog.waitFor({ timeout: 25000 });
+  } catch (error) {
+    await page.screenshot({ path: `${output}/failure.png` });
+    console.error("Result timeout", page.url(), await page.locator("body").innerText());
+    throw error;
+  }
   const rows = await dialog.locator(".result-standings").evaluate((el) => ({
     height: el.clientHeight,
     firstTwo: [...el.children].slice(0, 2).reduce((sum, row) => sum + row.getBoundingClientRect().height, 0),
@@ -82,7 +109,8 @@ try {
     [844, 390],
     [768, 1024],
     [1440, 900],
-  ]) {
+  ].filter(([width]) => !viewportFilter || width === viewportFilter)) {
+    seenViewports.add(width);
     const context = await browser.newContext({ viewport: { width, height }, reducedMotion: "reduce" });
     const page = await context.newPage();
     observe(page);
@@ -91,16 +119,16 @@ try {
       if (worker.url().includes("simulation.worker")) workers++;
     });
     await page.goto(root, { waitUntil: "networkidle" });
-    await page.getByRole("link", { name: /Level 1 Langkah pertama/ }).waitFor();
+    await page.getByRole("link", { name: /Level 1 Tiga arah/ }).waitFor();
     await layout(page, `home-${width}`);
-    await page.getByRole("link", { name: /Level 1 Langkah pertama/ }).click();
+    await page.getByRole("link", { name: /Level 1 Tiga arah/ }).click();
     await ready(page);
     assert.equal(workers, 0, "Worker started before Play");
     await layout(page, `ready-${width}`);
     {
       const dialog = page.getByRole("dialog", { name: "Pilih peserta" });
       await dialog.waitFor();
-      assert.equal(await dialog.locator(".algorithm-entry").count(), 5);
+      assert.equal(await dialog.locator(".algorithm-entry").count(), 10);
       await dialog.getByRole("radio", { name: "Gunakan Bidirectional BFS" }).check();
       await dialog.getByRole("checkbox", { name: "Lawan Depth-First Search" }).check();
       await dialog.getByRole("button", { name: "Save", exact: true }).click();
@@ -133,34 +161,53 @@ try {
     await dialog.getByRole("button", { name: "Ganti algoritma" }).click();
     assert.ok(await page.getByRole("radio", { name: "Gunakan Bidirectional BFS" }).isChecked());
     await page.keyboard.press("Escape");
-    await page.evaluate((p) => localStorage.setItem("grid-puzzle.progress.v3", JSON.stringify(p)), complete);
+    await page.evaluate((p) => localStorage.setItem("grid-puzzle.progress.v4", JSON.stringify(p)), complete);
     if ([390, 1440].includes(width)) {
-      for (const level of catalog.levels) {
+      for (const level of catalog.levels.filter((level) => (!levelFilter || level.id === levelFilter) && (!classicOnly || level.mode === "race" || level.mode === "gems"))) {
         await page.goto(`${root}/play/${level.id}`, { waitUntil: "networkidle" });
         await ready(page);
         const roster = page.getByRole("dialog", { name: "Pilih peserta" });
         await roster.waitFor();
         const saved = await page.evaluate(() => JSON.parse(localStorage.getItem("grid-puzzle.participants.v1")));
         const unsupported = level.board.terrain.includes("slow") || level.changes.some((change) => change.terrain === "slow");
-        const expectedPlayer =
-          saved.player === "bidirectional" && unsupported
-            ? "A*"
-            : { astar: "A*", "weighted-astar": "Weighted A*", greedy: "Greedy Best-First", dfs: "Depth-First Search", bidirectional: "Bidirectional BFS" }[saved.player];
+        const expectedPlayer = saved.player === "bidirectional" && unsupported ? "A*" : algorithmNames[saved.player];
         assert.ok(await roster.getByRole("radio", { name: `Gunakan ${expectedPlayer}`, exact: true }).isChecked(), "Saved player was not restored");
         await layout(page, `roster-${level.id}-${width}`);
+        if (level.id === "cargo-1" && width === 390) {
+          // Exercise seeded action controllers and incremental pathfinding
+          // together in a real worker.
+          for (const checkbox of await roster.getByRole("checkbox").all()) if (await checkbox.isChecked()) await checkbox.uncheck();
+          await roster.getByRole("radio", { name: "Gunakan Monte Carlo Tree Search", exact: true }).check();
+          for (const name of ["D* Lite", "Random Walk", "Breadth-First Search"]) await roster.getByRole("checkbox", { name: `Lawan ${name}`, exact: true }).check();
+        }
+        if (level.id === "cargo-1" && width === 1440) await roster.getByRole("radio", { name: "Gunakan Dijkstra", exact: true }).check();
         await roster.getByRole("button", { name: "Save", exact: true }).click();
         await layout(page, `${level.id}-${width}`);
-        await page.getByRole("combobox", { name: "Kecepatan simulasi" }).selectOption("4");
-        await page.getByRole("button", { name: "Mulai pertandingan", exact: true }).click();
-        await resultPopup(page);
-        await layout(page, `result-${level.id}-${width}`);
+        seenBoards.add(level.id);
+        seenModes.add(level.mode);
+        seenThemes.add(level.theme);
+        if (level.order === 1 || (level.order === 7 && width === 390)) {
+          await page.getByRole("combobox", { name: "Kecepatan simulasi" }).selectOption("4");
+          await page.getByRole("button", { name: "Mulai pertandingan", exact: true }).click();
+          if (level.order === 1 && (level.mode === "race" || level.mode === "gems")) {
+            await page.waitForFunction(() => Number(document.querySelector(".board-wrap .sr-only").textContent.match(/Tick (\d+)/)?.[1]) >= 180);
+            await page.getByRole("button", { name: "Jeda pertandingan", exact: true }).click();
+            await page.getByLabel("Aturan dan jadwal arena", { exact: true }).waitFor();
+            await layout(page, `live-rules-${level.id}-${width}`);
+            await page.getByRole("button", { name: "Lanjutkan pertandingan", exact: true }).click();
+          }
+          await resultPopup(page);
+          await layout(page, `result-${level.id}-${width}`);
+        }
       }
     }
     await context.close();
   }
   assert.deepEqual(errors, [], "Runtime browser errors");
   assert.deepEqual(replayRequests, [], "Static replay requested");
-  console.log(`Chromium passed: ${checks.length} layouts, 7 viewports, all 14 live levels, 7 themes, four explorers, Pause/step/restart, and no static replays.`);
+  console.log(
+    `Chromium passed: ${checks.length} layouts, ${seenViewports.size} viewports, ${seenBoards.size} boards, ${seenModes.size} modes, ${seenThemes.size} themes, 10 algorithm choices, real worker matches, Pause/step/restart, and no static replays.`
+  );
 } finally {
   await fs.writeFile(`${output}/findings.json`, JSON.stringify({ errors, replayRequests, checks }, null, 2));
   await browser.close();

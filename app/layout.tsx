@@ -4,7 +4,7 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: "Grid Puzzle — Arena petualang",
   icons: { icon: "/assets/game/characters/farm/portrait.png" },
-  description: "Adu algoritma dalam balap petualang dan perebutan gem di tujuh dunia pixel art. Setiap pertandingan dihitung langsung saat Play.",
+  description: "Adu sepuluh algoritma dalam tujuh jenis game dan 49 level pixel art. Setiap pertandingan dihitung langsung saat Play.",
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
