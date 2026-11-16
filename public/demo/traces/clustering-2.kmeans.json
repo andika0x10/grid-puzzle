@@ -1,0 +1,1462 @@
+{
+  "schemaVersion": 1,
+  "levelId": "clustering-2",
+  "optionId": "kmeans",
+  "initial": {
+    "cells": {},
+    "entities": {
+      "robot": {
+        "x": 0,
+        "y": 9,
+        "facing": "down"
+      }
+    },
+    "path": [],
+    "centroids": [],
+    "metrics": {
+      "quality": 0,
+      "groups": 0,
+      "work": 0
+    },
+    "note": "Pilih algoritma, lalu amati apa yang terjadi."
+  },
+  "steps": [
+    {
+      "events": [
+        {
+          "kind": "cell",
+          "x": 1,
+          "y": 1,
+          "state": {
+            "group": 1
+          }
+        },
+        {
+          "kind": "metric",
+          "id": "groups",
+          "value": 2
+        },
+        {
+          "kind": "metric",
+          "id": "work",
+          "value": 2
+        },
+        {
+          "kind": "note",
+          "text": "Memeriksa hubungan bijih emas dengan kelompok di sekitarnya."
+        },
+        {
+          "kind": "centroids",
+          "points": [
+            {
+              "x": 2,
+              "y": 2
+            },
+            {
+              "x": 6,
+              "y": 5
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "events": [
+        {
+          "kind": "cell",
+          "x": 2,
+          "y": 1,
+          "state": {
+            "group": 0
+          }
+        },
+        {
+          "kind": "metric",
+          "id": "groups",
+          "value": 2
+        },
+        {
+          "kind": "metric",
+          "id": "work",
+          "value": 4
+        },
+        {
+          "kind": "note",
+          "text": "Memeriksa hubungan bijih emas dengan kelompok di sekitarnya."
+        },
+        {
+          "kind": "centroids",
+          "points": [
+            {
+              "x": 2,
+              "y": 2
+            },
+            {
+              "x": 6,
+              "y": 5
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "events": [
+        {
+          "kind": "cell",
+          "x": 3,
+          "y": 2,
+          "state": {
+            "group": 0
+          }
+        },
+        {
+          "kind": "metric",
+          "id": "groups",
+          "value": 2
+        },
+        {
+          "kind": "metric",
+          "id": "work",
+          "value": 6
+        },
+        {
+          "kind": "note",
+          "text": "Memeriksa hubungan bijih emas dengan kelompok di sekitarnya."
+        },
+        {
+          "kind": "centroids",
+          "points": [
+            {
+              "x": 2,
+              "y": 2
+            },
+            {
+              "x": 6,
+              "y": 5
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "events": [
+        {
+          "kind": "cell",
+          "x": 3,
+          "y": 3,
+          "state": {
+            "group": 0
+          }
+        },
+        {
+          "kind": "metric",
+          "id": "groups",
+          "value": 2
+        },
+        {
+          "kind": "metric",
+          "id": "work",
+          "value": 8
+        },
+        {
+          "kind": "note",
+          "text": "Memeriksa hubungan bijih emas dengan kelompok di sekitarnya."
+        },
+        {
+          "kind": "centroids",
+          "points": [
+            {
+              "x": 2,
+              "y": 2
+            },
+            {
+              "x": 6,
+              "y": 5
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "events": [
+        {
+          "kind": "cell",
+          "x": 2,
+          "y": 4,
+          "state": {
+            "group": 0
+          }
+        },
+        {
+          "kind": "metric",
+          "id": "groups",
+          "value": 2
+        },
+        {
+          "kind": "metric",
+          "id": "work",
+          "value": 10
+        },
+        {
+          "kind": "note",
+          "text": "Memeriksa hubungan bijih emas dengan kelompok di sekitarnya."
+        },
+        {
+          "kind": "centroids",
+          "points": [
+            {
+              "x": 2,
+              "y": 2
+            },
+            {
+              "x": 6,
+              "y": 5
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "events": [
+        {
+          "kind": "cell",
+          "x": 1,
+          "y": 4,
+          "state": {
+            "group": 1
+          }
+        },
+        {
+          "kind": "metric",
+          "id": "groups",
+          "value": 2
+        },
+        {
+          "kind": "metric",
+          "id": "work",
+          "value": 12
+        },
+        {
+          "kind": "note",
+          "text": "Memeriksa hubungan bijih emas dengan kelompok di sekitarnya."
+        },
+        {
+          "kind": "centroids",
+          "points": [
+            {
+              "x": 2,
+              "y": 2
+            },
+            {
+              "x": 6,
+              "y": 5
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "events": [
+        {
+          "kind": "cell",
+          "x": 7,
+          "y": 4,
+          "state": {
+            "group": 1
+          }
+        },
+        {
+          "kind": "metric",
+          "id": "groups",
+          "value": 2
+        },
+        {
+          "kind": "metric",
+          "id": "work",
+          "value": 14
+        },
+        {
+          "kind": "note",
+          "text": "Memeriksa hubungan bijih emas dengan kelompok di sekitarnya."
+        },
+        {
+          "kind": "centroids",
+          "points": [
+            {
+              "x": 2,
+              "y": 2
+            },
+            {
+              "x": 6,
+              "y": 5
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "events": [
+        {
+          "kind": "cell",
+          "x": 8,
+          "y": 4,
+          "state": {
+            "group": 1
+          }
+        },
+        {
+          "kind": "metric",
+          "id": "groups",
+          "value": 2
+        },
+        {
+          "kind": "metric",
+          "id": "work",
+          "value": 16
+        },
+        {
+          "kind": "note",
+          "text": "Memeriksa hubungan bijih emas dengan kelompok di sekitarnya."
+        },
+        {
+          "kind": "centroids",
+          "points": [
+            {
+              "x": 2,
+              "y": 2
+            },
+            {
+              "x": 6,
+              "y": 5
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "events": [
+        {
+          "kind": "cell",
+          "x": 9,
+          "y": 5,
+          "state": {
+            "group": 0
+          }
+        },
+        {
+          "kind": "metric",
+          "id": "groups",
+          "value": 2
+        },
+        {
+          "kind": "metric",
+          "id": "work",
+          "value": 18
+        },
+        {
+          "kind": "note",
+          "text": "Memeriksa hubungan bijih emas dengan kelompok di sekitarnya."
+        },
+        {
+          "kind": "centroids",
+          "points": [
+            {
+              "x": 2,
+              "y": 2
+            },
+            {
+              "x": 6,
+              "y": 5
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "events": [
+        {
+          "kind": "cell",
+          "x": 9,
+          "y": 6,
+          "state": {
+            "group": 1
+          }
+        },
+        {
+          "kind": "metric",
+          "id": "groups",
+          "value": 2
+        },
+        {
+          "kind": "metric",
+          "id": "work",
+          "value": 20
+        },
+        {
+          "kind": "note",
+          "text": "Memeriksa hubungan bijih emas dengan kelompok di sekitarnya."
+        },
+        {
+          "kind": "centroids",
+          "points": [
+            {
+              "x": 2,
+              "y": 2
+            },
+            {
+              "x": 6,
+              "y": 5
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "events": [
+        {
+          "kind": "cell",
+          "x": 8,
+          "y": 7,
+          "state": {
+            "group": 1
+          }
+        },
+        {
+          "kind": "metric",
+          "id": "groups",
+          "value": 2
+        },
+        {
+          "kind": "metric",
+          "id": "work",
+          "value": 22
+        },
+        {
+          "kind": "note",
+          "text": "Memeriksa hubungan bijih emas dengan kelompok di sekitarnya."
+        },
+        {
+          "kind": "centroids",
+          "points": [
+            {
+              "x": 2,
+              "y": 2
+            },
+            {
+              "x": 6,
+              "y": 5
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "events": [
+        {
+          "kind": "cell",
+          "x": 7,
+          "y": 7,
+          "state": {
+            "group": 1
+          }
+        },
+        {
+          "kind": "metric",
+          "id": "groups",
+          "value": 2
+        },
+        {
+          "kind": "metric",
+          "id": "work",
+          "value": 24
+        },
+        {
+          "kind": "note",
+          "text": "Memeriksa hubungan bijih emas dengan kelompok di sekitarnya."
+        },
+        {
+          "kind": "centroids",
+          "points": [
+            {
+              "x": 2,
+              "y": 2
+            },
+            {
+              "x": 6,
+              "y": 5
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "events": [
+        {
+          "kind": "cell",
+          "x": 1,
+          "y": 1,
+          "state": {
+            "group": 1
+          }
+        },
+        {
+          "kind": "metric",
+          "id": "groups",
+          "value": 2
+        },
+        {
+          "kind": "metric",
+          "id": "work",
+          "value": 26
+        },
+        {
+          "kind": "note",
+          "text": "Memperbarui penempatan kelompok dan pusatnya."
+        },
+        {
+          "kind": "centroids",
+          "points": [
+            {
+              "x": 2,
+              "y": 2
+            },
+            {
+              "x": 6,
+              "y": 5
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "events": [
+        {
+          "kind": "cell",
+          "x": 2,
+          "y": 1,
+          "state": {
+            "group": 0
+          }
+        },
+        {
+          "kind": "metric",
+          "id": "groups",
+          "value": 2
+        },
+        {
+          "kind": "metric",
+          "id": "work",
+          "value": 28
+        },
+        {
+          "kind": "note",
+          "text": "Memperbarui penempatan kelompok dan pusatnya."
+        },
+        {
+          "kind": "centroids",
+          "points": [
+            {
+              "x": 2,
+              "y": 2
+            },
+            {
+              "x": 6,
+              "y": 5
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "events": [
+        {
+          "kind": "cell",
+          "x": 3,
+          "y": 2,
+          "state": {
+            "group": 0
+          }
+        },
+        {
+          "kind": "metric",
+          "id": "groups",
+          "value": 2
+        },
+        {
+          "kind": "metric",
+          "id": "work",
+          "value": 30
+        },
+        {
+          "kind": "note",
+          "text": "Memperbarui penempatan kelompok dan pusatnya."
+        },
+        {
+          "kind": "centroids",
+          "points": [
+            {
+              "x": 2,
+              "y": 2
+            },
+            {
+              "x": 6,
+              "y": 5
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "events": [
+        {
+          "kind": "cell",
+          "x": 3,
+          "y": 3,
+          "state": {
+            "group": 0
+          }
+        },
+        {
+          "kind": "metric",
+          "id": "groups",
+          "value": 2
+        },
+        {
+          "kind": "metric",
+          "id": "work",
+          "value": 32
+        },
+        {
+          "kind": "note",
+          "text": "Memperbarui penempatan kelompok dan pusatnya."
+        },
+        {
+          "kind": "centroids",
+          "points": [
+            {
+              "x": 2,
+              "y": 2
+            },
+            {
+              "x": 6,
+              "y": 5
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "events": [
+        {
+          "kind": "cell",
+          "x": 2,
+          "y": 4,
+          "state": {
+            "group": 0
+          }
+        },
+        {
+          "kind": "metric",
+          "id": "groups",
+          "value": 2
+        },
+        {
+          "kind": "metric",
+          "id": "work",
+          "value": 34
+        },
+        {
+          "kind": "note",
+          "text": "Memperbarui penempatan kelompok dan pusatnya."
+        },
+        {
+          "kind": "centroids",
+          "points": [
+            {
+              "x": 2,
+              "y": 2
+            },
+            {
+              "x": 6,
+              "y": 5
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "events": [
+        {
+          "kind": "cell",
+          "x": 1,
+          "y": 4,
+          "state": {
+            "group": 1
+          }
+        },
+        {
+          "kind": "metric",
+          "id": "groups",
+          "value": 2
+        },
+        {
+          "kind": "metric",
+          "id": "work",
+          "value": 36
+        },
+        {
+          "kind": "note",
+          "text": "Memperbarui penempatan kelompok dan pusatnya."
+        },
+        {
+          "kind": "centroids",
+          "points": [
+            {
+              "x": 2,
+              "y": 2
+            },
+            {
+              "x": 6,
+              "y": 5
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "events": [
+        {
+          "kind": "cell",
+          "x": 7,
+          "y": 4,
+          "state": {
+            "group": 1
+          }
+        },
+        {
+          "kind": "metric",
+          "id": "groups",
+          "value": 2
+        },
+        {
+          "kind": "metric",
+          "id": "work",
+          "value": 38
+        },
+        {
+          "kind": "note",
+          "text": "Memperbarui penempatan kelompok dan pusatnya."
+        },
+        {
+          "kind": "centroids",
+          "points": [
+            {
+              "x": 2,
+              "y": 2
+            },
+            {
+              "x": 6,
+              "y": 5
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "events": [
+        {
+          "kind": "cell",
+          "x": 8,
+          "y": 4,
+          "state": {
+            "group": 1
+          }
+        },
+        {
+          "kind": "metric",
+          "id": "groups",
+          "value": 2
+        },
+        {
+          "kind": "metric",
+          "id": "work",
+          "value": 40
+        },
+        {
+          "kind": "note",
+          "text": "Memperbarui penempatan kelompok dan pusatnya."
+        },
+        {
+          "kind": "centroids",
+          "points": [
+            {
+              "x": 2,
+              "y": 2
+            },
+            {
+              "x": 6,
+              "y": 5
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "events": [
+        {
+          "kind": "cell",
+          "x": 9,
+          "y": 5,
+          "state": {
+            "group": 0
+          }
+        },
+        {
+          "kind": "metric",
+          "id": "groups",
+          "value": 2
+        },
+        {
+          "kind": "metric",
+          "id": "work",
+          "value": 42
+        },
+        {
+          "kind": "note",
+          "text": "Memperbarui penempatan kelompok dan pusatnya."
+        },
+        {
+          "kind": "centroids",
+          "points": [
+            {
+              "x": 2,
+              "y": 2
+            },
+            {
+              "x": 6,
+              "y": 5
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "events": [
+        {
+          "kind": "cell",
+          "x": 9,
+          "y": 6,
+          "state": {
+            "group": 1
+          }
+        },
+        {
+          "kind": "metric",
+          "id": "groups",
+          "value": 2
+        },
+        {
+          "kind": "metric",
+          "id": "work",
+          "value": 44
+        },
+        {
+          "kind": "note",
+          "text": "Memperbarui penempatan kelompok dan pusatnya."
+        },
+        {
+          "kind": "centroids",
+          "points": [
+            {
+              "x": 2,
+              "y": 2
+            },
+            {
+              "x": 6,
+              "y": 5
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "events": [
+        {
+          "kind": "cell",
+          "x": 8,
+          "y": 7,
+          "state": {
+            "group": 1
+          }
+        },
+        {
+          "kind": "metric",
+          "id": "groups",
+          "value": 2
+        },
+        {
+          "kind": "metric",
+          "id": "work",
+          "value": 46
+        },
+        {
+          "kind": "note",
+          "text": "Memperbarui penempatan kelompok dan pusatnya."
+        },
+        {
+          "kind": "centroids",
+          "points": [
+            {
+              "x": 2,
+              "y": 2
+            },
+            {
+              "x": 6,
+              "y": 5
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "events": [
+        {
+          "kind": "cell",
+          "x": 7,
+          "y": 7,
+          "state": {
+            "group": 1
+          }
+        },
+        {
+          "kind": "metric",
+          "id": "groups",
+          "value": 2
+        },
+        {
+          "kind": "metric",
+          "id": "work",
+          "value": 48
+        },
+        {
+          "kind": "note",
+          "text": "Memperbarui penempatan kelompok dan pusatnya."
+        },
+        {
+          "kind": "centroids",
+          "points": [
+            {
+              "x": 2,
+              "y": 2
+            },
+            {
+              "x": 6,
+              "y": 5
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "events": [
+        {
+          "kind": "cell",
+          "x": 1,
+          "y": 1,
+          "state": {
+            "group": 0
+          }
+        },
+        {
+          "kind": "metric",
+          "id": "groups",
+          "value": 2
+        },
+        {
+          "kind": "metric",
+          "id": "work",
+          "value": 50
+        },
+        {
+          "kind": "note",
+          "text": "Memperbarui penempatan kelompok dan pusatnya."
+        },
+        {
+          "kind": "centroids",
+          "points": [
+            {
+              "x": 2,
+              "y": 2
+            },
+            {
+              "x": 6,
+              "y": 5
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "events": [
+        {
+          "kind": "cell",
+          "x": 2,
+          "y": 1,
+          "state": {
+            "group": 0
+          }
+        },
+        {
+          "kind": "metric",
+          "id": "groups",
+          "value": 2
+        },
+        {
+          "kind": "metric",
+          "id": "work",
+          "value": 52
+        },
+        {
+          "kind": "note",
+          "text": "Memperbarui penempatan kelompok dan pusatnya."
+        },
+        {
+          "kind": "centroids",
+          "points": [
+            {
+              "x": 2,
+              "y": 2
+            },
+            {
+              "x": 6,
+              "y": 5
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "events": [
+        {
+          "kind": "cell",
+          "x": 3,
+          "y": 2,
+          "state": {
+            "group": 0
+          }
+        },
+        {
+          "kind": "metric",
+          "id": "groups",
+          "value": 2
+        },
+        {
+          "kind": "metric",
+          "id": "work",
+          "value": 54
+        },
+        {
+          "kind": "note",
+          "text": "Memperbarui penempatan kelompok dan pusatnya."
+        },
+        {
+          "kind": "centroids",
+          "points": [
+            {
+              "x": 2,
+              "y": 2
+            },
+            {
+              "x": 6,
+              "y": 5
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "events": [
+        {
+          "kind": "cell",
+          "x": 3,
+          "y": 3,
+          "state": {
+            "group": 0
+          }
+        },
+        {
+          "kind": "metric",
+          "id": "groups",
+          "value": 2
+        },
+        {
+          "kind": "metric",
+          "id": "work",
+          "value": 56
+        },
+        {
+          "kind": "note",
+          "text": "Memperbarui penempatan kelompok dan pusatnya."
+        },
+        {
+          "kind": "centroids",
+          "points": [
+            {
+              "x": 2,
+              "y": 2
+            },
+            {
+              "x": 6,
+              "y": 5
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "events": [
+        {
+          "kind": "cell",
+          "x": 2,
+          "y": 4,
+          "state": {
+            "group": 1
+          }
+        },
+        {
+          "kind": "metric",
+          "id": "groups",
+          "value": 2
+        },
+        {
+          "kind": "metric",
+          "id": "work",
+          "value": 58
+        },
+        {
+          "kind": "note",
+          "text": "Memperbarui penempatan kelompok dan pusatnya."
+        },
+        {
+          "kind": "centroids",
+          "points": [
+            {
+              "x": 2,
+              "y": 2
+            },
+            {
+              "x": 6,
+              "y": 5
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "events": [
+        {
+          "kind": "cell",
+          "x": 1,
+          "y": 4,
+          "state": {
+            "group": 1
+          }
+        },
+        {
+          "kind": "metric",
+          "id": "groups",
+          "value": 2
+        },
+        {
+          "kind": "metric",
+          "id": "work",
+          "value": 60
+        },
+        {
+          "kind": "note",
+          "text": "Memperbarui penempatan kelompok dan pusatnya."
+        },
+        {
+          "kind": "centroids",
+          "points": [
+            {
+              "x": 2,
+              "y": 2
+            },
+            {
+              "x": 6,
+              "y": 5
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "events": [
+        {
+          "kind": "cell",
+          "x": 7,
+          "y": 4,
+          "state": {
+            "group": 1
+          }
+        },
+        {
+          "kind": "metric",
+          "id": "groups",
+          "value": 2
+        },
+        {
+          "kind": "metric",
+          "id": "work",
+          "value": 62
+        },
+        {
+          "kind": "note",
+          "text": "Memperbarui penempatan kelompok dan pusatnya."
+        },
+        {
+          "kind": "centroids",
+          "points": [
+            {
+              "x": 2,
+              "y": 2
+            },
+            {
+              "x": 6,
+              "y": 5
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "events": [
+        {
+          "kind": "cell",
+          "x": 8,
+          "y": 4,
+          "state": {
+            "group": 1
+          }
+        },
+        {
+          "kind": "metric",
+          "id": "groups",
+          "value": 2
+        },
+        {
+          "kind": "metric",
+          "id": "work",
+          "value": 64
+        },
+        {
+          "kind": "note",
+          "text": "Memperbarui penempatan kelompok dan pusatnya."
+        },
+        {
+          "kind": "centroids",
+          "points": [
+            {
+              "x": 2,
+              "y": 2
+            },
+            {
+              "x": 6,
+              "y": 5
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "events": [
+        {
+          "kind": "cell",
+          "x": 9,
+          "y": 5,
+          "state": {
+            "group": 1
+          }
+        },
+        {
+          "kind": "metric",
+          "id": "groups",
+          "value": 2
+        },
+        {
+          "kind": "metric",
+          "id": "work",
+          "value": 66
+        },
+        {
+          "kind": "note",
+          "text": "Memperbarui penempatan kelompok dan pusatnya."
+        },
+        {
+          "kind": "centroids",
+          "points": [
+            {
+              "x": 2,
+              "y": 2
+            },
+            {
+              "x": 6,
+              "y": 5
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "events": [
+        {
+          "kind": "cell",
+          "x": 9,
+          "y": 6,
+          "state": {
+            "group": 1
+          }
+        },
+        {
+          "kind": "metric",
+          "id": "groups",
+          "value": 2
+        },
+        {
+          "kind": "metric",
+          "id": "work",
+          "value": 68
+        },
+        {
+          "kind": "note",
+          "text": "Memperbarui penempatan kelompok dan pusatnya."
+        },
+        {
+          "kind": "centroids",
+          "points": [
+            {
+              "x": 2,
+              "y": 2
+            },
+            {
+              "x": 6,
+              "y": 5
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "events": [
+        {
+          "kind": "cell",
+          "x": 8,
+          "y": 7,
+          "state": {
+            "group": 1
+          }
+        },
+        {
+          "kind": "metric",
+          "id": "groups",
+          "value": 2
+        },
+        {
+          "kind": "metric",
+          "id": "work",
+          "value": 70
+        },
+        {
+          "kind": "note",
+          "text": "Memperbarui penempatan kelompok dan pusatnya."
+        },
+        {
+          "kind": "centroids",
+          "points": [
+            {
+              "x": 2,
+              "y": 2
+            },
+            {
+              "x": 6,
+              "y": 5
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "events": [
+        {
+          "kind": "cell",
+          "x": 7,
+          "y": 7,
+          "state": {
+            "group": 1
+          }
+        },
+        {
+          "kind": "metric",
+          "id": "groups",
+          "value": 2
+        },
+        {
+          "kind": "metric",
+          "id": "work",
+          "value": 72
+        },
+        {
+          "kind": "note",
+          "text": "Memperbarui penempatan kelompok dan pusatnya."
+        },
+        {
+          "kind": "centroids",
+          "points": [
+            {
+              "x": 2,
+              "y": 2
+            },
+            {
+              "x": 6,
+              "y": 5
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "events": [
+        {
+          "kind": "metric",
+          "id": "quality",
+          "value": 70
+        },
+        {
+          "kind": "metric",
+          "id": "groups",
+          "value": 2
+        },
+        {
+          "kind": "metric",
+          "id": "work",
+          "value": 72
+        },
+        {
+          "kind": "note",
+          "text": "Bentuk kelompok pada rekaman ini belum sesuai dengan pola misi. Coba pendekatan lain."
+        }
+      ]
+    }
+  ],
+  "result": {
+    "passed": false,
+    "tier": "failed",
+    "reason": "Bentuk kelompok pada rekaman ini belum sesuai dengan pola misi. Coba pendekatan lain.",
+    "metrics": {
+      "quality": 70,
+      "groups": 2,
+      "work": 72
+    }
+  }
+}

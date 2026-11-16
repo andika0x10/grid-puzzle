@@ -1,0 +1,52 @@
+{
+  "name": "grid-puzzle",
+  "version": "0.1.0",
+  "private": true,
+  "packageManager": "npm",
+  "dependencies": {
+    "@vinext/cloudflare": "latest",
+    "pixi.js": "^8.23.0",
+    "react": "latest",
+    "react-dom": "latest",
+    "react-server-dom-webpack": "latest",
+    "vinext": "latest",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "@cloudflare/vite-plugin": "beta",
+    "@tailwindcss/postcss": "latest",
+    "@testing-library/react": "^16.3.3",
+    "@testing-library/user-event": "^14.6.10",
+    "@types/node": "latest",
+    "@types/react": "latest",
+    "@types/react-dom": "latest",
+    "@vitejs/plugin-react": "latest",
+    "@vitejs/plugin-rsc": "latest",
+    "cf": "^1.0.0-beta.32",
+    "happy-dom": "^21.0.4",
+    "playwright": "^1.65.1",
+    "prettier": "3.10.1",
+    "sharp": "^0.35.5",
+    "tailwindcss": "latest",
+    "tsx": "^4.23.15",
+    "typescript": "latest",
+    "vite": "8.3.0",
+    "vitest": "^5.1.0"
+  },
+  "type": "module",
+  "scripts": {
+    "test": "vitest run --config vitest.config.ts",
+    "test:visual": "node scripts/visual-review.mjs",
+    "typecheck": "tsc --noEmit",
+    "validate:levels": "tsx scripts/validate-levels.ts",
+    "content:build": "tsx scripts/build-content.ts",
+    "assets:build": "node scripts/pack-assets.mjs",
+    "dev": "vite dev",
+    "build": "vite build",
+    "start": "vite preview",
+    "deploy": "vinext-cloudflare deploy",
+    "preview": "npm run build && npm run start --",
+    "cf-typegen": "cf workers types",
+    "format": "prettier --write ."
+  }
+}

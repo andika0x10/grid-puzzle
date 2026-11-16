@@ -1,0 +1,29 @@
+import Link from "next/link";
+import Icon from "./Icon";
+export default function Header({ compact = false, completed, total = 10 }: { compact?: boolean; completed?: number; total?: number }) {
+  return (
+    <header className={`site-header ${compact ? "compact-header" : ""}`}>
+      <div className="header-inner">
+        <Link href="/" className="brand" aria-label="Grid Puzzle, beranda">
+          Grid Puzzle
+        </Link>
+        {compact ? (
+          <Link className="header-link" href="/">
+            <Icon name="grid" size={18} />
+            Semua level
+          </Link>
+        ) : completed !== undefined ? (
+          <div className="header-progress">
+            <Icon name="check" size={19} />
+            <span>
+              <strong>{completed}</strong> / {total} level
+            </span>
+            <progress value={completed} max={total} aria-label={`${completed} dari ${total} level selesai`} />
+          </div>
+        ) : (
+          <span className="header-label">Demo</span>
+        )}
+      </div>
+    </header>
+  );
+}

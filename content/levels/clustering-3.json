@@ -1,0 +1,301 @@
+{
+  "schemaVersion": 1,
+  "id": "clustering-3",
+  "sectionId": "clustering",
+  "order": 3,
+  "title": "Titik pencilan",
+  "description": "Beberapa titik bijih emas terpisah dari kelompoknya.",
+  "mission": "Kelompokkan bijih emas dengan kecocokan pola minimal 90%.",
+  "tip": "Kecocokan dihitung dari hubungan antartitik pada pola contoh. Parameter metode sudah ditetapkan dalam rekaman demo.",
+  "mechanic": "clustering",
+  "theme": "desert",
+  "board": {
+    "width": 12,
+    "height": 10,
+    "terrain": [
+      "grass",
+      "grass",
+      "grass",
+      "grass",
+      "grass",
+      "grass",
+      "grass",
+      "grass",
+      "grass",
+      "grass",
+      "grass",
+      "grass",
+      "grass",
+      "grass",
+      "grass",
+      "grass",
+      "grass",
+      "grass",
+      "grass",
+      "grass",
+      "grass",
+      "grass",
+      "grass",
+      "grass",
+      "grass",
+      "grass",
+      "grass",
+      "grass",
+      "grass",
+      "grass",
+      "grass",
+      "grass",
+      "grass",
+      "grass",
+      "grass",
+      "grass",
+      "grass",
+      "grass",
+      "grass",
+      "grass",
+      "grass",
+      "grass",
+      "grass",
+      "grass",
+      "grass",
+      "grass",
+      "grass",
+      "grass",
+      "grass",
+      "grass",
+      "grass",
+      "grass",
+      "grass",
+      "grass",
+      "grass",
+      "grass",
+      "grass",
+      "grass",
+      "grass",
+      "grass",
+      "grass",
+      "grass",
+      "grass",
+      "grass",
+      "grass",
+      "grass",
+      "grass",
+      "grass",
+      "grass",
+      "grass",
+      "grass",
+      "grass",
+      "grass",
+      "grass",
+      "grass",
+      "grass",
+      "grass",
+      "grass",
+      "grass",
+      "grass",
+      "grass",
+      "grass",
+      "grass",
+      "grass",
+      "grass",
+      "grass",
+      "grass",
+      "grass",
+      "grass",
+      "grass",
+      "grass",
+      "grass",
+      "grass",
+      "grass",
+      "grass",
+      "grass",
+      "grass",
+      "grass",
+      "grass",
+      "grass",
+      "grass",
+      "grass",
+      "grass",
+      "grass",
+      "grass",
+      "grass",
+      "grass",
+      "grass",
+      "grass",
+      "grass",
+      "grass",
+      "grass",
+      "grass",
+      "grass",
+      "grass",
+      "grass",
+      "grass",
+      "grass",
+      "grass",
+      "grass"
+    ],
+    "robot": {
+      "x": 0,
+      "y": 9
+    },
+    "objects": [
+      {
+        "id": "crystal-0",
+        "asset": "crystal",
+        "x": 1,
+        "y": 2
+      },
+      {
+        "id": "crystal-1",
+        "asset": "crystal",
+        "x": 2,
+        "y": 2
+      },
+      {
+        "id": "crystal-2",
+        "asset": "crystal",
+        "x": 1,
+        "y": 3
+      },
+      {
+        "id": "crystal-3",
+        "asset": "crystal",
+        "x": 2,
+        "y": 3
+      },
+      {
+        "id": "crystal-4",
+        "asset": "crystal",
+        "x": 3,
+        "y": 3
+      },
+      {
+        "id": "crystal-5",
+        "asset": "crystal",
+        "x": 8,
+        "y": 5
+      },
+      {
+        "id": "crystal-6",
+        "asset": "crystal",
+        "x": 9,
+        "y": 5
+      },
+      {
+        "id": "crystal-7",
+        "asset": "crystal",
+        "x": 8,
+        "y": 6
+      },
+      {
+        "id": "crystal-8",
+        "asset": "crystal",
+        "x": 9,
+        "y": 6
+      },
+      {
+        "id": "crystal-9",
+        "asset": "crystal",
+        "x": 10,
+        "y": 6
+      },
+      {
+        "id": "crystal-10",
+        "asset": "crystal",
+        "x": 5,
+        "y": 1
+      },
+      {
+        "id": "crystal-11",
+        "asset": "crystal",
+        "x": 5,
+        "y": 8
+      },
+      {
+        "id": "crate",
+        "asset": "crate",
+        "x": 0,
+        "y": 8
+      },
+      {
+        "id": "bush",
+        "asset": "bush",
+        "x": 11,
+        "y": 0
+      },
+      {
+        "id": "cactus",
+        "asset": "tree",
+        "x": 11,
+        "y": 9
+      }
+    ]
+  },
+  "options": [
+    {
+      "id": "kmeans",
+      "name": "K-means",
+      "description": "Pusat kelompok bergerak mengikuti titik.",
+      "detail": "Jumlah kelompok ditetapkan oleh level. Titik dan pusat kelompok diperbarui bergantian."
+    },
+    {
+      "id": "dbscan",
+      "name": "DBSCAN",
+      "description": "Hubungkan tetangga yang cukup rapat.",
+      "detail": "Memperluas kelompok berdasarkan radius dan kepadatan; titik tertentu dapat menjadi pencilan."
+    },
+    {
+      "id": "agglomerative",
+      "name": "Agglomerative",
+      "description": "Gabungkan kelompok kecil bertahap.",
+      "detail": "Membangun hierarki dari titik-titik terpisah hingga menjadi kelompok yang lebih besar."
+    },
+    {
+      "id": "meanshift",
+      "name": "Mean Shift",
+      "description": "Bergerak menuju pusat kepadatan.",
+      "detail": "Jendela pencarian bergerak mengikuti konsentrasi titik dalam lingkungan sekitarnya."
+    },
+    {
+      "id": "optics",
+      "name": "OPTICS",
+      "description": "Telusuri struktur kepadatan titik.",
+      "detail": "Mengurutkan keterjangkauan titik untuk membantu menemukan struktur kelompok pada beberapa skala."
+    }
+  ],
+  "metrics": [
+    {
+      "id": "quality",
+      "label": "Kecocokan pola",
+      "unit": "%",
+      "description": "Hubungan pasangan titik yang sesuai dengan pola contoh.",
+      "goal": "higher",
+      "required": true,
+      "limit": 90
+    },
+    {
+      "id": "groups",
+      "label": "Kelompok",
+      "unit": "grup",
+      "description": "Jumlah kelompok yang terbentuk; pencilan tidak dihitung.",
+      "goal": "exact",
+      "required": false,
+      "limit": 2
+    },
+    {
+      "id": "work",
+      "label": "Kerja komputasi",
+      "unit": "operasi",
+      "description": "Ilustrasi pekerjaan yang direkam pada storyboard ini.",
+      "goal": "lower",
+      "required": false
+    }
+  ],
+  "traceRefs": {
+    "kmeans": "/demo/traces/clustering-3.kmeans.json",
+    "dbscan": "/demo/traces/clustering-3.dbscan.json",
+    "agglomerative": "/demo/traces/clustering-3.agglomerative.json",
+    "meanshift": "/demo/traces/clustering-3.meanshift.json",
+    "optics": "/demo/traces/clustering-3.optics.json"
+  }
+}

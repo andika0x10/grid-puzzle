@@ -1,0 +1,1131 @@
+{
+  "schemaVersion": 1,
+  "levelId": "navigation-1",
+  "optionId": "greedy",
+  "initial": {
+    "cells": {},
+    "entities": {
+      "robot": {
+        "x": 1,
+        "y": 5,
+        "facing": "down"
+      }
+    },
+    "path": [],
+    "centroids": [],
+    "metrics": {
+      "cost": 0,
+      "work": 0,
+      "memory": 0
+    },
+    "note": "Pilih algoritma, lalu amati apa yang terjadi."
+  },
+  "steps": [
+    {
+      "events": [
+        {
+          "kind": "cell",
+          "x": 1,
+          "y": 5,
+          "state": {
+            "status": "visited"
+          }
+        },
+        {
+          "kind": "metric",
+          "id": "work",
+          "value": 1
+        },
+        {
+          "kind": "metric",
+          "id": "memory",
+          "value": 1
+        },
+        {
+          "kind": "note",
+          "text": "Memeriksa sel dengan perkiraan jarak terdekat."
+        }
+      ]
+    },
+    {
+      "events": [
+        {
+          "kind": "cell",
+          "x": 1,
+          "y": 4,
+          "state": {
+            "status": "frontier"
+          }
+        },
+        {
+          "kind": "cell",
+          "x": 2,
+          "y": 5,
+          "state": {
+            "status": "visited"
+          }
+        },
+        {
+          "kind": "metric",
+          "id": "work",
+          "value": 7
+        },
+        {
+          "kind": "metric",
+          "id": "memory",
+          "value": 3
+        },
+        {
+          "kind": "note",
+          "text": "Memeriksa sel dengan perkiraan jarak terdekat."
+        }
+      ]
+    },
+    {
+      "events": [
+        {
+          "kind": "cell",
+          "x": 1,
+          "y": 4,
+          "state": {
+            "status": "frontier"
+          }
+        },
+        {
+          "kind": "cell",
+          "x": 3,
+          "y": 5,
+          "state": {
+            "status": "visited"
+          }
+        },
+        {
+          "kind": "metric",
+          "id": "work",
+          "value": 13
+        },
+        {
+          "kind": "metric",
+          "id": "memory",
+          "value": 4
+        },
+        {
+          "kind": "note",
+          "text": "Memeriksa sel dengan perkiraan jarak terdekat."
+        }
+      ]
+    },
+    {
+      "events": [
+        {
+          "kind": "cell",
+          "x": 1,
+          "y": 4,
+          "state": {
+            "status": "frontier"
+          }
+        },
+        {
+          "kind": "cell",
+          "x": 4,
+          "y": 5,
+          "state": {
+            "status": "visited"
+          }
+        },
+        {
+          "kind": "metric",
+          "id": "work",
+          "value": 19
+        },
+        {
+          "kind": "metric",
+          "id": "memory",
+          "value": 5
+        },
+        {
+          "kind": "note",
+          "text": "Memeriksa sel dengan perkiraan jarak terdekat."
+        }
+      ]
+    },
+    {
+      "events": [
+        {
+          "kind": "cell",
+          "x": 4,
+          "y": 4,
+          "state": {
+            "status": "frontier"
+          }
+        },
+        {
+          "kind": "cell",
+          "x": 1,
+          "y": 4,
+          "state": {
+            "status": "frontier"
+          }
+        },
+        {
+          "kind": "cell",
+          "x": 5,
+          "y": 5,
+          "state": {
+            "status": "visited"
+          }
+        },
+        {
+          "kind": "metric",
+          "id": "work",
+          "value": 27
+        },
+        {
+          "kind": "metric",
+          "id": "memory",
+          "value": 7
+        },
+        {
+          "kind": "note",
+          "text": "Memeriksa sel dengan perkiraan jarak terdekat."
+        }
+      ]
+    },
+    {
+      "events": [
+        {
+          "kind": "cell",
+          "x": 5,
+          "y": 4,
+          "state": {
+            "status": "frontier"
+          }
+        },
+        {
+          "kind": "cell",
+          "x": 4,
+          "y": 4,
+          "state": {
+            "status": "frontier"
+          }
+        },
+        {
+          "kind": "cell",
+          "x": 1,
+          "y": 4,
+          "state": {
+            "status": "frontier"
+          }
+        },
+        {
+          "kind": "cell",
+          "x": 6,
+          "y": 5,
+          "state": {
+            "status": "visited"
+          }
+        },
+        {
+          "kind": "metric",
+          "id": "work",
+          "value": 37
+        },
+        {
+          "kind": "metric",
+          "id": "memory",
+          "value": 9
+        },
+        {
+          "kind": "note",
+          "text": "Memeriksa sel dengan perkiraan jarak terdekat."
+        }
+      ]
+    },
+    {
+      "events": [
+        {
+          "kind": "cell",
+          "x": 6,
+          "y": 4,
+          "state": {
+            "status": "frontier"
+          }
+        },
+        {
+          "kind": "cell",
+          "x": 5,
+          "y": 4,
+          "state": {
+            "status": "frontier"
+          }
+        },
+        {
+          "kind": "cell",
+          "x": 4,
+          "y": 4,
+          "state": {
+            "status": "frontier"
+          }
+        },
+        {
+          "kind": "cell",
+          "x": 1,
+          "y": 4,
+          "state": {
+            "status": "frontier"
+          }
+        },
+        {
+          "kind": "cell",
+          "x": 7,
+          "y": 5,
+          "state": {
+            "status": "visited"
+          }
+        },
+        {
+          "kind": "metric",
+          "id": "work",
+          "value": 49
+        },
+        {
+          "kind": "metric",
+          "id": "memory",
+          "value": 11
+        },
+        {
+          "kind": "note",
+          "text": "Memeriksa sel dengan perkiraan jarak terdekat."
+        }
+      ]
+    },
+    {
+      "events": [
+        {
+          "kind": "cell",
+          "x": 6,
+          "y": 4,
+          "state": {
+            "status": "frontier"
+          }
+        },
+        {
+          "kind": "cell",
+          "x": 5,
+          "y": 4,
+          "state": {
+            "status": "frontier"
+          }
+        },
+        {
+          "kind": "cell",
+          "x": 4,
+          "y": 4,
+          "state": {
+            "status": "frontier"
+          }
+        },
+        {
+          "kind": "cell",
+          "x": 1,
+          "y": 4,
+          "state": {
+            "status": "frontier"
+          }
+        },
+        {
+          "kind": "cell",
+          "x": 7,
+          "y": 4,
+          "state": {
+            "status": "visited"
+          }
+        },
+        {
+          "kind": "metric",
+          "id": "work",
+          "value": 61
+        },
+        {
+          "kind": "metric",
+          "id": "memory",
+          "value": 12
+        },
+        {
+          "kind": "note",
+          "text": "Memeriksa sel dengan perkiraan jarak terdekat."
+        }
+      ]
+    },
+    {
+      "events": [
+        {
+          "kind": "cell",
+          "x": 6,
+          "y": 4,
+          "state": {
+            "status": "frontier"
+          }
+        },
+        {
+          "kind": "cell",
+          "x": 5,
+          "y": 4,
+          "state": {
+            "status": "frontier"
+          }
+        },
+        {
+          "kind": "cell",
+          "x": 4,
+          "y": 4,
+          "state": {
+            "status": "frontier"
+          }
+        },
+        {
+          "kind": "cell",
+          "x": 1,
+          "y": 4,
+          "state": {
+            "status": "frontier"
+          }
+        },
+        {
+          "kind": "cell",
+          "x": 7,
+          "y": 3,
+          "state": {
+            "status": "visited"
+          }
+        },
+        {
+          "kind": "metric",
+          "id": "work",
+          "value": 73
+        },
+        {
+          "kind": "metric",
+          "id": "memory",
+          "value": 13
+        },
+        {
+          "kind": "note",
+          "text": "Memeriksa sel dengan perkiraan jarak terdekat."
+        }
+      ]
+    },
+    {
+      "events": [
+        {
+          "kind": "cell",
+          "x": 6,
+          "y": 3,
+          "state": {
+            "status": "frontier"
+          }
+        },
+        {
+          "kind": "cell",
+          "x": 6,
+          "y": 4,
+          "state": {
+            "status": "frontier"
+          }
+        },
+        {
+          "kind": "cell",
+          "x": 5,
+          "y": 4,
+          "state": {
+            "status": "frontier"
+          }
+        },
+        {
+          "kind": "cell",
+          "x": 4,
+          "y": 4,
+          "state": {
+            "status": "frontier"
+          }
+        },
+        {
+          "kind": "cell",
+          "x": 1,
+          "y": 4,
+          "state": {
+            "status": "frontier"
+          }
+        },
+        {
+          "kind": "cell",
+          "x": 7,
+          "y": 2,
+          "state": {
+            "status": "visited"
+          }
+        },
+        {
+          "kind": "metric",
+          "id": "work",
+          "value": 88
+        },
+        {
+          "kind": "metric",
+          "id": "memory",
+          "value": 15
+        },
+        {
+          "kind": "note",
+          "text": "Memeriksa sel dengan perkiraan jarak terdekat."
+        }
+      ]
+    },
+    {
+      "events": [
+        {
+          "kind": "cell",
+          "x": 6,
+          "y": 2,
+          "state": {
+            "status": "frontier"
+          }
+        },
+        {
+          "kind": "cell",
+          "x": 6,
+          "y": 3,
+          "state": {
+            "status": "frontier"
+          }
+        },
+        {
+          "kind": "cell",
+          "x": 6,
+          "y": 4,
+          "state": {
+            "status": "frontier"
+          }
+        },
+        {
+          "kind": "cell",
+          "x": 5,
+          "y": 4,
+          "state": {
+            "status": "frontier"
+          }
+        },
+        {
+          "kind": "cell",
+          "x": 4,
+          "y": 4,
+          "state": {
+            "status": "frontier"
+          }
+        },
+        {
+          "kind": "cell",
+          "x": 1,
+          "y": 4,
+          "state": {
+            "status": "frontier"
+          }
+        },
+        {
+          "kind": "cell",
+          "x": 7,
+          "y": 1,
+          "state": {
+            "status": "visited"
+          }
+        },
+        {
+          "kind": "metric",
+          "id": "work",
+          "value": 105
+        },
+        {
+          "kind": "metric",
+          "id": "memory",
+          "value": 17
+        },
+        {
+          "kind": "note",
+          "text": "Memeriksa sel dengan perkiraan jarak terdekat."
+        }
+      ]
+    },
+    {
+      "events": [
+        {
+          "kind": "entity",
+          "id": "robot",
+          "x": 1,
+          "y": 5,
+          "facing": "down"
+        },
+        {
+          "kind": "path",
+          "points": [
+            {
+              "x": 1,
+              "y": 5
+            }
+          ]
+        },
+        {
+          "kind": "metric",
+          "id": "cost",
+          "value": 0
+        },
+        {
+          "kind": "note",
+          "text": "Petani mengikuti rute yang ditemukan."
+        }
+      ]
+    },
+    {
+      "events": [
+        {
+          "kind": "entity",
+          "id": "robot",
+          "x": 2,
+          "y": 5,
+          "facing": "right"
+        },
+        {
+          "kind": "path",
+          "points": [
+            {
+              "x": 1,
+              "y": 5
+            },
+            {
+              "x": 2,
+              "y": 5
+            }
+          ]
+        },
+        {
+          "kind": "metric",
+          "id": "cost",
+          "value": 1
+        },
+        {
+          "kind": "note",
+          "text": "Petani mengikuti rute yang ditemukan."
+        }
+      ]
+    },
+    {
+      "events": [
+        {
+          "kind": "entity",
+          "id": "robot",
+          "x": 3,
+          "y": 5,
+          "facing": "right"
+        },
+        {
+          "kind": "path",
+          "points": [
+            {
+              "x": 1,
+              "y": 5
+            },
+            {
+              "x": 2,
+              "y": 5
+            },
+            {
+              "x": 3,
+              "y": 5
+            }
+          ]
+        },
+        {
+          "kind": "metric",
+          "id": "cost",
+          "value": 2
+        },
+        {
+          "kind": "note",
+          "text": "Petani mengikuti rute yang ditemukan."
+        }
+      ]
+    },
+    {
+      "events": [
+        {
+          "kind": "entity",
+          "id": "robot",
+          "x": 4,
+          "y": 5,
+          "facing": "right"
+        },
+        {
+          "kind": "path",
+          "points": [
+            {
+              "x": 1,
+              "y": 5
+            },
+            {
+              "x": 2,
+              "y": 5
+            },
+            {
+              "x": 3,
+              "y": 5
+            },
+            {
+              "x": 4,
+              "y": 5
+            }
+          ]
+        },
+        {
+          "kind": "metric",
+          "id": "cost",
+          "value": 3
+        },
+        {
+          "kind": "note",
+          "text": "Petani mengikuti rute yang ditemukan."
+        }
+      ]
+    },
+    {
+      "events": [
+        {
+          "kind": "entity",
+          "id": "robot",
+          "x": 5,
+          "y": 5,
+          "facing": "right"
+        },
+        {
+          "kind": "path",
+          "points": [
+            {
+              "x": 1,
+              "y": 5
+            },
+            {
+              "x": 2,
+              "y": 5
+            },
+            {
+              "x": 3,
+              "y": 5
+            },
+            {
+              "x": 4,
+              "y": 5
+            },
+            {
+              "x": 5,
+              "y": 5
+            }
+          ]
+        },
+        {
+          "kind": "metric",
+          "id": "cost",
+          "value": 4
+        },
+        {
+          "kind": "note",
+          "text": "Petani mengikuti rute yang ditemukan."
+        }
+      ]
+    },
+    {
+      "events": [
+        {
+          "kind": "entity",
+          "id": "robot",
+          "x": 6,
+          "y": 5,
+          "facing": "right"
+        },
+        {
+          "kind": "path",
+          "points": [
+            {
+              "x": 1,
+              "y": 5
+            },
+            {
+              "x": 2,
+              "y": 5
+            },
+            {
+              "x": 3,
+              "y": 5
+            },
+            {
+              "x": 4,
+              "y": 5
+            },
+            {
+              "x": 5,
+              "y": 5
+            },
+            {
+              "x": 6,
+              "y": 5
+            }
+          ]
+        },
+        {
+          "kind": "metric",
+          "id": "cost",
+          "value": 5
+        },
+        {
+          "kind": "note",
+          "text": "Petani mengikuti rute yang ditemukan."
+        }
+      ]
+    },
+    {
+      "events": [
+        {
+          "kind": "entity",
+          "id": "robot",
+          "x": 7,
+          "y": 5,
+          "facing": "right"
+        },
+        {
+          "kind": "path",
+          "points": [
+            {
+              "x": 1,
+              "y": 5
+            },
+            {
+              "x": 2,
+              "y": 5
+            },
+            {
+              "x": 3,
+              "y": 5
+            },
+            {
+              "x": 4,
+              "y": 5
+            },
+            {
+              "x": 5,
+              "y": 5
+            },
+            {
+              "x": 6,
+              "y": 5
+            },
+            {
+              "x": 7,
+              "y": 5
+            }
+          ]
+        },
+        {
+          "kind": "metric",
+          "id": "cost",
+          "value": 6
+        },
+        {
+          "kind": "note",
+          "text": "Petani mengikuti rute yang ditemukan."
+        }
+      ]
+    },
+    {
+      "events": [
+        {
+          "kind": "entity",
+          "id": "robot",
+          "x": 7,
+          "y": 4,
+          "facing": "up"
+        },
+        {
+          "kind": "path",
+          "points": [
+            {
+              "x": 1,
+              "y": 5
+            },
+            {
+              "x": 2,
+              "y": 5
+            },
+            {
+              "x": 3,
+              "y": 5
+            },
+            {
+              "x": 4,
+              "y": 5
+            },
+            {
+              "x": 5,
+              "y": 5
+            },
+            {
+              "x": 6,
+              "y": 5
+            },
+            {
+              "x": 7,
+              "y": 5
+            },
+            {
+              "x": 7,
+              "y": 4
+            }
+          ]
+        },
+        {
+          "kind": "metric",
+          "id": "cost",
+          "value": 7
+        },
+        {
+          "kind": "note",
+          "text": "Petani mengikuti rute yang ditemukan."
+        }
+      ]
+    },
+    {
+      "events": [
+        {
+          "kind": "entity",
+          "id": "robot",
+          "x": 7,
+          "y": 3,
+          "facing": "up"
+        },
+        {
+          "kind": "path",
+          "points": [
+            {
+              "x": 1,
+              "y": 5
+            },
+            {
+              "x": 2,
+              "y": 5
+            },
+            {
+              "x": 3,
+              "y": 5
+            },
+            {
+              "x": 4,
+              "y": 5
+            },
+            {
+              "x": 5,
+              "y": 5
+            },
+            {
+              "x": 6,
+              "y": 5
+            },
+            {
+              "x": 7,
+              "y": 5
+            },
+            {
+              "x": 7,
+              "y": 4
+            },
+            {
+              "x": 7,
+              "y": 3
+            }
+          ]
+        },
+        {
+          "kind": "metric",
+          "id": "cost",
+          "value": 8
+        },
+        {
+          "kind": "note",
+          "text": "Petani mengikuti rute yang ditemukan."
+        }
+      ]
+    },
+    {
+      "events": [
+        {
+          "kind": "entity",
+          "id": "robot",
+          "x": 7,
+          "y": 2,
+          "facing": "up"
+        },
+        {
+          "kind": "path",
+          "points": [
+            {
+              "x": 1,
+              "y": 5
+            },
+            {
+              "x": 2,
+              "y": 5
+            },
+            {
+              "x": 3,
+              "y": 5
+            },
+            {
+              "x": 4,
+              "y": 5
+            },
+            {
+              "x": 5,
+              "y": 5
+            },
+            {
+              "x": 6,
+              "y": 5
+            },
+            {
+              "x": 7,
+              "y": 5
+            },
+            {
+              "x": 7,
+              "y": 4
+            },
+            {
+              "x": 7,
+              "y": 3
+            },
+            {
+              "x": 7,
+              "y": 2
+            }
+          ]
+        },
+        {
+          "kind": "metric",
+          "id": "cost",
+          "value": 9
+        },
+        {
+          "kind": "note",
+          "text": "Petani mengikuti rute yang ditemukan."
+        }
+      ]
+    },
+    {
+      "events": [
+        {
+          "kind": "entity",
+          "id": "robot",
+          "x": 7,
+          "y": 1,
+          "facing": "up"
+        },
+        {
+          "kind": "path",
+          "points": [
+            {
+              "x": 1,
+              "y": 5
+            },
+            {
+              "x": 2,
+              "y": 5
+            },
+            {
+              "x": 3,
+              "y": 5
+            },
+            {
+              "x": 4,
+              "y": 5
+            },
+            {
+              "x": 5,
+              "y": 5
+            },
+            {
+              "x": 6,
+              "y": 5
+            },
+            {
+              "x": 7,
+              "y": 5
+            },
+            {
+              "x": 7,
+              "y": 4
+            },
+            {
+              "x": 7,
+              "y": 3
+            },
+            {
+              "x": 7,
+              "y": 2
+            },
+            {
+              "x": 7,
+              "y": 1
+            }
+          ]
+        },
+        {
+          "kind": "metric",
+          "id": "cost",
+          "value": 10
+        },
+        {
+          "kind": "note",
+          "text": "Petani sudah mencapai gerobak panen."
+        }
+      ]
+    },
+    {
+      "events": [
+        {
+          "kind": "metric",
+          "id": "cost",
+          "value": 10
+        },
+        {
+          "kind": "metric",
+          "id": "work",
+          "value": 105
+        },
+        {
+          "kind": "metric",
+          "id": "memory",
+          "value": 17
+        },
+        {
+          "kind": "note",
+          "text": "Tujuan tercapai dengan rute hemat. Bandingkan juga pekerjaan pencarian dan memori yang digunakan."
+        }
+      ]
+    }
+  ],
+  "result": {
+    "passed": true,
+    "tier": "efficient",
+    "reason": "Tujuan tercapai dengan rute hemat. Bandingkan juga pekerjaan pencarian dan memori yang digunakan.",
+    "metrics": {
+      "cost": 10,
+      "work": 105,
+      "memory": 17
+    }
+  }
+}

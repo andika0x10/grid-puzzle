@@ -1,0 +1,370 @@
+{
+  "schemaVersion": 1,
+  "levelId": "clustering-4",
+  "optionId": "dbscan",
+  "initial": {
+    "cells": {},
+    "entities": {
+      "robot": {
+        "x": 0,
+        "y": 9,
+        "facing": "down"
+      }
+    },
+    "path": [],
+    "centroids": [],
+    "metrics": {
+      "quality": 0,
+      "groups": 0,
+      "work": 0
+    },
+    "note": "Pilih algoritma, lalu amati apa yang terjadi."
+  },
+  "steps": [
+    {
+      "events": [
+        {
+          "kind": "cell",
+          "x": 1,
+          "y": 1,
+          "state": {
+            "group": 0
+          }
+        },
+        {
+          "kind": "metric",
+          "id": "groups",
+          "value": 4
+        },
+        {
+          "kind": "metric",
+          "id": "work",
+          "value": 4
+        },
+        {
+          "kind": "note",
+          "text": "Memeriksa hubungan bijih emas dengan kelompok di sekitarnya."
+        }
+      ]
+    },
+    {
+      "events": [
+        {
+          "kind": "cell",
+          "x": 2,
+          "y": 1,
+          "state": {
+            "group": 0
+          }
+        },
+        {
+          "kind": "metric",
+          "id": "groups",
+          "value": 4
+        },
+        {
+          "kind": "metric",
+          "id": "work",
+          "value": 8
+        },
+        {
+          "kind": "note",
+          "text": "Memeriksa hubungan bijih emas dengan kelompok di sekitarnya."
+        }
+      ]
+    },
+    {
+      "events": [
+        {
+          "kind": "cell",
+          "x": 1,
+          "y": 2,
+          "state": {
+            "group": 0
+          }
+        },
+        {
+          "kind": "metric",
+          "id": "groups",
+          "value": 4
+        },
+        {
+          "kind": "metric",
+          "id": "work",
+          "value": 12
+        },
+        {
+          "kind": "note",
+          "text": "Memeriksa hubungan bijih emas dengan kelompok di sekitarnya."
+        }
+      ]
+    },
+    {
+      "events": [
+        {
+          "kind": "cell",
+          "x": 2,
+          "y": 2,
+          "state": {
+            "group": 0
+          }
+        },
+        {
+          "kind": "metric",
+          "id": "groups",
+          "value": 4
+        },
+        {
+          "kind": "metric",
+          "id": "work",
+          "value": 16
+        },
+        {
+          "kind": "note",
+          "text": "Memeriksa hubungan bijih emas dengan kelompok di sekitarnya."
+        }
+      ]
+    },
+    {
+      "events": [
+        {
+          "kind": "cell",
+          "x": 1,
+          "y": 3,
+          "state": {
+            "group": 0
+          }
+        },
+        {
+          "kind": "metric",
+          "id": "groups",
+          "value": 4
+        },
+        {
+          "kind": "metric",
+          "id": "work",
+          "value": 20
+        },
+        {
+          "kind": "note",
+          "text": "Memeriksa hubungan bijih emas dengan kelompok di sekitarnya."
+        }
+      ]
+    },
+    {
+      "events": [
+        {
+          "kind": "cell",
+          "x": 2,
+          "y": 3,
+          "state": {
+            "group": 0
+          }
+        },
+        {
+          "kind": "metric",
+          "id": "groups",
+          "value": 4
+        },
+        {
+          "kind": "metric",
+          "id": "work",
+          "value": 24
+        },
+        {
+          "kind": "note",
+          "text": "Memeriksa hubungan bijih emas dengan kelompok di sekitarnya."
+        }
+      ]
+    },
+    {
+      "events": [
+        {
+          "kind": "cell",
+          "x": 7,
+          "y": 2,
+          "state": {
+            "group": 1
+          }
+        },
+        {
+          "kind": "metric",
+          "id": "groups",
+          "value": 4
+        },
+        {
+          "kind": "metric",
+          "id": "work",
+          "value": 28
+        },
+        {
+          "kind": "note",
+          "text": "Memeriksa hubungan bijih emas dengan kelompok di sekitarnya."
+        }
+      ]
+    },
+    {
+      "events": [
+        {
+          "kind": "cell",
+          "x": 9,
+          "y": 2,
+          "state": {
+            "group": 2
+          }
+        },
+        {
+          "kind": "metric",
+          "id": "groups",
+          "value": 4
+        },
+        {
+          "kind": "metric",
+          "id": "work",
+          "value": 32
+        },
+        {
+          "kind": "note",
+          "text": "Memeriksa hubungan bijih emas dengan kelompok di sekitarnya."
+        }
+      ]
+    },
+    {
+      "events": [
+        {
+          "kind": "cell",
+          "x": 8,
+          "y": 4,
+          "state": {
+            "group": 3
+          }
+        },
+        {
+          "kind": "metric",
+          "id": "groups",
+          "value": 4
+        },
+        {
+          "kind": "metric",
+          "id": "work",
+          "value": 36
+        },
+        {
+          "kind": "note",
+          "text": "Memeriksa hubungan bijih emas dengan kelompok di sekitarnya."
+        }
+      ]
+    },
+    {
+      "events": [
+        {
+          "kind": "cell",
+          "x": 10,
+          "y": 4,
+          "state": {
+            "group": 1
+          }
+        },
+        {
+          "kind": "metric",
+          "id": "groups",
+          "value": 4
+        },
+        {
+          "kind": "metric",
+          "id": "work",
+          "value": 40
+        },
+        {
+          "kind": "note",
+          "text": "Memeriksa hubungan bijih emas dengan kelompok di sekitarnya."
+        }
+      ]
+    },
+    {
+      "events": [
+        {
+          "kind": "cell",
+          "x": 7,
+          "y": 6,
+          "state": {
+            "group": 2
+          }
+        },
+        {
+          "kind": "metric",
+          "id": "groups",
+          "value": 4
+        },
+        {
+          "kind": "metric",
+          "id": "work",
+          "value": 44
+        },
+        {
+          "kind": "note",
+          "text": "Memeriksa hubungan bijih emas dengan kelompok di sekitarnya."
+        }
+      ]
+    },
+    {
+      "events": [
+        {
+          "kind": "cell",
+          "x": 9,
+          "y": 6,
+          "state": {
+            "group": 3
+          }
+        },
+        {
+          "kind": "metric",
+          "id": "groups",
+          "value": 4
+        },
+        {
+          "kind": "metric",
+          "id": "work",
+          "value": 48
+        },
+        {
+          "kind": "note",
+          "text": "Memeriksa hubungan bijih emas dengan kelompok di sekitarnya."
+        }
+      ]
+    },
+    {
+      "events": [
+        {
+          "kind": "metric",
+          "id": "quality",
+          "value": 82
+        },
+        {
+          "kind": "metric",
+          "id": "groups",
+          "value": 4
+        },
+        {
+          "kind": "metric",
+          "id": "work",
+          "value": 48
+        },
+        {
+          "kind": "note",
+          "text": "Kelompok yang renggang terpecah. Perhatikan pengaruh kepadatan dan parameter metode."
+        }
+      ]
+    }
+  ],
+  "result": {
+    "passed": false,
+    "tier": "failed",
+    "reason": "Kelompok yang renggang terpecah. Perhatikan pengaruh kepadatan dan parameter metode.",
+    "metrics": {
+      "quality": 82,
+      "groups": 4,
+      "work": 48
+    }
+  }
+}
