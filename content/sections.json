@@ -2,21 +2,31 @@
   {
     "id": "navigation",
     "order": 1,
-    "title": "Navigasi kebun",
-    "subtitle": "Bantu petani menemukan jalan",
-    "description": "Lewati kebun, pilih jalan, dan antar hasil panen dengan energi yang cukup.",
-    "color": "green",
-    "illustration": "/demo/thumbnails/navigation-1.png",
-    "levelIds": ["navigation-1", "navigation-2", "navigation-3", "navigation-4", "navigation-5"]
+    "title": "Balap rute",
+    "subtitle": "Capai finis lebih dulu dari lawan.",
+    "levelIds": [
+      "navigation-1",
+      "navigation-2",
+      "navigation-3",
+      "navigation-4",
+      "navigation-5",
+      "navigation-6",
+      "navigation-7"
+    ]
   },
   {
-    "id": "clustering",
+    "id": "gems",
     "order": 2,
-    "title": "Pengelompokan sumber daya",
-    "subtitle": "Petakan gurun bersama sherif",
-    "description": "Kenali kelompok bijih emas, bentuk yang berbeda, dan titik yang berdiri sendiri.",
-    "color": "green",
-    "illustration": "/demo/thumbnails/clustering-1.png",
-    "levelIds": ["clustering-1", "clustering-2", "clustering-3", "clustering-4", "clustering-5"]
+    "title": "Perebutan gem",
+    "subtitle": "Ambil gem sebanyak mungkin.",
+    "levelIds": [
+      "gems-1",
+      "gems-2",
+      "gems-3",
+      "gems-4",
+      "gems-5",
+      "gems-6",
+      "gems-7"
+    ]
   }
 ]

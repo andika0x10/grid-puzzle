@@ -1,45 +1,12 @@
-import type { LevelDefinition } from "./schema";
-
-export type ThemeId = LevelDefinition["theme"];
-
-// Terrain/object IDs describe game rules. Each biome supplies its own artwork and vocabulary.
+export const themeIds = ["farm", "desert", "forest", "snow", "volcano", "factory", "space"] as const;
+export type ThemeId = (typeof themeIds)[number];
 export const themes = {
-  farm: {
-    actor: "Petani",
-    resource: "Keranjang panen",
-    terrainGuide: [
-      { asset: "grass", label: "Rumput · 1 energi" },
-      { asset: "path", label: "Jalan tanah · 1 energi" },
-      { asset: "mud", label: "Tanah basah · 4 energi" },
-      { asset: "water", label: "Saluran air · penghalang" },
-      { asset: "wall", label: "Pagar tanaman · penghalang" },
-      { asset: "bridge-h", label: "Jembatan · 1 energi" },
-    ],
-    resourceGuide: [
-      { asset: "crystal", label: "Keranjang panen" },
-      { asset: "bush", label: "Semak dekoratif" },
-      { asset: "crate", label: "Peti hasil kebun" },
-    ],
-  },
-  desert: {
-    actor: "Sherif",
-    resource: "Bijih emas",
-    terrainGuide: [
-      { asset: "grass", label: "Pasir · 1 energi" },
-      { asset: "path", label: "Jalan setapak · 1 energi" },
-      { asset: "mud", label: "Kerikil lepas · 4 energi" },
-      { asset: "water", label: "Jurang · penghalang" },
-      { asset: "wall", label: "Tebing · penghalang" },
-      { asset: "bridge-h", label: "Jembatan tali · 1 energi" },
-    ],
-    resourceGuide: [
-      { asset: "crystal", label: "Bijih emas" },
-      { asset: "bush", label: "Semak gurun" },
-      { asset: "crate", label: "Peti persediaan" },
-    ],
-  },
-} as const;
-
-export function spriteUrl(theme: ThemeId, name: string) {
-  return `/assets/game/${theme}/sprites/${name}.png`;
-}
+  farm: { name: "Kebun", color: "#59923d", ground: "Rumput", path: "Jalan tanah", slow: "Lumpur", water: "Saluran air", wall: "Pagar tanaman" },
+  desert: { name: "Gurun", color: "#b4772c", ground: "Pasir", path: "Jalan setapak", slow: "Kerikil lepas", water: "Jurang", wall: "Tebing" },
+  forest: { name: "Hutan", color: "#35735f", ground: "Tanah berlumut", path: "Jalur hutan", slow: "Lumpur berakar", water: "Sungai", wall: "Pohon rapat" },
+  snow: { name: "Salju", color: "#527c9a", ground: "Salju", path: "Jalur padat", slow: "Salju tebal", water: "Retakan es", wall: "Tebing es" },
+  volcano: { name: "Vulkanik", color: "#b65532", ground: "Basalt", path: "Jalur obsidian", slow: "Abu tebal", water: "Lava", wall: "Batu vulkanik" },
+  factory: { name: "Pabrik", color: "#587c89", ground: "Lantai logam", path: "Lorong", slow: "Tumpahan oli", water: "Celah lantai", wall: "Mesin" },
+  space: { name: "Luar angkasa", color: "#7460a7", ground: "Debu bulan", path: "Platform", slow: "Puing", water: "Ruang kosong", wall: "Meteor" },
+} satisfies Record<ThemeId, { name: string; color: string; ground: string; path: string; slow: string; water: string; wall: string }>;
+export const characterPortrait = (theme: ThemeId) => `/assets/game/characters/${theme}/portrait.png`;

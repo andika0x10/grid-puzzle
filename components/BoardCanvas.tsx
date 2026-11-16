@@ -1,77 +1,84 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
-import type { BoardState, LevelDefinition } from "../game/schema";
-import type { ReplayController } from "../game/replay";
+import type { LevelDefinition } from "../game/schema";
+import type { MatchFrame } from "../game/engine";
 import type { BoardRenderer } from "../game/renderer";
-import { mechanics } from "../game/mechanics";
-export default function BoardCanvas({ level, frame, controller }: { level: LevelDefinition; frame: BoardState; controller: ReplayController }) {
+export default function BoardCanvas({
+  level,
+  frame,
+  playing,
+  focused,
+  onReady,
+}: {
+  level: LevelDefinition;
+  frame: MatchFrame;
+  playing: boolean;
+  focused: string;
+  onReady: (ready: boolean) => void;
+}) {
   const host = useRef<HTMLDivElement>(null),
     renderer = useRef<BoardRenderer | null>(null),
-    frameRef = useRef(frame);
-  frameRef.current = frame;
+    current = useRef({ frame, playing, focused, onReady });
+  current.current = { frame, playing, focused, onReady };
   const [status, setStatus] = useState<"loading" | "ready" | "error">("loading"),
     [retry, setRetry] = useState(0);
   useEffect(() => {
     let cancelled = false,
       instance: BoardRenderer | null = null;
     setStatus("loading");
-    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    current.current.onReady(false);
     void import("../game/renderer")
-      .then(({ BoardRenderer }) => {
+      .then(async ({ BoardRenderer }) => {
         if (cancelled || !host.current) return;
-        instance = new BoardRenderer(
-          host.current,
-          level,
-          frameRef.current,
-          (ms) => controller.tick(ms),
-          () => controller.getSnapshot().phase,
-          reduced
-        );
+        instance = new BoardRenderer(host.current, level, current.current.frame, window.matchMedia("(prefers-reduced-motion: reduce)").matches);
         renderer.current = instance;
-        return instance.ready().then(() => {
-          if (!cancelled) {
-            instance?.setFrame(frameRef.current);
-            setStatus("ready");
-          }
-        });
+        await instance.ready();
+        if (!cancelled) {
+          instance.setFrame(current.current.frame);
+          instance.setPlayback(current.current.playing);
+          instance.setFocus(current.current.focused);
+          setStatus("ready");
+          current.current.onReady(true);
+        }
       })
       .catch(() => {
-        if (!cancelled) setStatus("error");
+        if (!cancelled) {
+          setStatus("error");
+          current.current.onReady(false);
+        }
       });
-    const hide = () => {
-      if (document.hidden) controller.pause();
-    };
-    document.addEventListener("visibilitychange", hide);
     return () => {
       cancelled = true;
       instance?.destroy();
       renderer.current = null;
-      document.removeEventListener("visibilitychange", hide);
     };
-  }, [level, controller, retry]);
+  }, [level, retry]);
   useEffect(() => {
+    renderer.current?.setPlayback(playing);
     renderer.current?.setFrame(frame);
-  }, [frame]);
+    renderer.current?.setFocus(focused);
+  }, [frame, playing, focused]);
   return (
     <div className="board-wrap">
-      <div className="board-scroll" tabIndex={0} aria-label="Papan permainan. Geser untuk melihat bagian papan yang lebih besar.">
-        <div ref={host} className="canvas-host" />
-      </div>
+      <div ref={host} className="canvas-host" role="img" aria-label="Papan permainan" />
       {status === "loading" && (
         <div className="board-cover" role="status">
           <span className="loader" />
-          Menyiapkan medan…
+          Menyiapkan arena…
         </div>
       )}
       {status === "error" && (
         <div className="board-cover" role="alert">
-          <p>Medan belum dapat ditampilkan.</p>
+          <p>Arena belum dapat ditampilkan.</p>
           <button className="button secondary" onClick={() => setRetry((n) => n + 1)}>
             Muat ulang aset
           </button>
         </div>
       )}
-      <p className="sr-only">{mechanics[level.mechanic].describe(level, frame)}</p>
+      <p className="sr-only">
+        Tick {frame.tick}. {frame.gems.filter((g) => !g.taken).length} gem tersisa.{" "}
+        {frame.bots.map((b) => `${b.algorithm}: kolom ${b.x + 1}, baris ${b.y + 1}, ${b.score} gem`).join(". ")}
+      </p>
     </div>
   );
 }

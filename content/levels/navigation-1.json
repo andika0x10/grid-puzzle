@@ -1,14 +1,14 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "id": "navigation-1",
   "sectionId": "navigation",
   "order": 1,
-  "title": "Kenali medan",
-  "description": "Antar hasil kebun ke gerobak panen.",
-  "mission": "Bantu petani mencapai gerobak panen.",
-  "tip": "Empat arah gerak. Saluran air dan pagar tanaman tidak dapat dilalui.",
-  "mechanic": "navigation",
+  "title": "Langkah pertama",
+  "mission": "Capai garis finis lebih dulu.",
   "theme": "farm",
+  "mode": "race",
+  "seed": 1001,
+  "timeLimit": 1200,
   "board": {
     "width": 9,
     "height": 7,
@@ -23,40 +23,40 @@
       "wall",
       "wall",
       "wall",
-      "grass",
-      "grass",
-      "grass",
-      "grass",
-      "grass",
-      "grass",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
       "path",
       "wall",
       "wall",
-      "grass",
-      "grass",
+      "ground",
+      "ground",
       "wall",
       "wall",
-      "grass",
-      "grass",
-      "grass",
+      "ground",
+      "ground",
+      "ground",
       "wall",
       "wall",
-      "grass",
-      "grass",
-      "grass",
-      "grass",
-      "grass",
-      "grass",
-      "grass",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
       "wall",
       "wall",
-      "grass",
+      "ground",
       "wall",
       "wall",
-      "grass",
-      "grass",
-      "grass",
-      "grass",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
       "wall",
       "wall",
       "path",
@@ -64,8 +64,8 @@
       "path",
       "path",
       "path",
-      "grass",
-      "grass",
+      "ground",
+      "ground",
       "wall",
       "wall",
       "wall",
@@ -77,7 +77,7 @@
       "wall",
       "wall"
     ],
-    "robot": {
+    "spawn": {
       "x": 1,
       "y": 5
     },
@@ -85,84 +85,17 @@
       "x": 7,
       "y": 1
     },
-    "objects": [
+    "gems": [],
+    "decorations": [
       {
-        "id": "start",
-        "asset": "start",
-        "x": 1,
-        "y": 5
+        "x": 0,
+        "y": 0
       },
       {
-        "id": "goal",
-        "asset": "goal",
-        "x": 7,
-        "y": 1
+        "x": 8,
+        "y": 6
       }
     ]
   },
-  "options": [
-    {
-      "id": "bfs",
-      "name": "Breadth-First Search",
-      "description": "Menjelajah selapis demi selapis.",
-      "detail": "Antrean membantu memeriksa semua tetangga terdekat sebelum melangkah lebih jauh."
-    },
-    {
-      "id": "dfs",
-      "name": "Depth-First Search",
-      "description": "Ikuti satu cabang sampai ujung.",
-      "detail": "Tumpukan menyimpan cabang yang akan dikunjungi ketika petani menemui jalan buntu."
-    },
-    {
-      "id": "dijkstra",
-      "name": "Dijkstra",
-      "description": "Dahulukan biaya perjalanan terkecil.",
-      "detail": "Setiap jalur dibandingkan berdasarkan biaya yang sudah dikeluarkan."
-    },
-    {
-      "id": "astar",
-      "name": "A* Search",
-      "description": "Gabungkan biaya dan perkiraan jarak.",
-      "detail": "Perkiraan jarak Manhattan membantu mengarahkan pencarian menuju tujuan."
-    },
-    {
-      "id": "greedy",
-      "name": "Greedy Best-First",
-      "description": "Dahulukan yang tampak dekat tujuan.",
-      "detail": "Mengikuti perkiraan jarak tanpa memperhitungkan seluruh biaya yang sudah ditempuh."
-    }
-  ],
-  "metrics": [
-    {
-      "id": "cost",
-      "label": "Biaya rute",
-      "unit": "energi",
-      "description": "Energi yang dipakai petani sepanjang rute.",
-      "goal": "lower",
-      "required": false
-    },
-    {
-      "id": "work",
-      "label": "Kerja komputasi",
-      "unit": "operasi",
-      "description": "Ilustrasi biaya pemeriksaan dan persiapan pencarian.",
-      "goal": "lower",
-      "required": false
-    },
-    {
-      "id": "memory",
-      "label": "Puncak memori",
-      "unit": "state",
-      "description": "Ilustrasi jumlah state yang disimpan bersamaan.",
-      "goal": "lower",
-      "required": false
-    }
-  ],
-  "traceRefs": {
-    "bfs": "/demo/traces/navigation-1.bfs.json",
-    "dfs": "/demo/traces/navigation-1.dfs.json",
-    "dijkstra": "/demo/traces/navigation-1.dijkstra.json",
-    "astar": "/demo/traces/navigation-1.astar.json",
-    "greedy": "/demo/traces/navigation-1.greedy.json"
-  }
+  "changes": []
 }

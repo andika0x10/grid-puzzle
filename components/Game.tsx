@@ -1,114 +1,135 @@
 "use client";
-import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
+import { useEffect, useMemo, useRef, useState, useSyncExternalStore, type CSSProperties } from "react";
 import Link from "next/link";
-import Header from "./Header";
 import Icon from "./Icon";
+import Header from "./Header";
 import Modal from "./Modal";
 import BoardCanvas from "./BoardCanvas";
-import { getLevel, sections, levels, createGameDataProvider } from "../game/provider";
-import { ReplayController } from "../game/replay";
-import { emptyProgress, isLevelUnlocked, type DemoProgress } from "../game/progress";
-import { initialFrame, mechanics } from "../game/mechanics";
-import type { AttemptResult } from "../game/schema";
-import { themes, spriteUrl } from "../game/themes";
-const tierText = (r: AttemptResult) => (r.tier === "efficient" ? "Sangat efisien" : r.passed ? "Misi tercapai" : "Belum memenuhi misi");
-const metricLabels: Record<string, string> = {
-  work: "operasi",
-  memory: "state",
-  cost: "energi",
-  quality: "cocok",
-  groups: "grup",
-};
+import { getLevel, levels, sections } from "../game/provider";
+import { algorithms, BOT_COLORS, getAlgorithm, unavailableReason, type AlgorithmId, type MatchConfig } from "../game/algorithms";
+import { emptyProgress, isLevelUnlocked, readProgress, recordMatch, subscribeProgress } from "../game/progress";
+import { SimulationController } from "../game/simulation";
+import { themes } from "../game/themes";
+import { TICK_MS, type BotStatus } from "../game/engine";
+
+const statusText: Record<BotStatus, string> = { searching: "Mencari rute", moving: "Bergerak", finished: "Selesai", unreachable: "Jalan terputus", timeout: "Waktu habis" };
 export default function Game({ levelId }: { levelId: string }) {
   return <GameSession key={levelId} levelId={levelId} />;
 }
 function GameSession({ levelId }: { levelId: string }) {
-  const level = getLevel(levelId)!;
-  const theme = themes[level.theme];
-  const provider = useMemo(() => createGameDataProvider(), []),
-    controller = useMemo(() => new ReplayController(initialFrame(level)), [level]);
+  const level = getLevel(levelId)!,
+    theme = themes[level.theme],
+    section = sections.find((s) => s.id === level.sectionId)!;
+  const controller = useMemo(() => new SimulationController(level), [level]);
   const state = useSyncExternalStore(controller.subscribe, controller.getSnapshot, controller.getSnapshot);
-  const [progress, setProgress] = useState<DemoProgress>(emptyProgress),
+  const [progress, setProgress] = useState(emptyProgress),
     [loaded, setLoaded] = useState(false),
-    [storageWarning, setStorageWarning] = useState(false),
-    [showTip, setShowTip] = useState(false);
-  const request = useRef<AbortController | null>(null),
-    requestSerial = useRef(0),
-    playControl = useRef<HTMLButtonElement>(null);
-  const section = sections.find((s) => s.id === level.sectionId)!,
-    adapter = mechanics[level.mechanic];
+    [boardReady, setBoardReady] = useState(false);
+  const [panel, setPanel] = useState(false),
+    [stats, setStats] = useState(false),
+    [help, setHelp] = useState(false),
+    [focused, setFocused] = useState("bot-0"),
+    [storageWarning, setStorageWarning] = useState(false);
+  const [draft, setDraft] = useState<MatchConfig>(state.config),
+    [savedRun, setSavedRun] = useState(0);
+  const recorded = useRef(0),
+    playButton = useRef<HTMLButtonElement>(null);
   const unlocked = loaded && isLevelUnlocked(level.id, sections, progress),
-    levelProgress = progress.levels[level.id];
-  const active = level.options.find((o) => o.id === state.trace?.optionId),
-    pending = level.options.find((o) => o.id === state.pending);
-  const total = state.trace?.steps.length ?? 0,
-    result = state.phase === "finished" ? state.trace?.result : null;
-  const next = levels.find((l) => isLevelUnlocked(l.id, sections, progress) && !progress.levels[l.id]?.passed);
+    running = state.phase === "playing" || state.phase === "starting";
+  const hasStarted = state.phase !== "ready",
+    result = state.phase === "finished" ? state.result : null;
+  const next = levels[levels.findIndex((l) => l.id === levelId) + 1];
   useEffect(() => {
-    setProgress(provider.getProgress());
+    setProgress(readProgress());
     setLoaded(true);
-    return () => {
-      requestSerial.current++;
-      request.current?.abort();
-      controller.pause();
-    };
-  }, [provider, controller]);
+    return subscribeProgress(() => setProgress(readProgress()));
+  }, []);
   useEffect(() => {
-    if (state.phase === "finished" && state.trace) {
-      const saved = provider.completePlayback(state.trace);
-      setProgress(saved.progress);
-      setStorageWarning(!saved.persisted);
-    }
-  }, [state.phase, state.trace, provider]);
+    let raf = 0,
+      last = performance.now();
+    const frame = (now: number) => {
+      controller.tick(now - last);
+      last = now;
+      raf = requestAnimationFrame(frame);
+    };
+    raf = requestAnimationFrame(frame);
+    const hidden = () => {
+      if (document.hidden) controller.pause();
+    };
+    document.addEventListener("visibilitychange", hidden);
+    return () => {
+      cancelAnimationFrame(raf);
+      controller.dispose();
+      document.removeEventListener("visibilitychange", hidden);
+    };
+  }, [controller]);
+  useEffect(() => {
+    if (!state.result || recorded.current === state.run) return;
+    recorded.current = state.run;
+    let cancelled = false;
+    void recordMatch(level.id, level.mode, state.result).then((saved) => {
+      if (!cancelled) {
+        setProgress(saved.progress);
+        setStorageWarning(!saved.persisted);
+        setSavedRun(state.run);
+      }
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [state.result, state.run, level.id, level.mode]);
   useEffect(() => {
     const keyboard = (e: KeyboardEvent) => {
-      if ((e.target as HTMLElement).closest("button,input,select,a,dialog,textarea") || e.altKey || e.ctrlKey || e.metaKey) return;
-      if (e.code === "Space" && state.trace) {
+      if (
+        !unlocked ||
+        !boardReady ||
+        document.querySelector("dialog[open]") ||
+        (e.target as HTMLElement).closest("button,input,select,a,textarea,[contenteditable=true]") ||
+        e.altKey ||
+        e.ctrlKey ||
+        e.metaKey
+      )
+        return;
+      if (e.code === "Space") {
         e.preventDefault();
-        state.phase === "playing" ? controller.pause() : controller.play();
+        running ? controller.pause() : controller.play();
       }
-      if (e.key === "ArrowLeft" && state.trace) {
+      if (e.key === "ArrowLeft") {
         e.preventDefault();
         controller.step(-1);
       }
-      if (e.key === "ArrowRight" && state.trace) {
+      if (e.key === "ArrowRight") {
         e.preventDefault();
         controller.step(1);
-      }
-      if (/^[a-e]$/i.test(e.key) && unlocked) {
-        const o = level.options[e.key.toLowerCase().charCodeAt(0) - 97];
-        if (o) controller.choose(o.id);
       }
     };
     window.addEventListener("keydown", keyboard);
     return () => window.removeEventListener("keydown", keyboard);
-  }, [state.phase, state.trace, controller, level, unlocked]);
-  async function confirm() {
-    const current = controller.getSnapshot();
-    if (current.phase !== "confirming" || !current.pending) return;
-    const id = current.pending;
-    controller.loading();
-    request.current?.abort();
-    const abort = new AbortController();
-    request.current = abort;
-    const serial = ++requestSerial.current;
-    try {
-      const trace = await provider.startAttempt(level, id, abort.signal);
-      if (serial === requestSerial.current && !abort.signal.aborted) {
-        controller.load(trace);
-        requestAnimationFrame(() => playControl.current?.focus());
-      }
-    } catch (e) {
-      if (!abort.signal.aborted && serial === requestSerial.current) controller.fail(e instanceof Error ? e.message : "Rekaman belum termuat. Coba lagi.");
-    }
+  }, [controller, unlocked, boardReady, running]);
+  function openSettings() {
+    controller.pause();
+    setDraft(state.config);
+    setPanel(true);
+  }
+  function start(config = state.config) {
+    setPanel(false);
+    setFocused("bot-0");
+    controller.start(config);
+    requestAnimationFrame(() => playButton.current?.focus({ preventScroll: true }));
+  }
+  function selectPlayer(id: AlgorithmId) {
+    setDraft((old) => ({ ...old, player: id, opponents: old.opponents.includes(id) ? old.opponents.map((opponent) => (opponent === id ? old.player : opponent)) : old.opponents }));
+  }
+  function toggleOpponent(id: AlgorithmId) {
+    setDraft((old) => ({ ...old, opponents: old.opponents.includes(id) ? old.opponents.filter((a) => a !== id) : [...old.opponents, id] }));
   }
   if (!loaded)
     return (
       <>
         <Header compact />
-        <main className="shell loading-page" role="status">
+        <main className="locked-page shell" role="status">
           <span className="loader" />
-          Menyiapkan ekspedisi…
+          Menyiapkan perjalanan…
         </main>
       </>
     );
@@ -117,315 +138,372 @@ function GameSession({ levelId }: { levelId: string }) {
       <>
         <Header compact />
         <main className="locked-page shell">
-          <span className="locked-illustration">
-            <Icon name="lock" size={42} />
-          </span>
-          <h1>Ekspedisi ini belum terbuka.</h1>
-          <p>Selesaikan level sebelumnya untuk melanjutkan perjalananmu.</p>
+          <Icon name="lock" size={42} />
+          <h1>Arena ini belum terbuka.</h1>
+          <p>Selesaikan pertandingan di level sebelumnya untuk melanjutkan.</p>
           <Link className="button primary" href="/">
             Lihat perjalanan
           </Link>
         </main>
       </>
     );
-  const completedInSection = section.levelIds.filter((id) => progress.levels[id]?.passed).length;
+  const player = state.frame.bots.find((b) => b.player)!,
+    observed = state.frame.bots.find((b) => b.id === focused) ?? player;
+  const winners = state.frame.bots
+    .filter((b) => state.frame.winners.includes(b.id))
+    .map((b) => getAlgorithm(b.algorithm).short)
+    .join(", ");
+  const resultTitle = result?.won ? (result.draw ? "Hasil seri" : "Kamu menang!") : "Pertandingan selesai";
   return (
-    <div className="lesson-page">
-      <header className="lesson-header">
-        <div className="lesson-header-inner">
-          <Link href="/" className="icon-button lesson-exit" aria-label="Kembali ke daftar level" title="Semua level">
-            <Icon name="close" size={25} />
+    <div className="match-page">
+      <header className="match-header">
+        <div className="match-header-inner">
+          <Link href="/" className="icon-button" aria-label="Kembali ke daftar level">
+            <Icon name="close" size={24} />
           </Link>
-          <progress value={completedInSection} max={section.levelIds.length} aria-label={completedInSection + " dari " + section.levelIds.length + " level bagian ini selesai"} />
-          <span className="lesson-count">
-            Level <strong>{level.order}</strong> / {section.levelIds.length}
+          <progress value={section.levelIds.filter((id) => progress.levels[id]?.completed).length} max={section.levelIds.length} aria-label="Progres kategori" />
+          <span className="level-count">
+            {level.order} / {section.levelIds.length}
           </span>
-        </div>
-      </header>
-      <main className="game shell">
-        <div className="lesson-prompt">
-          <div>
-            <p className="lesson-topic">{level.title}</p>
-            <h1>{level.mission}</h1>
-          </div>
-          <button className="icon-button" onClick={() => setShowTip(true)} aria-label="Lihat aturan medan">
-            <Icon name="help" size={24} />
+          <button
+            className="icon-button"
+            onClick={() => {
+              controller.pause();
+              setHelp(true);
+            }}
+            aria-label="Aturan arena"
+          >
+            <Icon name="help" />
           </button>
         </div>
-        <div className="game-layout">
-          <div className="environment-column">
-            <div className="environment-top">
-              <span>{level.theme === "farm" ? "Kebun" : "Gurun"}</span>
-              <span>
-                {level.board.width} × {level.board.height} petak
-              </span>
+      </header>
+      <main className="match-main">
+        <section className="arena-column" aria-label="Pertandingan">
+          <div className="mission-row">
+            <div>
+              <p>{level.title}</p>
+              <h1>{level.mission}</h1>
             </div>
-            <BoardCanvas level={level} frame={state.frame} controller={controller} />
-            <div className="board-legend">
-              {state.trace ? (
-                adapter.legend.map((item) => (
-                  <span key={item.label}>
-                    <i style={{ background: item.color }} />
-                    {item.label}
-                  </span>
-                ))
-              ) : (
-                <>
-                  <span>
-                    <img src={spriteUrl(level.theme, "actor-down-idle-0")} width="32" height="32" alt="" />
-                    {theme.actor}
-                  </span>
-                  <span>
-                    <img src={spriteUrl(level.theme, level.mechanic === "navigation" ? "goal" : "crystal")} width="32" height="32" alt="" />
-                    {level.mechanic === "navigation" ? "Tujuan" : theme.resource}
-                  </span>
-                </>
-              )}
-            </div>
-            <div className="step-explanation" aria-live="polite">
-              <p>{result?.reason ?? (state.trace ? state.frame.note : level.tip)}</p>
-            </div>
-            {state.phase === "error" && (
-              <div className="feedback failed" role="alert">
-                <strong>Rekaman belum dapat diputar.</strong>
-                <p>{state.error}</p>
-                <button className="button secondary" onClick={() => controller.choose(state.pending ?? active?.id ?? level.options[0].id)}>
-                  Coba lagi
-                </button>
-              </div>
-            )}
+            <button className="participants-button" onClick={openSettings} aria-label="Peserta">
+              <Icon name="grid" size={17} />
+              <span>Peserta</span>
+            </button>
           </div>
-          <aside className="choices-panel" aria-labelledby="choices-heading">
-            <div className="choices-heading">
-              <div>
-                <h2 id="choices-heading">Pilih algoritma</h2>
-                <p>Mana yang paling cocok untuk misi ini?</p>
+          <div className="participant-strip" style={{ "--participants": state.frame.bots.length } as CSSProperties}>
+            {state.frame.bots.map((bot, i) => (
+              <button
+                key={bot.id}
+                className={`participant ${bot.id === focused ? "selected" : ""}`}
+                style={{ "--bot-color": BOT_COLORS[i] } as CSSProperties}
+                onClick={() => setFocused(bot.id)}
+                aria-pressed={bot.id === focused}
+                aria-label={`Amati ${getAlgorithm(bot.algorithm).name}${bot.player ? ", karakter saya" : ""}`}
+              >
+                <span className="participant-name">
+                  <i>{i + 1}</i>
+                  <strong>{getAlgorithm(bot.algorithm).short}</strong>
+                </span>
+                <span className="participant-score">
+                  {hasStarted
+                    ? level.mode === "gems"
+                      ? `${bot.score} gem`
+                      : `${(((bot.finishTick ?? state.frame.tick) * TICK_MS) / 1000).toFixed(1)} dtk`
+                    : bot.player
+                      ? "Kamu"
+                      : "Lawan"}
+                </span>
+              </button>
+            ))}
+          </div>
+          <div className="arena-meta">
+            <span style={{ color: theme.color }}>
+              <i style={{ background: theme.color }} />
+              {theme.name}
+            </span>
+            <span>
+              {hasStarted ? (
+                <>
+                  {state.phase === "paused" ? "Dijeda" : state.phase === "finished" ? "Selesai" : ""}
+                  <b>{((state.frame.tick * TICK_MS) / 1000).toFixed(1)} dtk</b>
+                </>
+              ) : (
+                `${level.board.width} × ${level.board.height} petak`
+              )}
+            </span>
+          </div>
+          <div
+            className="arena-stage"
+            style={
+              { "--board-ratio": (level.board.width * 32 + 16) / (level.board.height * 32 + 16), "--board-max-width": `${level.board.width * 32 * 3 + 16}px` } as CSSProperties
+            }
+          >
+            <div className="board-group">
+              <BoardCanvas level={level} frame={state.frame} playing={state.phase === "playing"} focused={focused} onReady={setBoardReady} />
+              <div className="arena-caption">
+                <span>
+                  <i className="visited-key" />
+                  Diperiksa <i className="frontier-key" />
+                  Kandidat
+                </span>
+                <p>
+                  {state.phase === "ready"
+                    ? "Pilih peserta atau langsung mulai."
+                    : `${getAlgorithm(observed.algorithm).short}: ${statusText[observed.status].toLowerCase()} · ${observed.expanded} petak diperiksa`}
+                </p>
               </div>
             </div>
-            <div className="choices">
-              {level.options.map((option, i) => {
-                const saved = levelProgress?.results[option.id],
-                  isActive = active?.id === option.id,
-                  shown = isActive && state.trace ? state.frame.metrics : saved?.metrics,
-                  doneActive = isActive && state.phase === "finished";
-                return (
-                  <button
-                    key={option.id}
-                    className={`choice ${isActive ? "active" : ""} ${saved?.passed ? "tried-success" : ""}`}
-                    disabled={["playing", "loading", "confirming"].includes(state.phase)}
-                    onClick={() => controller.choose(option.id)}
-                    aria-label={`${String.fromCharCode(65 + i)}. ${option.name}. ${saved ? tierText(saved) : option.description}`}
-                    aria-pressed={isActive}
-                  >
-                    <span className="choice-letter">{String.fromCharCode(65 + i)}</span>
-                    <span className="choice-content">
-                      <strong>{option.name}</strong>
-                      {shown && (
-                        <span className="choice-metrics">
-                          {level.metrics.map((m) => (
-                            <span key={m.id}>
-                              <b>
-                                {shown[m.id] ?? 0}
-                                {m.unit === "%" ? "%" : ""}
-                              </b>
-                              <small>{metricLabels[m.id] ?? m.label.toLowerCase()}</small>
-                            </span>
-                          ))}
-                        </span>
-                      )}
-                      {saved && (!isActive || doneActive) && (
-                        <span className={`choice-result ${saved.passed ? "good" : "bad"}`}>
-                          <Icon name={saved.passed ? "check" : "info"} size={12} />
-                          {tierText(saved)}
-                        </span>
-                      )}
-                      {isActive && state.phase === "playing" && (
-                        <span className="choice-result live">
-                          <span />
-                          Sedang diamati
-                        </span>
-                      )}
-                    </span>
-                    {!shown && <span className="choice-radio" />}
-                  </button>
-                );
-              })}
-            </div>
-            <p className="choice-hint">Pilih A–E. Kamu bisa mencoba lagi.</p>
-            {state.trace && (
-              <details className="metric-guide">
-                <summary>Arti metrik</summary>
-                {level.metrics.map((m) => (
-                  <div key={m.id}>
-                    <strong>
-                      {m.label}
-                      {m.required && m.limit !== undefined ? (
-                        <span className="metric-limit">
-                          {m.goal === "higher" ? "≥" : m.goal === "lower" ? "≤" : "="} {m.limit}
-                          {m.unit === "%" ? "%" : ""}
-                        </span>
-                      ) : null}
-                    </strong>
-                    <p>{m.description}</p>
-                  </div>
-                ))}
-              </details>
-            )}
-          </aside>
-        </div>
-        <p className="game-demo-note">Demo visual. Hasil menggunakan rekaman contoh.</p>
-        {storageWarning && (
-          <p className="error-text" role="alert">
-            Progres belum tersimpan di browser. Kamu tetap dapat bermain selama halaman ini terbuka.
+          </div>
+          <p className="sr-only" aria-live="polite">
+            {state.frame.note}
           </p>
-        )}
-      </main>
-      <footer className={`lesson-dock ${result?.passed ? "dock-success" : ""}`}>
-        <div className="lesson-dock-inner">
-          {result && (
-            <div className="dock-result" role="status">
-              <span className="feedback-symbol">
-                <Icon name={result.passed ? "check" : "info"} size={22} />
-              </span>
-              <h2>{tierText(result)}</h2>
-              {levelProgress?.firstTry && result.passed && <span className="first-try">Percobaan pertama</span>}
-              <button className="text-button" onClick={() => controller.play()}>
-                <Icon name="reset" size={16} />
-                Putar ulang
+          {state.phase === "error" && (
+            <div className="inline-error" role="alert">
+              <p>{state.error}</p>
+              <button className="text-button" onClick={() => start()}>
+                Coba lagi
               </button>
             </div>
           )}
-          {state.trace ? (
-            <div className="playback">
-              <div className="playback-top">
-                <div className="playback-buttons">
-                  <button
-                    className="icon-button"
-                    title="Ulang dari awal"
-                    aria-label="Ulang dari awal"
-                    disabled={!state.trace || state.phase === "loading"}
-                    onClick={() => controller.seek(0)}
-                  >
-                    <Icon name="reset" size={18} />
-                  </button>
-                  <button
-                    className="icon-button"
-                    title="Langkah sebelumnya"
-                    aria-label="Langkah sebelumnya"
-                    disabled={!state.trace || state.cursor === 0 || state.phase === "loading"}
-                    onClick={() => controller.step(-1)}
-                  >
-                    <Icon name="step-back" size={18} />
-                  </button>
-                  <button
-                    ref={playControl}
-                    className="play-button"
-                    aria-label={state.phase === "playing" ? "Jeda simulasi" : "Putar simulasi"}
-                    disabled={!state.trace || state.phase === "loading"}
-                    onClick={() => (state.phase === "playing" ? controller.pause() : controller.play())}
-                  >
-                    <Icon name={state.phase === "playing" ? "pause" : "play"} size={19} />
-                  </button>
-                  <button
-                    className="icon-button"
-                    title="Langkah berikutnya"
-                    aria-label="Langkah berikutnya"
-                    disabled={!state.trace || state.cursor === total || state.phase === "loading"}
-                    onClick={() => controller.step(1)}
-                  >
-                    <Icon name="step-next" size={18} />
-                  </button>
-                </div>
-                <span className="step-counter">
-                  <span className="counter-label">Langkah </span>
-                  <strong>{state.cursor}</strong> / {total}
-                </span>
-                <label className="speed-label">
-                  <span className="sr-only">Kecepatan simulasi</span>
-                  <select value={state.speed} onChange={(e) => controller.setSpeed(Number(e.target.value))}>
-                    {[0.5, 1, 2, 4].map((n) => (
-                      <option key={n} value={n}>
-                        {n.toLocaleString("id-ID")}×
-                      </option>
-                    ))}
-                  </select>
-                </label>
-              </div>
-              <input
-                className="timeline"
-                type="range"
-                min="0"
-                max={Math.max(1, total)}
-                value={state.cursor}
-                disabled={!state.trace || state.phase === "loading"}
-                aria-label="Langkah simulasi"
-                aria-valuetext={`Langkah ${state.cursor} dari ${total}`}
-                onChange={(e) => controller.seek(Number(e.target.value))}
-              />
+        </section>
+      </main>
+      <footer className="match-dock">
+        {result && (
+          <div className={`match-result ${result.won ? "won" : ""}`} role="status">
+            <div>
+              <strong>{resultTitle}</strong>
+              <p>
+                {winners ? `${winners} ${state.frame.winners.length > 1 ? "berbagi posisi teratas" : "menang"}.` : "Belum ada penjelajah yang mencapai finis."}{" "}
+                {level.mode === "gems" ? `Kamu mendapat ${player.score} gem.` : ""}
+              </p>
             </div>
-          ) : (
-            <p className="dock-hint">
-              <Icon name="play" size={20} />
-              Pilih algoritma untuk melihat cara kerjanya.
-            </p>
+            {savedRun === state.run && (
+              <Link href={next ? `/play/${next.id}` : "/"} className="button primary next-level">
+                {next ? "Level berikutnya" : "Semua level selesai"}
+              </Link>
+            )}
+          </div>
+        )}
+        <div className="transport">
+          {hasStarted && (
+            <button
+              className="icon-button"
+              onClick={() => start()}
+              disabled={!boardReady || !hasStarted || state.phase === "starting"}
+              aria-label="Mulai ulang pertandingan"
+              title="Mulai ulang"
+            >
+              <Icon name="reset" />
+            </button>
           )}
-          {result?.passed ? (
-            next ? (
-              <Link className="button primary dock-next" href={"/play/" + next.id}>
-                Level berikutnya
-              </Link>
-            ) : (
-              <Link className="button primary dock-next" href="/">
-                Semua level selesai
-              </Link>
-            )
-          ) : !state.trace ? (
-            <button className="button secondary" onClick={() => setShowTip(true)}>
-              Aturan medan
+          {hasStarted && (
+            <button className="icon-button" onClick={() => controller.step(-1)} disabled={!state.cursor} aria-label="Langkah sebelumnya">
+              <Icon name="step-back" />
             </button>
-          ) : null}
-        </div>
-      </footer>
-      {pending && state.phase === "confirming" && (
-        <Modal title={`Jalankan ${pending.name}?`} onClose={() => controller.cancel()}>
-          <div className="confirm-actor">
-            <img src={spriteUrl(level.theme, "actor-down-idle-0")} width="64" height="64" alt={`${theme.actor} siap bereksplorasi`} />
-            <p>{pending.detail}</p>
-          </div>
-          <p className="modal-note">Amati rekaman langkahnya dan bandingkan hasilnya. Kamu bisa mencoba pilihan lain setelah simulasi selesai.</p>
-          <div className="modal-actions">
-            <button className="button secondary" onClick={() => controller.cancel()}>
-              Pilih lagi
-            </button>
-            <button className="button primary" onClick={() => void confirm()}>
-              <Icon name="play" size={16} />
-              Jalankan
-            </button>
-          </div>
-        </Modal>
-      )}
-      {state.phase === "loading" && (
-        <div className="loading-toast" role="status">
-          <span className="loader" />
-          Memuat rekaman ekspedisi…
-        </div>
-      )}
-      {showTip && (
-        <Modal title="Kenali medannya" onClose={() => setShowTip(false)}>
-          <p>{level.tip}</p>
-          <div className="terrain-guide">
-            {(level.mechanic === "navigation" ? theme.terrainGuide : theme.resourceGuide).map((item) => (
-              <div key={item.asset}>
-                <img src={spriteUrl(level.theme, item.asset)} width="32" height="32" alt="" />
-                <span>{item.label}</span>
-              </div>
-            ))}
-          </div>
-          <button className="button primary full" onClick={() => setShowTip(false)}>
-            Mengerti
+          )}
+          <button
+            ref={playButton}
+            className={`play-button ${!hasStarted ? "start-button" : ""}`}
+            disabled={!boardReady || state.phase === "starting"}
+            onClick={() => (running ? controller.pause() : controller.play())}
+            aria-label={
+              state.phase === "playing"
+                ? "Jeda pertandingan"
+                : state.phase === "paused"
+                  ? "Lanjutkan pertandingan"
+                  : state.phase === "finished"
+                    ? "Mulai ulang pertandingan"
+                    : "Mulai pertandingan"
+            }
+          >
+            <Icon name={state.phase === "playing" ? "pause" : "play"} size={23} />
+            {!hasStarted && <span>Mulai</span>}
           </button>
+          {hasStarted && (
+            <button
+              className="icon-button"
+              onClick={() => controller.step(1)}
+              disabled={!hasStarted || state.phase === "starting" || state.phase === "error" || state.frame.phase === "finished"}
+              aria-label="Langkah berikutnya"
+            >
+              <Icon name="step-next" />
+            </button>
+          )}
+          <label className="speed-label">
+            <span className="sr-only">Kecepatan simulasi</span>
+            <select value={state.speed} onChange={(e) => controller.setSpeed(Number(e.target.value))}>
+              {[0.5, 1, 2, 4].map((n) => (
+                <option key={n} value={n}>
+                  {n.toLocaleString("id-ID")}×
+                </option>
+              ))}
+            </select>
+          </label>
+          {hasStarted && (
+            <button
+              className="icon-button"
+              onClick={() => {
+                controller.pause();
+                setStats(true);
+              }}
+              aria-label="Statistik dan riwayat"
+              title="Statistik dan riwayat"
+            >
+              <Icon name="info" />
+            </button>
+          )}
+        </div>
+        {storageWarning && (
+          <p className="storage-warning" role="alert">
+            Progres belum tersimpan. Kamu tetap dapat bermain di tab ini.
+          </p>
+        )}
+      </footer>
+      {panel && (
+        <Modal title="Pilih peserta" onClose={() => setPanel(false)}>
+          <p className="modal-intro">Pilih algoritmamu dan satu sampai tiga lawan.</p>
+          <Roster level={level} draft={draft} selectPlayer={selectPlayer} toggleOpponent={toggleOpponent} />
+          <div className="modal-sticky-action">
+            <button className="button primary full" disabled={!boardReady || draft.opponents.length < 1 || draft.opponents.length > 3} onClick={() => start(draft)}>
+              <Icon name="play" size={17} />
+              Mulai pertandingan
+            </button>
+          </div>
         </Modal>
       )}
+      {stats && (
+        <Modal title="Statistik pertandingan" onClose={() => setStats(false)}>
+          <p className="modal-intro">Waktu finis = waktu mencari + perjalanan. 1 tick = 0,05 detik.</p>
+          <div className="stat-table-wrap">
+            <table className="stat-table">
+              <thead>
+                <tr>
+                  <th>Penjelajah</th>
+                  <th>Petak</th>
+                  <th>State</th>
+                  <th>Biaya</th>
+                  <th>Cari / gerak</th>
+                </tr>
+              </thead>
+              <tbody>
+                {state.frame.bots.map((b) => (
+                  <tr key={b.id}>
+                    <th>{getAlgorithm(b.algorithm).short}</th>
+                    <td>{b.expanded}</td>
+                    <td>{b.memory}</td>
+                    <td>{b.cost}</td>
+                    <td>
+                      {(b.searchTicks * 0.05).toFixed(1)} / {(b.moveTicks * 0.05).toFixed(1)} dtk
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <label className="history-label">
+            Riwayat yang sudah dihitung{" "}
+            <strong>
+              Tick {state.cursor} / {state.head}
+            </strong>
+            <input
+              className="timeline"
+              type="range"
+              min={0}
+              max={Math.max(1, state.head)}
+              value={state.cursor}
+              disabled={!state.head}
+              aria-label="Riwayat simulasi"
+              onChange={(e) => controller.seek(Number(e.target.value))}
+            />
+          </label>
+          <p className="modal-note">Petak = node diperiksa. State = puncak informasi pencarian tersimpan. Biaya = total medan yang dilalui.</p>
+        </Modal>
+      )}
+      {help && (
+        <Modal title={`Arena ${theme.name.toLowerCase()}`} onClose={() => setHelp(false)}>
+          <p>
+            {level.mode === "race"
+              ? "Cari jalan lalu capai bendera finis. Penjelajah tercepat menang; waktu berpikir ikut dihitung."
+              : "Rebut gem sebelum lawan. Gem yang dicapai pada tick yang sama memberi satu poin kepada setiap penjelajah yang tiba."}
+          </p>
+          <div className="terrain-guide">
+            {(
+              [
+                ["ground", theme.ground],
+                ["path", theme.path],
+                ["slow", theme.slow],
+                ["water", theme.water],
+                ["wall", theme.wall],
+                ["bridge-h", "Jembatan mendatar"],
+                ["bridge-v", "Jembatan tegak"],
+              ] as const
+            ).map(([id, label]) => {
+              const index = ["ground", "path", "slow", "water", "wall", "bridge-h", "bridge-v"].indexOf(id);
+              return (
+                <div key={id}>
+                  <span className="terrain-swatch" style={{ backgroundImage: `url(/assets/game/themes/${level.theme}/atlas.png)`, backgroundPosition: `-${index * 32}px 0` }} />
+                  <span>
+                    {label}
+                    <small>{id === "wall" || id === "water" ? "Tidak dapat dilalui" : id === "slow" ? "4 biaya gerak" : "1 biaya gerak"}</small>
+                  </span>
+                </div>
+              );
+            })}
+          </div>
+          <p className="modal-note">Penjelajah tidak saling menghalangi. Menang atau kalah tetap membuka level berikutnya setelah pertandingan selesai.</p>
+        </Modal>
+      )}
+    </div>
+  );
+}
+function Roster({
+  level,
+  draft,
+  selectPlayer,
+  toggleOpponent,
+}: {
+  level: ReturnType<typeof getLevel> & {};
+  draft: MatchConfig;
+  selectPlayer: (id: AlgorithmId) => void;
+  toggleOpponent: (id: AlgorithmId) => void;
+}) {
+  return (
+    <div className="algorithm-list">
+      {algorithms.map((algorithm) => {
+        const reason = unavailableReason(algorithm.id, level),
+          own = draft.player === algorithm.id,
+          opponent = draft.opponents.includes(algorithm.id);
+        return (
+          <div key={algorithm.id} className="algorithm-entry">
+            <div className="algorithm-name">
+              <h3>{algorithm.name}</h3>
+            </div>
+            <p>{reason ?? algorithm.description}</p>
+            <div className="algorithm-actions">
+              <label>
+                <input
+                  type="radio"
+                  name="player-algorithm"
+                  checked={own}
+                  disabled={!!reason}
+                  onChange={() => selectPlayer(algorithm.id)}
+                  aria-label={`Gunakan ${algorithm.name}`}
+                />
+                Saya
+              </label>
+              <label>
+                <input
+                  type="checkbox"
+                  checked={opponent}
+                  disabled={!!reason || own || (!opponent && draft.opponents.length >= 3)}
+                  onChange={() => toggleOpponent(algorithm.id)}
+                  aria-label={`Lawan ${algorithm.name}`}
+                />
+                Lawan
+              </label>
+            </div>
+          </div>
+        );
+      })}
     </div>
   );
 }

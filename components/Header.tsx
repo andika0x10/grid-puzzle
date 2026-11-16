@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Icon from "./Icon";
-export default function Header({ compact = false, completed, total = 10 }: { compact?: boolean; completed?: number; total?: number }) {
+export default function Header({ compact = false, completed, total = 14 }: { compact?: boolean; completed?: number; total?: number }) {
   return (
     <header className={`site-header ${compact ? "compact-header" : ""}`}>
       <div className="header-inner">
@@ -14,14 +14,13 @@ export default function Header({ compact = false, completed, total = 10 }: { com
           </Link>
         ) : completed !== undefined ? (
           <div className="header-progress">
-            <Icon name="check" size={19} />
             <span>
               <strong>{completed}</strong> / {total} level
             </span>
             <progress value={completed} max={total} aria-label={`${completed} dari ${total} level selesai`} />
           </div>
         ) : (
-          <span className="header-label">Demo</span>
+          <span className="header-label">Arena petualang</span>
         )}
       </div>
     </header>

@@ -1,121 +1,127 @@
-// Real Chromium/WebGL review. Start the app, then: npm run test:visual -- http://127.0.0.1:5173
 import assert from "node:assert/strict";
 import fs from "node:fs/promises";
 import { chromium } from "playwright";
-
-const root = process.argv[2] ?? "http://127.0.0.1:5173";
-const output = "artifacts/layout-revision";
+import sharp from "sharp";
+const root = process.argv[2] ?? "http://127.0.0.1:5173",
+  output = "artifacts/arena-review";
 await fs.mkdir(output, { recursive: true });
 const catalog = JSON.parse(await fs.readFile("content/catalog.json", "utf8"));
 const browser = await chromium.launch({ headless: true, args: ["--enable-unsafe-swiftshader"] });
 const errors = [],
-  findings = [];
-const capture = (page, name) => page.screenshot({ path: `${output}/${name}.png` });
-
-async function waitForBoard(page) {
-  await page.locator("canvas").waitFor();
-  await page.getByText("Menyiapkan medan…", { exact: true }).waitFor({ state: "hidden" });
-}
-async function checkLayout(page, width, screen) {
-  const result = await page.evaluate(() => {
-    const main = document.querySelector("main").getBoundingClientRect();
-    const dock = document.querySelector(".lesson-dock")?.getBoundingClientRect();
-    return {
-      viewport: innerWidth,
-      documentWidth: document.documentElement.scrollWidth,
-      main: main.toJSON(),
-      dock: dock?.toJSON(),
-    };
+  checks = [],
+  replayRequests = [];
+function observe(page) {
+  page.on("pageerror", (e) => errors.push(e.message));
+  page.on("request", (r) => {
+    if (/\/demo\/traces\//.test(r.url())) replayRequests.push(r.url());
   });
-  assert.ok(result.documentWidth <= width, `${screen}/${width}: page overflows horizontally`);
-  assert.ok(Math.abs(result.main.x - (width - result.main.width) / 2) < 2, `${screen}/${width}: content is not centered`);
-  if (result.dock) assert.ok(result.main.bottom <= result.dock.top + 1, `${screen}/${width}: playback overlaps the content`);
-  findings.push({ width, screen, ...result });
 }
-async function checkChoices(page) {
-  const choices = page.locator(".choice");
-  assert.equal(await choices.count(), 5);
-  for (const choice of await choices.all()) {
-    await choice.scrollIntoViewIfNeeded();
-    const box = await choice.boundingBox();
-    const dock = await page.locator(".lesson-dock").boundingBox();
-    assert.ok(box.y >= 0 && box.y + box.height <= dock.y + 1, "Answer cannot be scrolled clear of the playback controls");
-  }
+async function ready(page) {
+  await page.locator("canvas").waitFor();
+  await page.getByText("Menyiapkan arena…", { exact: true }).waitFor({ state: "hidden" });
 }
-async function finish(page, id, screenshots) {
-  const level = catalog.levels.find((l) => l.id === id);
-  let option;
-  for (const candidate of level.options) {
-    const trace = JSON.parse(await fs.readFile(`public${level.traceRefs[candidate.id]}`, "utf8"));
-    if (trace.result.passed) {
-      option = candidate;
-      break;
-    }
+async function layout(page, name) {
+  await page.evaluate(() => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve))));
+  const data = await page.evaluate(() => ({
+    width: innerWidth,
+    height: innerHeight,
+    documentWidth: document.documentElement.scrollWidth,
+    board: document.querySelector(".board-wrap")?.getBoundingClientRect().toJSON(),
+    dock: document.querySelector(".match-dock")?.getBoundingClientRect().toJSON(),
+    header: document.querySelector(".match-header")?.getBoundingClientRect().toJSON(),
+  }));
+  assert.ok(data.documentWidth <= data.width, `${name}: horizontal overflow`);
+  if (data.board) {
+    assert.ok(data.board.top >= data.header.bottom - 1, `${name}: board above viewport`);
+    assert.ok(data.board.bottom <= data.dock.top + 1, `${name}: board obscured by controls`);
+    assert.ok(data.board.height >= 100, `${name}: board too short`);
+    const { data: pixels, info } = await sharp(await page.locator(".board-wrap").screenshot())
+      .removeAlpha()
+      .raw()
+      .toBuffer({ resolveWithObject: true });
+    let colored = 0;
+    for (let i = 0; i < pixels.length; i += info.channels)
+      if (Math.max(pixels[i], pixels[i + 1], pixels[i + 2]) - Math.min(pixels[i], pixels[i + 1], pixels[i + 2]) > 25) colored++;
+    assert.ok(colored / (info.width * info.height) > 0.03, `${name}: blank WebGL board`);
   }
-  const index = level.options.findIndex((o) => o.id === option.id);
-  await page.locator(".choice").nth(index).click();
-  const dialog = await page.getByRole("dialog").boundingBox();
-  const viewport = page.viewportSize();
-  assert.ok(dialog.x >= 0 && dialog.x + dialog.width <= viewport.width, "Confirmation is clipped");
-  if (screenshots) await capture(page, `confirm-${screenshots}`);
-  await page.getByRole("button", { name: "Jalankan", exact: true }).click();
-  await page.getByRole("button", { name: "Jeda simulasi" }).click();
-  await page.getByRole("slider", { name: "Langkah simulasi" }).press("End");
-  await page.getByRole("link", { name: "Level berikutnya", exact: true }).waitFor();
-  if (screenshots) {
-    await page.locator(".dock-result").waitFor();
-    await page.locator(".game").evaluate((el) => {
-      el.scrollTop = 0;
-    });
-    await capture(page, `result-${screenshots}`);
-  }
+  checks.push({ name, ...data });
+  await page.screenshot({ path: `${output}/${name}.png` });
 }
-
+const complete = { version: 2, levels: Object.fromEntries(catalog.levels.map((l) => [l.id, { completed: true, matches: 1, wins: 0, bestTicks: null, bestGems: 0 }])) };
 try {
-  for (const width of [1440, 1024, 768, 390, 320]) {
-    const page = await browser.newPage({
-      viewport: { width, height: 900 },
-      deviceScaleFactor: 1,
-      reducedMotion: "reduce",
+  for (const [width, height] of [
+    [320, 568],
+    [360, 640],
+    [390, 844],
+    [412, 915],
+    [844, 390],
+    [768, 1024],
+    [1440, 900],
+  ]) {
+    const context = await browser.newContext({ viewport: { width, height }, reducedMotion: "reduce" });
+    const page = await context.newPage();
+    observe(page);
+    let workers = 0;
+    page.on("worker", (worker) => {
+      if (worker.url().includes("simulation.worker")) workers++;
     });
-    page.on("pageerror", (e) => errors.push({ width, message: e.message }));
     await page.goto(root, { waitUntil: "networkidle" });
-    await page.getByRole("link", { name: /Level 01 Kenali medan/ }).waitFor();
-    await checkLayout(page, width, "home");
-    await capture(page, `home-${width}`);
-    await page.getByRole("link", { name: /Level 01 Kenali medan/ }).click();
-    await waitForBoard(page);
-    await checkLayout(page, width, "game");
-    await capture(page, `game-${width}`);
-    await checkChoices(page);
-    await page.locator(".choices-heading").scrollIntoViewIfNeeded();
-    await capture(page, `choices-${width}`);
-    if ([1440, 390, 320].includes(width)) {
-      await finish(page, "navigation-1", String(width));
-      await checkLayout(page, width, "result");
-      await page.goto(root, { waitUntil: "networkidle" });
-      await page.getByRole("link", { name: /Level 02 Jalan buntu/ }).waitFor();
-      await capture(page, `progress-${width}`);
-      for (const id of catalog.sections[0].levelIds.slice(1)) {
-        await page.goto(`${root}/play/${id}`, { waitUntil: "networkidle" });
-        await waitForBoard(page);
-        await finish(page, id);
-      }
-      await page.getByRole("link", { name: "Level berikutnya", exact: true }).click();
-      await waitForBoard(page);
-      await checkLayout(page, width, "desert");
-      await capture(page, `desert-${width}`);
-      await finish(page, "clustering-1", `desert-${width}`);
-      await page.locator(".game").evaluate((el) => {
-        el.scrollTop = 0;
-      });
-      await capture(page, `desert-groups-${width}`);
+    await page.getByRole("link", { name: /Level 1 Langkah pertama/ }).waitFor();
+    await layout(page, `home-${width}`);
+    await page.getByRole("link", { name: /Level 1 Langkah pertama/ }).click();
+    await ready(page);
+    assert.equal(workers, 0, "Worker started before Play");
+    await layout(page, `ready-${width}`);
+    {
+      await page.getByRole("button", { name: "Peserta", exact: true }).click();
+      const dialog = page.getByRole("dialog", { name: "Pilih peserta" });
+      assert.equal(await dialog.locator(".algorithm-entry").count(), 5);
+      await dialog.getByRole("radio", { name: "Gunakan Bidirectional BFS" }).check();
+      await dialog.getByRole("checkbox", { name: "Lawan Depth-First Search" }).check();
+      await dialog.getByRole("button", { name: "Mulai pertandingan", exact: true }).click();
     }
-    await page.close();
+    await page.waitForFunction(() => parseFloat(document.querySelector(".arena-meta b").textContent) >= 0.3);
+    await page.getByRole("button", { name: "Jeda pertandingan", exact: true }).click();
+    assert.equal(workers, 1);
+    await layout(page, `live-${width}`);
+    const paused = await page.locator(".arena-meta b").textContent();
+    await page.waitForTimeout(180);
+    assert.equal(await page.locator(".arena-meta b").textContent(), paused, "Pause advanced the display");
+    const tick = await page.locator(".board-wrap .sr-only").textContent();
+    await page.getByRole("button", { name: "Langkah berikutnya" }).click();
+    await page.waitForFunction((before) => document.querySelector(".board-wrap .sr-only").textContent !== before, tick);
+    await page.getByRole("button", { name: "Mulai ulang pertandingan", exact: true }).click();
+    await page.getByRole("button", { name: "Jeda pertandingan", exact: true }).waitFor();
+    assert.equal(workers, 2);
+    await page.getByRole("button", { name: "Jeda pertandingan", exact: true }).click();
+    await page.getByRole("combobox", { name: "Kecepatan simulasi" }).selectOption("4");
+    await page.getByRole("button", { name: "Lanjutkan pertandingan", exact: true }).click();
+    await page
+      .getByRole("status")
+      .filter({ hasText: /Kamu menang|Pertandingan selesai|Hasil seri/ })
+      .waitFor({ timeout: 20000 });
+    await layout(page, `result-${width}`);
+    await page.evaluate((p) => localStorage.setItem("grid-puzzle.progress.v2", JSON.stringify(p)), complete);
+    if ([390, 1440].includes(width)) {
+      for (const level of catalog.levels) {
+        await page.goto(`${root}/play/${level.id}`, { waitUntil: "networkidle" });
+        await ready(page);
+        await layout(page, `${level.id}-${width}`);
+        await page.getByRole("combobox", { name: "Kecepatan simulasi" }).selectOption("4");
+        await page.getByRole("button", { name: "Mulai pertandingan", exact: true }).click();
+        await page
+          .getByRole("status")
+          .filter({ hasText: /Kamu menang|Pertandingan selesai|Hasil seri/ })
+          .waitFor({ timeout: 20000 });
+        await layout(page, `result-${level.id}-${width}`);
+      }
+    }
+    await context.close();
   }
-  assert.deepEqual(errors, [], "Browser runtime errors");
-  console.log(`Chromium review passed: ${findings.length} layout checks, 5 viewport sizes, both biomes, confirmation, replay, saved progress, and section unlock.`);
+  assert.deepEqual(errors, [], "Runtime browser errors");
+  assert.deepEqual(replayRequests, [], "Static replay requested");
+  console.log(`Chromium passed: ${checks.length} layouts, 7 viewports, all 14 live levels, 7 themes, four explorers, Pause/step/restart, and no static replays.`);
 } finally {
-  await fs.writeFile(`${output}/findings.json`, JSON.stringify({ errors, findings }, null, 2));
+  await fs.writeFile(`${output}/findings.json`, JSON.stringify({ errors, replayRequests, checks }, null, 2));
   await browser.close();
 }

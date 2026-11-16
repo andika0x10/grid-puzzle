@@ -1,0 +1,162 @@
+{
+  "schemaVersion": 2,
+  "id": "gems-1",
+  "sectionId": "gems",
+  "order": 1,
+  "title": "Panen gem",
+  "mission": "Ambil gem sebanyak mungkin.",
+  "theme": "farm",
+  "mode": "gems",
+  "seed": 2001,
+  "timeLimit": 1200,
+  "board": {
+    "width": 11,
+    "height": 9,
+    "terrain": [
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "ground",
+      "ground",
+      "wall",
+      "wall",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "wall",
+      "wall",
+      "ground",
+      "ground",
+      "wall",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "wall",
+      "wall",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "wall",
+      "wall",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "wall",
+      "wall",
+      "ground",
+      "ground",
+      "ground",
+      "wall",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "wall",
+      "wall",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "wall",
+      "wall",
+      "path",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall"
+    ],
+    "spawn": {
+      "x": 1,
+      "y": 7
+    },
+    "gems": [
+      {
+        "x": 8,
+        "y": 5
+      },
+      {
+        "x": 5,
+        "y": 6
+      },
+      {
+        "x": 7,
+        "y": 2
+      },
+      {
+        "x": 1,
+        "y": 3
+      },
+      {
+        "x": 6,
+        "y": 7
+      },
+      {
+        "x": 6,
+        "y": 3
+      },
+      {
+        "x": 4,
+        "y": 2
+      }
+    ],
+    "decorations": [
+      {
+        "x": 0,
+        "y": 0
+      },
+      {
+        "x": 10,
+        "y": 8
+      }
+    ]
+  },
+  "changes": []
+}

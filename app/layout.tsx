@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Grid Puzzle — Petualangan kecil, logika besar",
-  icons: { icon: "/assets/game/farm/sprites/actor-down-idle-0.png" },
-  description: "Pilih algoritma, amati langkahnya, dan temukan pendekatan yang paling pas dalam petualangan pixel art.",
+  title: "Grid Puzzle — Arena petualang",
+  icons: { icon: "/assets/game/characters/farm/portrait.png" },
+  description: "Adu algoritma dalam balap petualang dan perebutan gem di tujuh dunia pixel art. Setiap pertandingan dihitung langsung saat Play.",
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {

@@ -1,6 +1,6 @@
 # Grid Puzzle
 
-Game edukasi algoritma berbahasa Indonesia dengan dunia pixel art, UI lapang, dan engine replay PixiJS v8. Dibangun di atas vinext + React + Cloudflare Workers.
+Arena petualang berbahasa Indonesia: adu algoritma dalam **Balap rute** dan **Perebutan gem**. Ada 14 level dan tujuh dunia: kebun, gurun, hutan, salju, vulkanik, pabrik, dan luar angkasa. Dibangun dengan vinext, React, dan PixiJS v8 di Cloudflare Workers.
 
 ## Jalankan
 
@@ -9,46 +9,49 @@ npm install
 npm run dev
 ```
 
-Buka URL yang dicetak Vite. Beranda langsung menampilkan perjalanan: dua section, sepuluh level, dan lima pilihan pada setiap level. Konfirmasi pilihan untuk memutar rekaman dan membandingkan hasilnya.
+Buka URL Vite. Pilih algoritmamu dan satu sampai tiga lawan, lalu tekan Play. Tombol Peserta membuka daftar lengkap algoritma. Menang atau kalah tetap membuka level berikutnya.
 
-**Versi ini adalah demo visual.** Lima puluh replay dan metrik merupakan contoh ilustrasi. Progres disimpan di browser dan dapat diulang dari beranda. Pemeriksaan jawaban server, cookie anonim, D1, dan Durable Objects disiapkan sebagai tahap berikutnya melalui kontrak provider; belum diimplementasikan.
+## Simulasi langsung
 
-## Perintah
+JSON dalam `content/levels` hanya berisi kondisi awal: peta, tema, spawn, finis atau gem, seed, batas waktu, serta jadwal perubahan medan. Tidak ada rekaman pertandingan, jalur, metrik hasil, atau jawaban yang disimpan sebagai konten.
 
-| Perintah                  | Kegunaan                                                 |
-| ------------------------- | -------------------------------------------------------- |
-| `npm run validate:levels` | Validasi section, level, 50 replay, aset, dan atlas      |
-| `npm test`                | Tes engine, progres, dan interaksi komponen              |
-| `npm run test:visual`     | Review Chromium, WebGL, screenshot, dan layout responsif |
-| `npm run typecheck`       | Pemeriksaan TypeScript                                   |
-| `npm run build`           | Build Worker dan aset produksi                           |
-| `npm run start`           | Preview build produksi secara lokal                      |
-| `npm run content:build`   | Bangun katalog dari JSON sumber level                    |
-| `npm run assets:build`    | Kemas sumber gambar menjadi atlas, sprite, dan thumbnail |
+`game/search.ts` menjalankan A*, Weighted A* (bobot 1,5), Greedy Best-First, DFS, dan Bidirectional BFS secara bertahap. Bidirectional BFS membutuhkan biaya medan seragam. Semua nama dan deskripsi berasal dari katalog algoritma yang dapat ditambah.
 
-## Dokumentasi
+Play membuat Web Worker dan state pencarian baru. Main thread meminta batch kecil, maksimal delapan tick, sesuai waktu berjalan; worker tidak menghitung seluruh pertandingan di awal. Pause menghentikan permintaan baru. Langkah manual benar-benar menghitung satu tick. Riwayat RAM hanya mencakup tick yang sudah dihitung. Play setelah melihat riwayat mengejar ujung riwayat lalu melanjutkan engine. Mulai ulang menginisialisasi kembali algoritma. Pergantian tab menjeda permainan; pergantian level menghentikan worker.
 
-- [Konsep algoritma dan metrik](docs/algorithm-concepts.md)
-- [Panduan engine dan template level](docs/level-authoring.md)
-- [Design system dan spesifikasi pixel art](docs/design-system.md)
-- [Riset game pixel dan arah aset kebun/gurun](docs/pixel-art-direction.md)
-- [Revisi layout dan referensi Duolingo](docs/layout-revision.md)
-- [Prompt aset dan provenance](public/assets/game/source/prompts.json)
+Satu tick adalah 50 ms. Setiap penjelajah dapat memeriksa satu node per tick. Bergerak satu petak normal memerlukan empat tick; medan lambat enam belas tick. Pemenang balapan ditentukan oleh pencarian ditambah perjalanan. Batas pertandingan 1.200 tick. Angka ini merupakan waktu simulasi yang konsisten antarperangkat. Hasil seed dan peserta yang sama dapat direproduksi.
 
-Sumber level ada di `content/levels`, template di `content/templates`, replay di `public/demo/traces`. Primitive replay dan schema bersifat terpisah dari renderer. Menambah level untuk mekanik yang tersedia tidak membutuhkan perubahan komponen UI.
+Penjelajah tidak saling menghalangi. Gem diambil sesudah semua penjelajah menjalankan tick yang sama; kedatangan serentak memberi satu poin kepada setiap penjelajah yang tiba. Target yang diambil lawan dihitung ulang. Penutupan rintangan menunggu petak kosong. Jalan terputus dan batas waktu memiliki status tersendiri.
 
-## Kontrol dan aksesibilitas
+## Progres
 
-Gunakan kontrol HTML untuk putar/jeda, satu langkah, timeline, dan kecepatan. Di luar kontrol formulir: Spasi mengatur play/pause, panah kiri/kanan mengubah langkah, A–E membuka pilihan. Escape membatalkan dialog. Pergantian tab menjeda simulasi. Papan besar dapat digeser di dalam area papan. Reduced motion mematikan animasi dekoratif; angka kelompok melengkapi warna.
+Browser menyimpan ringkasan progres dan rekor melalui `grid-puzzle.progress.v2`; riwayat pertandingan tidak dipersistenkan. Penyimpanan membaca progres terbaru dan menggunakan Web Locks ketika tersedia, serta menyinkronkan perubahan antar-tab. Penyimpanan yang diblokir memakai memori tab. Progres navigasi versi lama dimigrasikan menjadi level selesai, tanpa mempertahankan hasil ilustratifnya.
 
-## Aset
+## Kontrol
 
-Aset dunia dibuat dengan imagegen built-in: **kebun dengan petani** dan **gurun dengan sherif**. Sumber PNG serta prompt disimpan di `public/assets/game/source`. Masing-masing biome memiliki atlas 40 frame 32 × 32 di `public/assets/game/farm` dan `public/assets/game/desert` (80 frame total). `scripts/pack-assets.mjs` memotong, menormalkan nearest-neighbor, membatasi palet, menyamakan baseline karakter, dan mengemas alpha tegas. Thumbnail memakai definisi papan dan sprite yang sama. Geist disertakan secara lokal dengan lisensi OFL.
+- Play/jeda, langkah sebelumnya/berikutnya, mulai ulang, dan kecepatan 0,5×–4×.
+- Statistik membuka metrik dan timeline riwayat yang sudah dihitung.
+- Sentuh peserta untuk mengamati frontier, petak diperiksa, dan rutenya.
+- Seluruh papan menyesuaikan lebar serta tinggi layar. Level lanjutan berisi lebih banyak petak, hingga 31 × 23 pada arena gem.
+- Spasi mengatur Play/jeda dan panah kiri/kanan mengubah langkah ketika fokus berada di luar kontrol formulir. Escape menutup dialog.
+- Reduced motion, fokus keyboard, nomor peserta, dan label melengkapi warna.
 
-## Verifikasi
+## Konten dan aset
 
-Tes mencakup seluruh replay pada empat kecepatan, seeking, progres, data rusak, konfirmasi, error/retry, dan perpindahan section. Tes DOM menggunakan happy-dom dan mock canvas. Review visual terpisah memakai Chromium dan renderer PixiJS nyata pada viewport 320/390/768/1024/1440 px, termasuk kedua biome, konfirmasi, replay, dan progres. Screenshot dan laporan berada di `artifacts/layout-revision/`.
+Edit definisi level lalu jalankan `npm run content:build`. `npm run content:generate` membangun ulang 14 level bawaan dari sumber authoring; perintah ini menimpa definisi bawaan tersebut.
 
-Untuk mengulang review: jalankan aplikasi, lalu `npm run test:visual -- http://127.0.0.1:5173` (sesuaikan URL server). Jika browser Playwright belum terpasang, jalankan `npx playwright install chromium` sekali. Pengujian memakai konteks browser terpisah.
+Semua tema memakai aturan terrain yang sama. Setiap tema memiliki atlas delapan frame medan dan atlas 24 pose karakter manusia: petani, sherif, penjaga hutan, pendaki salju, penjelajah vulkanik, mekanik, dan astronaut dengan wajah manusia. Atlas bersama memuat lima frame objek permainan. Hanya empat belas PNG terpisah yang dipakai UI: tujuh dekor dunia dan tujuh potret karakter.
 
-`scripts/create-demo.mjs` membangun ulang sepuluh level dan lima puluh storyboard bawaan. Menjalankannya menimpa konten demo bawaan; gunakan template untuk menulis level baru.
+Sprite dibuat dengan **imagegen built-in**, lalu dikemas dengan crop, normalisasi nearest-neighbor, alpha tegas, palet terbatas, serta baseline penjelajah yang konsisten. Sumber dan prompt tersimpan di [public/assets/game/source](public/assets/game/source). `npm run assets:build` membangun ulang atlas. Geist disertakan secara lokal bersama lisensinya.
+
+## Pemeriksaan
+
+| Perintah                                       | Fungsi                                                                     |
+| ---------------------------------------------- | -------------------------------------------------------------------------- |
+| `npm test`                                     | Kebenaran pencarian, simulasi, kontrol worker, progres, dan UI             |
+| `npm run typecheck`                            | Pemeriksaan TypeScript                                                     |
+| `npm run validate:levels`                      | 14 level, tujuh tema, seluruh frame, peluang menang roster, dan aset yatim |
+| `npm run test:visual -- http://127.0.0.1:5173` | Chromium/WebGL, mobile, landscape, semua tema, dan worker nyata            |
+| `npm run build`                                | Build produksi                                                             |
+
+Jalankan server sebelum pemeriksaan visual. Screenshot dan laporannya berada di `artifacts/arena-review`. Pengujian menggunakan konteks browser tersendiri.
