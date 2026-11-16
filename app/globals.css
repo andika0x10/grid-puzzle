@@ -559,6 +559,21 @@ progress::-moz-progress-bar {
   color: var(--muted);
   white-space: nowrap;
 }
+.own-bot-label {
+  display: block;
+  color: var(--muted);
+  font-size: 9px;
+  font-weight: 600;
+}
+.arena-event {
+  flex-shrink: 0;
+  min-height: 16px;
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: 10px;
+  line-height: 1.4;
+  text-align: center;
+}
 .arena-meta {
   display: flex;
   align-items: center;
@@ -805,6 +820,206 @@ progress::-moz-progress-bar {
   background: #fff;
   border-top: 1px solid var(--line);
   margin-top: 10px;
+}
+.result-dialog[open] {
+  display: flex;
+  flex-direction: column;
+}
+.result-dialog .modal-heading,
+.result-summary,
+.result-actions {
+  flex-shrink: 0;
+}
+.result-dialog .modal-heading h2 {
+  line-height: 1.2;
+}
+.result-summary {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin: 4px 0 20px;
+}
+.result-emblem {
+  display: grid;
+  place-items: center;
+  flex: 0 0 50px;
+  height: 50px;
+  border: 2px solid var(--line);
+  border-radius: 12px;
+}
+.player-won .result-emblem {
+  color: #26710d;
+  border-color: var(--green);
+  background: #f0ffe5;
+}
+.result-outcome {
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.5;
+}
+.result-player {
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.5;
+}
+.result-standings {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+.result-standing {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 68px;
+  padding: 12px 0;
+  border-top: 1px solid var(--line);
+}
+.result-bot-number {
+  display: grid;
+  place-items: center;
+  flex: 0 0 28px;
+  height: 28px;
+  border: 2px solid var(--bot-color);
+  border-radius: 50%;
+  font-size: 12px;
+  font-weight: 800;
+}
+.winner .result-bot-number {
+  color: #fff;
+  background: var(--bot-color);
+}
+.result-bot-name {
+  flex: 1;
+  min-width: 0;
+}
+.result-bot-name strong,
+.result-bot-name span {
+  display: block;
+  overflow-wrap: anywhere;
+}
+.result-bot-name strong {
+  font-size: 13px;
+  line-height: 1.4;
+}
+.result-bot-name span {
+  margin-top: 3px;
+  font-size: 11px;
+  color: var(--muted);
+}
+.result-value {
+  flex: 0 0 auto;
+  max-width: 32%;
+  font-size: 12px;
+  text-align: right;
+  line-height: 1.4;
+}
+.result-actions {
+  margin-top: 18px;
+}
+.result-actions > div {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 10px;
+}
+.result-actions .button {
+  min-width: 0;
+  padding: 12px 10px;
+  font-size: 12px;
+  text-align: center;
+}
+@media (max-width: 480px) {
+  .modal.result-dialog {
+    padding: 18px;
+  }
+  .result-dialog .modal-heading {
+    margin-bottom: 12px;
+  }
+  .result-dialog .modal-heading h2 {
+    font-size: 20px;
+  }
+  .result-summary {
+    gap: 10px;
+    margin: 0 0 14px;
+  }
+  .result-emblem {
+    display: none;
+  }
+  .result-outcome {
+    font-size: 13px;
+    line-height: 1.4;
+  }
+  .result-standing {
+    min-height: 58px;
+    padding-block: 8px;
+  }
+  .result-actions .button {
+    padding-inline: 6px;
+    font-size: 11px;
+  }
+}
+@media (max-height: 500px) and (min-width: 481px) {
+  .modal.result-dialog {
+    width: min(680px, calc(100% - 32px));
+    padding: 14px 18px;
+  }
+  .result-dialog .modal-heading {
+    margin-bottom: 8px;
+  }
+  .result-dialog .modal-heading h2 {
+    font-size: 20px;
+  }
+  .result-summary {
+    margin: 0 0 10px;
+  }
+  .result-summary > div {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    column-gap: 10px;
+  }
+  .result-emblem {
+    display: none;
+  }
+  .result-outcome {
+    font-size: 13px;
+    line-height: 1.4;
+  }
+  .result-player {
+    margin-top: 0;
+    font-size: 11px;
+  }
+  .result-standing {
+    min-height: 44px;
+    padding-block: 6px;
+  }
+  .result-bot-name strong {
+    font-size: 12px;
+    line-height: 1.3;
+  }
+  .result-bot-name span {
+    margin-top: 1px;
+    font-size: 10px;
+  }
+  .result-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 12px;
+  }
+  .result-actions > div {
+    display: contents;
+  }
+  .result-actions .button {
+    flex: 1;
+    width: auto;
+    padding: 10px 6px;
+    font-size: 11px;
+  }
 }
 .algorithm-list {
   display: block;

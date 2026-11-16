@@ -29,9 +29,15 @@ async function layout(page, name) {
     board: document.querySelector(".board-wrap")?.getBoundingClientRect().toJSON(),
     dock: document.querySelector(".match-dock")?.getBoundingClientRect().toJSON(),
     header: document.querySelector(".match-header")?.getBoundingClientRect().toJSON(),
+    dialog: document.querySelector("dialog[open]")?.getBoundingClientRect().toJSON(),
   }));
   assert.ok(data.documentWidth <= data.width, `${name}: horizontal overflow`);
-  if (data.board) {
+  if (data.dialog) {
+    assert.ok(data.dialog.top >= 0 && data.dialog.bottom <= data.height, `${name}: dialog outside viewport`);
+    assert.ok(data.dialog.left >= 0 && data.dialog.right <= data.width, `${name}: dialog wider than viewport`);
+    assert.ok(await page.locator("dialog[open]").evaluate((el) => el.scrollWidth <= el.clientWidth), `${name}: dialog horizontal overflow`);
+  }
+  if (data.board && !data.dialog) {
     assert.ok(data.board.top >= data.header.bottom - 1, `${name}: board above viewport`);
     assert.ok(data.board.bottom <= data.dock.top + 1, `${name}: board obscured by controls`);
     assert.ok(data.board.height >= 100, `${name}: board too short`);
@@ -47,7 +53,26 @@ async function layout(page, name) {
   checks.push({ name, ...data });
   await page.screenshot({ path: `${output}/${name}.png` });
 }
-const complete = { version: 2, levels: Object.fromEntries(catalog.levels.map((l) => [l.id, { completed: true, matches: 1, wins: 0, bestTicks: null, bestGems: 0 }])) };
+const complete = { version: 3, levels: Object.fromEntries(catalog.levels.map((l) => [l.id, { completed: true, matches: 1, wins: 0, bestTicks: null, bestGems: 0 }])) };
+async function resultPopup(page) {
+  const dialog = page.getByRole("dialog").filter({ has: page.getByRole("list", { name: "Hasil peserta" }) });
+  await dialog.waitFor({ timeout: 25000 });
+  const rows = await dialog.locator(".result-standings").evaluate((el) => ({
+    height: el.clientHeight,
+    firstTwo: [...el.children].slice(0, 2).reduce((sum, row) => sum + row.getBoundingClientRect().height, 0),
+  }));
+  assert.ok(rows.height >= rows.firstTwo - 1, "Popup must leave room for at least two complete results");
+  assert.equal(
+    await dialog
+      .getByRole("list", { name: "Hasil peserta" })
+      .getByText(/^Bot kamu(?: · Pemenang)?$/)
+      .count(),
+    1,
+    "Player identity missing from results"
+  );
+  await dialog.getByRole("link", { name: /Level berikutnya|Kembali ke daftar level/ }).waitFor();
+  return dialog;
+}
 try {
   for (const [width, height] of [
     [320, 568],
@@ -96,12 +121,16 @@ try {
     await page.getByRole("button", { name: "Jeda pertandingan", exact: true }).click();
     await page.getByRole("combobox", { name: "Kecepatan simulasi" }).selectOption("4");
     await page.getByRole("button", { name: "Lanjutkan pertandingan", exact: true }).click();
-    await page
-      .getByRole("status")
-      .filter({ hasText: /Kamu menang|Pertandingan selesai|Hasil seri/ })
-      .waitFor({ timeout: 20000 });
+    const dialog = await resultPopup(page);
     await layout(page, `result-${width}`);
-    await page.evaluate((p) => localStorage.setItem("grid-puzzle.progress.v2", JSON.stringify(p)), complete);
+    await page.keyboard.press("Escape");
+    await dialog.waitFor({ state: "hidden" });
+    await page.getByRole("button", { name: "Lihat hasil" }).click();
+    await dialog.waitFor();
+    await dialog.getByRole("button", { name: "Ganti algoritma" }).click();
+    assert.ok(await page.getByRole("radio", { name: "Gunakan Bidirectional BFS" }).isChecked());
+    await page.keyboard.press("Escape");
+    await page.evaluate((p) => localStorage.setItem("grid-puzzle.progress.v3", JSON.stringify(p)), complete);
     if ([390, 1440].includes(width)) {
       for (const level of catalog.levels) {
         await page.goto(`${root}/play/${level.id}`, { waitUntil: "networkidle" });
@@ -109,10 +138,7 @@ try {
         await layout(page, `${level.id}-${width}`);
         await page.getByRole("combobox", { name: "Kecepatan simulasi" }).selectOption("4");
         await page.getByRole("button", { name: "Mulai pertandingan", exact: true }).click();
-        await page
-          .getByRole("status")
-          .filter({ hasText: /Kamu menang|Pertandingan selesai|Hasil seri/ })
-          .waitFor({ timeout: 20000 });
+        await resultPopup(page);
         await layout(page, `result-${level.id}-${width}`);
       }
     }

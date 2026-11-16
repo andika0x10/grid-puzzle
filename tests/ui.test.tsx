@@ -1,10 +1,13 @@
 // @vitest-environment happy-dom
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { cleanup, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
+import { act, cleanup, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { useEffect } from "react";
 import Home from "../components/Home";
 import Game from "../components/Game";
-import { LocalWorker } from "./fixtures";
+import ResultDialog from "../components/ResultDialog";
+import { previewFrame } from "../game/engine";
+import { defaultConfig } from "../game/algorithms";
+import { fixture, LocalWorker } from "./fixtures";
 import { STORAGE_KEY } from "../game/progress";
 import { themeIds, characterPortrait } from "../game/themes";
 vi.mock("../components/BoardCanvas", () => ({
@@ -31,6 +34,12 @@ afterEach(() => {
   cleanup();
   vi.unstubAllGlobals();
 });
+function finishMatch() {
+  const port = ports[ports.length - 1];
+  act(() => {
+    while (port.engine!.snapshot().phase !== "finished") port.postMessage({ kind: "advance", ticks: 8 });
+  });
+}
 describe("penjelajah arena interface", () => {
   it("uses a human portrait for each world on the level selection screen", () => {
     const { container } = render(<Home />);
@@ -79,8 +88,70 @@ describe("penjelajah arena interface", () => {
     expect(await screen.findByRole("heading", { name: "Arena ini belum terbuka." })).toBeTruthy();
     expect(ports).toHaveLength(0);
   });
+  it("announces the winning opponent immediately and reopens only on request", async () => {
+    render(<Game levelId="navigation-1" />);
+    fireEvent.click(await screen.findByRole("button", { name: "Mulai pertandingan" }));
+    finishMatch();
+    const dialog = await screen.findByRole("dialog", { name: "Greedy Best-First menang!" });
+    expect(within(dialog).getByText("Bot lawan memenangkan pertandingan.")).toBeTruthy();
+    expect(within(dialog).getByText("Bot kamu menggunakan A*.")).toBeTruthy();
+    expect(within(dialog).getAllByText("Belum finis")).toHaveLength(2);
+    expect(await within(dialog).findByRole("link", { name: "Level berikutnya" })).toBeTruthy();
+    fireEvent.click(within(dialog).getByRole("button", { name: "Tutup dialog" }));
+    expect(screen.queryByRole("dialog")).toBeNull();
+    fireEvent.click(screen.getByRole("button", { name: "Langkah sebelumnya" }));
+    fireEvent.click(screen.getByRole("button", { name: "Langkah berikutnya" }));
+    expect(screen.queryByRole("dialog")).toBeNull();
+    fireEvent.click(screen.getByRole("button", { name: "Lihat hasil" }));
+    expect(screen.getByRole("dialog", { name: "Greedy Best-First menang!" })).toBeTruthy();
+    expect(JSON.parse(localStorage.getItem(STORAGE_KEY)!).levels["navigation-1"].matches).toBe(1);
+    fireEvent.click(screen.getByRole("button", { name: "Ganti algoritma" }));
+    expect(screen.getByRole("dialog", { name: "Pilih peserta" })).toBeTruthy();
+    expect((screen.getByRole("radio", { name: "Gunakan A*" }) as HTMLInputElement).checked).toBe(true);
+  });
+  it("uses the selected player algorithm and preserves it on replay", async () => {
+    render(<Game levelId="navigation-1" />);
+    fireEvent.click(await screen.findByRole("button", { name: "Peserta" }));
+    fireEvent.click(screen.getByRole("radio", { name: "Gunakan Greedy Best-First" }));
+    fireEvent.click(within(screen.getByRole("dialog")).getByRole("button", { name: "Mulai pertandingan" }));
+    const config = ports[0].engine!.config;
+    expect(config.player).toBe("greedy");
+    finishMatch();
+    const dialog = await screen.findByRole("dialog", { name: "Greedy Best-First menang!" });
+    expect(within(dialog).getByText("Bot kamu memenangkan pertandingan!")).toBeTruthy();
+    await within(dialog).findByRole("link", { name: "Level berikutnya" });
+    fireEvent.click(within(dialog).getByRole("button", { name: "Main lagi" }));
+    expect(screen.queryByRole("dialog")).toBeNull();
+    expect(ports[0].terminated).toBe(true);
+    expect(ports[1].engine!.config).toEqual(config);
+    finishMatch();
+    const replayDialog = await screen.findByRole("dialog", { name: "Greedy Best-First menang!" });
+    await within(replayDialog).findByRole("link", { name: "Level berikutnya" });
+    expect(JSON.parse(localStorage.getItem(STORAGE_KEY)!).levels["navigation-1"].matches).toBe(2);
+    fireEvent.keyDown(window, { code: "Space" });
+    expect(ports).toHaveLength(2);
+    fireEvent(replayDialog, new Event("cancel", { cancelable: true }));
+    expect(screen.queryByRole("dialog")).toBeNull();
+  });
+  it.each(["race", "gems"] as const)("renders ties, no winner and the save gate in %s results", (mode) => {
+    const frame = previewFrame(fixture(), defaultConfig(1));
+    frame.phase = "finished";
+    frame.winners = ["bot-0", "bot-1"];
+    const props = { frame, mode, onClose: vi.fn(), onReplay: vi.fn(), onSettings: vi.fn(), nextHref: "/play/navigation-2", saved: false };
+    const { rerender } = render(<ResultDialog {...props} />);
+    expect(screen.getByRole("dialog", { name: "Hasil seri" })).toBeTruthy();
+    expect(screen.getByText(/A\* dan Weighted A\* berbagi kemenangan/)).toBeTruthy();
+    expect((screen.getByRole("button", { name: "Menyimpan progres…" }) as HTMLButtonElement).disabled).toBe(true);
+    expect(screen.queryByRole("link", { name: "Level berikutnya" })).toBeNull();
+    rerender(<ResultDialog {...props} frame={{ ...frame, winners: [] }} saved />);
+    expect(screen.getByRole("dialog", { name: "Belum ada pemenang" })).toBeTruthy();
+    expect(screen.getByText(mode === "race" ? "Tidak ada bot yang mencapai finis." : "Belum ada gem yang berhasil direbut.")).toBeTruthy();
+    expect(screen.getByRole("link", { name: "Level berikutnya" })).toBeTruthy();
+    fireEvent.click(screen.getByRole("button", { name: "Tutup dialog" }));
+    expect(props.onClose).toHaveBeenCalledOnce();
+  });
   it("reads migrated progress and unlocks the next navigation level", async () => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify({ version: 2, levels: { "navigation-1": { completed: true, matches: 1, wins: 0, bestTicks: null, bestGems: 0 } } }));
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({ version: 3, levels: { "navigation-1": { completed: true, matches: 1, wins: 0, bestTicks: null, bestGems: 0 } } }));
     render(<Home />);
     expect(await screen.findByRole("link", { name: /Level 2 Belokan gurun/ })).toBeTruthy();
   });

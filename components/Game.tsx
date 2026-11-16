@@ -4,6 +4,7 @@ import Link from "next/link";
 import Icon from "./Icon";
 import Header from "./Header";
 import Modal from "./Modal";
+import ResultDialog, { resultHeadline } from "./ResultDialog";
 import BoardCanvas from "./BoardCanvas";
 import { getLevel, levels, sections } from "../game/provider";
 import { algorithms, BOT_COLORS, getAlgorithm, unavailableReason, type AlgorithmId, type MatchConfig } from "../game/algorithms";
@@ -11,8 +12,16 @@ import { emptyProgress, isLevelUnlocked, readProgress, recordMatch, subscribePro
 import { SimulationController } from "../game/simulation";
 import { themes } from "../game/themes";
 import { TICK_MS, type BotStatus } from "../game/engine";
+import { SEARCH_OPERATIONS_PER_TICK } from "../game/search";
 
-const statusText: Record<BotStatus, string> = { searching: "Mencari rute", moving: "Bergerak", finished: "Selesai", unreachable: "Jalan terputus", timeout: "Waktu habis" };
+const statusText: Record<BotStatus, string> = {
+  searching: "Menghitung rute",
+  moving: "Bergerak",
+  finished: "Selesai",
+  unreachable: "Jalan terputus",
+  timeout: "Waktu habis",
+  stopped: "Belum finis",
+};
 export default function Game({ levelId }: { levelId: string }) {
   return <GameSession key={levelId} levelId={levelId} />;
 }
@@ -28,11 +37,13 @@ function GameSession({ levelId }: { levelId: string }) {
   const [panel, setPanel] = useState(false),
     [stats, setStats] = useState(false),
     [help, setHelp] = useState(false),
+    [showResult, setShowResult] = useState(false),
     [focused, setFocused] = useState("bot-0"),
     [storageWarning, setStorageWarning] = useState(false);
   const [draft, setDraft] = useState<MatchConfig>(state.config),
     [savedRun, setSavedRun] = useState(0);
   const recorded = useRef(0),
+    announced = useRef(0),
     playButton = useRef<HTMLButtonElement>(null);
   const unlocked = loaded && isLevelUnlocked(level.id, sections, progress),
     running = state.phase === "playing" || state.phase === "starting";
@@ -79,6 +90,14 @@ function GameSession({ levelId }: { levelId: string }) {
     };
   }, [state.result, state.run, level.id, level.mode]);
   useEffect(() => {
+    if (state.phase !== "finished" || !state.result || announced.current === state.run) return;
+    announced.current = state.run;
+    setPanel(false);
+    setStats(false);
+    setHelp(false);
+    setShowResult(true);
+  }, [state.phase, state.result, state.run]);
+  useEffect(() => {
     const keyboard = (e: KeyboardEvent) => {
       if (
         !unlocked ||
@@ -108,11 +127,15 @@ function GameSession({ levelId }: { levelId: string }) {
   }, [controller, unlocked, boardReady, running]);
   function openSettings() {
     controller.pause();
+    setShowResult(false);
     setDraft(state.config);
     setPanel(true);
   }
   function start(config = state.config) {
     setPanel(false);
+    setShowResult(false);
+    setStats(false);
+    setHelp(false);
     setFocused("bot-0");
     controller.start(config);
     requestAnimationFrame(() => playButton.current?.focus({ preventScroll: true }));
@@ -153,7 +176,7 @@ function GameSession({ levelId }: { levelId: string }) {
     .filter((b) => state.frame.winners.includes(b.id))
     .map((b) => getAlgorithm(b.algorithm).short)
     .join(", ");
-  const resultTitle = result?.won ? (result.draw ? "Hasil seri" : "Kamu menang!") : "Pertandingan selesai";
+  const resultTitle = resultHeadline(state.frame);
   return (
     <div className="match-page">
       <header className="match-header">
@@ -201,13 +224,18 @@ function GameSession({ levelId }: { levelId: string }) {
               >
                 <span className="participant-name">
                   <i>{i + 1}</i>
-                  <strong>{getAlgorithm(bot.algorithm).short}</strong>
+                  <strong>
+                    {getAlgorithm(bot.algorithm).short}
+                    {bot.player && hasStarted && <small className="own-bot-label">Kamu</small>}
+                  </strong>
                 </span>
                 <span className="participant-score">
                   {hasStarted
                     ? level.mode === "gems"
                       ? `${bot.score} gem`
-                      : `${(((bot.finishTick ?? state.frame.tick) * TICK_MS) / 1000).toFixed(1)} dtk`
+                      : bot.status === "stopped"
+                        ? "Belum finis"
+                        : `${(((bot.finishTick ?? state.frame.tick) * TICK_MS) / 1000).toFixed(2)} dtk`
                     : bot.player
                       ? "Kamu"
                       : "Lawan"}
@@ -248,12 +276,12 @@ function GameSession({ levelId }: { levelId: string }) {
                 <p>
                   {state.phase === "ready"
                     ? "Pilih peserta atau langsung mulai."
-                    : `${getAlgorithm(observed.algorithm).short}: ${statusText[observed.status].toLowerCase()} · ${observed.expanded} petak diperiksa`}
+                    : `${getAlgorithm(observed.algorithm).short}: ${statusText[observed.status].toLowerCase()} · ${observed.computeOps} operasi`}
                 </p>
               </div>
             </div>
           </div>
-          <p className="sr-only" aria-live="polite">
+          <p className="arena-event" aria-live="polite">
             {state.frame.note}
           </p>
           {state.phase === "error" && (
@@ -276,11 +304,9 @@ function GameSession({ levelId }: { levelId: string }) {
                 {level.mode === "gems" ? `Kamu mendapat ${player.score} gem.` : ""}
               </p>
             </div>
-            {savedRun === state.run && (
-              <Link href={next ? `/play/${next.id}` : "/"} className="button primary next-level">
-                {next ? "Level berikutnya" : "Semua level selesai"}
-              </Link>
-            )}
+            <button className="button secondary next-level" onClick={() => setShowResult(true)}>
+              Lihat hasil
+            </button>
           </div>
         )}
         <div className="transport">
@@ -372,13 +398,14 @@ function GameSession({ levelId }: { levelId: string }) {
       )}
       {stats && (
         <Modal title="Statistik pertandingan" onClose={() => setStats(false)}>
-          <p className="modal-intro">Waktu finis = waktu mencari + perjalanan. 1 tick = 0,05 detik.</p>
+          <p className="modal-intro">Waktu finis = waktu menghitung + perjalanan. Setiap bot mendapat {SEARCH_OPERATIONS_PER_TICK} operasi per tick (0,05 detik).</p>
           <div className="stat-table-wrap">
             <table className="stat-table">
               <thead>
                 <tr>
                   <th>Penjelajah</th>
                   <th>Petak</th>
+                  <th>Operasi</th>
                   <th>State</th>
                   <th>Biaya</th>
                   <th>Cari / gerak</th>
@@ -389,10 +416,11 @@ function GameSession({ levelId }: { levelId: string }) {
                   <tr key={b.id}>
                     <th>{getAlgorithm(b.algorithm).short}</th>
                     <td>{b.expanded}</td>
+                    <td>{b.computeOps}</td>
                     <td>{b.memory}</td>
                     <td>{b.cost}</td>
                     <td>
-                      {(b.searchTicks * 0.05).toFixed(1)} / {(b.moveTicks * 0.05).toFixed(1)} dtk
+                      {(b.searchTicks * 0.05).toFixed(2)} / {(b.moveTicks * 0.05).toFixed(2)} dtk
                     </td>
                   </tr>
                 ))}
@@ -415,15 +443,18 @@ function GameSession({ levelId }: { levelId: string }) {
               onChange={(e) => controller.seek(Number(e.target.value))}
             />
           </label>
-          <p className="modal-note">Petak = node diperiksa. State = puncak informasi pencarian tersimpan. Biaya = total medan yang dilalui.</p>
+          <p className="modal-note">
+            Petak = node diperiksa. Operasi menghitung pemeriksaan tetangga, pengolahan antrean, penilaian rute, dan penyusunan jalur. State = puncak informasi pencarian tersimpan.
+            Biaya = total medan yang dilalui.
+          </p>
         </Modal>
       )}
       {help && (
         <Modal title={`Arena ${theme.name.toLowerCase()}`} onClose={() => setHelp(false)}>
           <p>
             {level.mode === "race"
-              ? "Cari jalan lalu capai bendera finis. Penjelajah tercepat menang; waktu berpikir ikut dihitung."
-              : "Rebut gem sebelum lawan. Gem yang dicapai pada tick yang sama memberi satu poin kepada setiap penjelajah yang tiba."}
+              ? "Cari jalan lalu capai bendera finis. Waktu menghitung ikut dihitung. Pertandingan berhenti pada tick finis pertama; bot yang finis pada tick yang sama berbagi kemenangan."
+              : "Satu gem hanya punya satu pemilik dan memberi satu poin. Bot yang kehilangan target harus menghitung ulang. Jika tiba pada tick yang sama, prioritas ditentukan oleh seed pertandingan, bukan urutan peserta."}
           </p>
           <div className="terrain-guide">
             {(
@@ -451,6 +482,17 @@ function GameSession({ levelId }: { levelId: string }) {
           </div>
           <p className="modal-note">Penjelajah tidak saling menghalangi. Menang atau kalah tetap membuka level berikutnya setelah pertandingan selesai.</p>
         </Modal>
+      )}
+      {showResult && result && (
+        <ResultDialog
+          frame={state.frame}
+          mode={level.mode}
+          onClose={() => setShowResult(false)}
+          onReplay={() => start()}
+          onSettings={openSettings}
+          nextHref={next ? `/play/${next.id}` : null}
+          saved={savedRun === state.run}
+        />
       )}
     </div>
   );

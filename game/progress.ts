@@ -1,7 +1,8 @@
 import { z } from "zod";
 import type { MatchResult } from "./engine";
 import type { SectionDefinition } from "./schema";
-export const STORAGE_KEY = "grid-puzzle.progress.v2";
+export const STORAGE_KEY = "grid-puzzle.progress.v3";
+const PREVIOUS_KEY = "grid-puzzle.progress.v2";
 const LEGACY_KEY = "gridlab.demo.progress.v1";
 const UPDATE_EVENT = "grid-puzzle-progress";
 const entrySchema = z.object({
@@ -11,10 +12,11 @@ const entrySchema = z.object({
   bestTicks: z.number().nonnegative().nullable(),
   bestGems: z.number().int().nonnegative(),
 });
-const progressSchema = z.object({ version: z.literal(2), levels: z.record(z.string(), entrySchema) });
+const progressSchema = z.object({ version: z.literal(3), levels: z.record(z.string(), entrySchema) });
+const previousSchema = progressSchema.extend({ version: z.literal(2) });
 export type Progress = z.infer<typeof progressSchema>;
 type Store = Pick<Storage, "getItem" | "setItem">;
-export const emptyProgress = (): Progress => ({ version: 2, levels: {} });
+export const emptyProgress = (): Progress => ({ version: 3, levels: {} });
 let volatileProgress: Progress | null = null;
 let volatileStore: Store | null = null;
 function browserStorage(): Store | null {
@@ -30,6 +32,12 @@ export function readProgress(storage: Store | null = browserStorage()): Progress
   try {
     const raw = storage.getItem(STORAGE_KEY);
     if (raw) return progressSchema.parse(JSON.parse(raw));
+    const previous = previousSchema.safeParse(JSON.parse(storage.getItem(PREVIOUS_KEY) ?? "null"));
+    if (previous.success) {
+      // Earlier records used a different clock and shared gem scoring. Keep
+      // completion/history, and retain the original v2 data under its old key.
+      return { version: 3, levels: Object.fromEntries(Object.entries(previous.data.levels).map(([id, value]) => [id, { ...value, bestTicks: null, bestGems: 0 }])) };
+    }
     const legacy = JSON.parse(storage.getItem(LEGACY_KEY) ?? "null");
     const progress = emptyProgress();
     if (legacy?.version === 1 && legacy.levels && typeof legacy.levels === "object") {
@@ -58,7 +66,7 @@ export function mergeProgress(a: Progress, b: Progress): Progress {
       bestGems: Math.max(old.bestGems, next.bestGems),
     };
   }
-  return { version: 2, levels };
+  return { version: 3, levels };
 }
 function persist(progress: Progress, storage: Store | null) {
   let persisted = false;

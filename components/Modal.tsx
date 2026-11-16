@@ -1,22 +1,23 @@
 "use client";
-import { useEffect, useRef, type ReactNode } from "react";
+import { useEffect, useId, useRef, type ReactNode } from "react";
 import Icon from "./Icon";
-export default function Modal({ title, onClose, children }: { title: string; onClose: () => void; children: ReactNode }) {
+export default function Modal({ title, onClose, children, className = "" }: { title: string; onClose: () => void; children: ReactNode; className?: string }) {
   const ref = useRef<HTMLDialogElement>(null);
+  const titleId = useId();
   useEffect(() => {
     const previous = document.activeElement as HTMLElement | null,
       dialog = ref.current;
     dialog?.showModal();
     return () => {
       dialog?.close();
-      previous?.focus();
+      if (previous?.isConnected) previous.focus();
     };
   }, []);
   return (
     <dialog
       ref={ref}
-      className="modal"
-      aria-labelledby="dialog-title"
+      className={`modal ${className}`}
+      aria-labelledby={titleId}
       onCancel={(e) => {
         e.preventDefault();
         onClose();
@@ -26,7 +27,7 @@ export default function Modal({ title, onClose, children }: { title: string; onC
       }}
     >
       <div className="modal-heading">
-        <h2 id="dialog-title">{title}</h2>
+        <h2 id={titleId}>{title}</h2>
         <button className="icon-button" aria-label="Tutup dialog" onClick={onClose}>
           <Icon name="close" />
         </button>

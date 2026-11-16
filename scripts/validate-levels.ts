@@ -77,12 +77,16 @@ ensure(
   catalog.levels.length === levels.length && catalog.levels.every((l: { id: string }) => JSON.stringify(l) === JSON.stringify(levels.find((source) => source.id === l.id))),
   "Stale level catalog"
 );
+const raceWinners = new Set<string>();
 for (const level of levels) {
   const engine = new MatchEngine(level, defaultConfig(level.seed));
   let frame = engine.snapshot();
   while (frame.phase !== "finished") frame = engine.step();
   ensure(frame.winners.length > 0, `No finisher or scoring outcome: ${level.id}`);
+  ensure(frame.bots.reduce((sum, bot) => sum + bot.score, 0) === frame.gems.filter((gem) => gem.taken).length, `Duplicated gem points: ${level.id}`);
+  if (level.mode === "race" && frame.winners.length === 1) raceWinners.add(frame.bots.find((bot) => bot.id === frame.winners[0])!.algorithm);
 }
+ensure(raceWinners.size >= 3, "Race maps must reward at least three different algorithms with the default roster");
 for (const algorithm of algorithms) {
   ensure(
     levels.some((level) => {

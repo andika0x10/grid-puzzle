@@ -1,9 +1,9 @@
 import { algorithms, unavailableReason, type AlgorithmId, type MatchConfig } from "./algorithms";
-import { createSearch, type Search } from "./search";
+import { createSearch, SEARCH_OPERATIONS_PER_TICK, type Search } from "./search";
 import { isWalkable, terrainCost, type LevelDefinition, type Point, type Terrain } from "./schema";
 
 export const TICK_MS = 50;
-export type BotStatus = "searching" | "moving" | "finished" | "unreachable" | "timeout";
+export type BotStatus = "searching" | "moving" | "finished" | "unreachable" | "timeout" | "stopped";
 export interface BotFrame extends Point {
   id: string;
   algorithm: AlgorithmId;
@@ -14,6 +14,7 @@ export interface BotFrame extends Point {
   expanded: number;
   memory: number;
   searchTicks: number;
+  computeOps: number;
   moveTicks: number;
   cost: number;
   finishTick: number | null;
@@ -24,6 +25,8 @@ export interface BotFrame extends Point {
 export interface Gem extends Point {
   id: string;
   taken: boolean;
+  claimedBy: string | null;
+  claimedTick: number | null;
 }
 export interface MatchFrame {
   tick: number;
@@ -53,7 +56,7 @@ export function previewFrame(level: LevelDefinition, config: MatchConfig): Match
     tick: 0,
     phase: "running",
     terrain: [...level.board.terrain],
-    gems: level.board.gems.map((p, i) => ({ ...p, id: `gem-${i}`, taken: false })),
+    gems: level.board.gems.map((p, i) => ({ ...p, id: `gem-${i}`, taken: false, claimedBy: null, claimedTick: null })),
     winners: [],
     note: "Pilih peserta, lalu mulai pertandingan.",
     bots: [config.player, ...config.opponents].map((algorithm, i) => ({
@@ -67,6 +70,7 @@ export function previewFrame(level: LevelDefinition, config: MatchConfig): Match
       expanded: 0,
       memory: 0,
       searchTicks: 0,
+      computeOps: 0,
       moveTicks: 0,
       cost: 0,
       finishTick: null,
@@ -158,7 +162,7 @@ export class MatchEngine {
     for (const bot of this.bots) {
       if (bot.status === "searching" && bot.search) {
         const previous = bot.search.expanded;
-        bot.search.step();
+        bot.computeOps += bot.search.advance(SEARCH_OPERATIONS_PER_TICK);
         bot.searchTicks++;
         bot.expanded += bot.search.expanded - previous;
         bot.memory = Math.max(bot.memory, bot.search.memory);
@@ -207,12 +211,17 @@ export class MatchEngine {
       const taken = new Set<string>();
       for (const gem of this.gems)
         if (!gem.taken) {
-          const claimants = this.bots.filter((b) => same(b, gem));
+          const claimants = this.bots
+            .filter((b) => same(b, gem))
+            .sort((a, b) => hash(`${gem.id}:${a.algorithm}`, this.config.seed) - hash(`${gem.id}:${b.algorithm}`, this.config.seed) || (a.algorithm < b.algorithm ? -1 : 1));
           if (claimants.length) {
+            const owner = claimants[0];
             gem.taken = true;
+            gem.claimedBy = owner.id;
+            gem.claimedTick = this.tickNumber;
             taken.add(gem.id);
-            claimants.forEach((b) => b.score++);
-            this.note = `${claimants.length > 1 ? "Gem diambil bersamaan." : "Satu gem berhasil diambil."} Penjelajah mencari target berikutnya.`;
+            owner.score++;
+            this.note = `${algorithms.find((a) => a.id === owner.algorithm)!.short} merebut gem. Penjelajah yang kehilangan target menghitung ulang rutenya.`;
           }
         }
       for (const bot of this.bots) if (bot.targetId && taken.has(bot.targetId)) this.plan(bot);
@@ -221,7 +230,13 @@ export class MatchEngine {
         for (const b of this.bots) b.status = "finished";
       }
     }
-    if (this.tickNumber >= this.level.timeLimit) {
+    // Resolve the whole tick before stopping: finishers on the same tick tie.
+    if (this.level.mode === "race" && this.bots.some((b) => b.finishTick !== null)) {
+      this.finished = true;
+      for (const bot of this.bots) if (bot.status !== "finished" && bot.status !== "unreachable") bot.status = "stopped";
+      this.note = "Garis finis tercapai. Pertandingan selesai.";
+    }
+    if (!this.finished && this.tickNumber >= this.level.timeLimit) {
       this.finished = true;
       for (const bot of this.bots) if (bot.status !== "finished" && bot.status !== "unreachable") bot.status = "timeout";
       this.note = "Waktu pertandingan habis.";
@@ -243,7 +258,7 @@ export class MatchEngine {
         }
       } else {
         const best = Math.max(...this.bots.map((b) => b.score));
-        winners = this.bots.filter((b) => b.score === best).map((b) => b.id);
+        if (best > 0) winners = this.bots.filter((b) => b.score === best).map((b) => b.id);
       }
     }
     return {

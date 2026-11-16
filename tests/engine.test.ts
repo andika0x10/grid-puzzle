@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { levels, sections } from "../game/provider";
 import { algorithms, defaultConfig, unavailableReason } from "../game/algorithms";
 import { MatchEngine, matchResult } from "../game/engine";
-import { createSearch } from "../game/search";
+import { createSearch, SEARCH_OPERATIONS_PER_TICK } from "../game/search";
 import { isWalkable, levelSchema, terrainCost } from "../game/schema";
 import { SimulationController } from "../game/simulation";
 import { emptyProgress, isLevelUnlocked, readProgress, recordMatch, STORAGE_KEY } from "../game/progress";
@@ -27,35 +27,91 @@ describe("live level simulation", () => {
         expect(f.tick).toBe(0);
         expect(f.bots.every((b) => b.expanded === 0)).toBe(true);
         while (f.phase !== "finished") {
+          const previous = f;
           f = e.step();
           expect(f.tick).toBeLessThanOrEqual(level.timeLimit);
-          for (const b of f.bots) expect(isWalkable(f.terrain[b.y * level.board.width + b.x])).toBe(true);
+          for (const [i, b] of f.bots.entries()) {
+            expect(isWalkable(f.terrain[b.y * level.board.width + b.x])).toBe(true);
+            expect(b.computeOps - previous.bots[i].computeOps).toBeLessThanOrEqual(SEARCH_OPERATIONS_PER_TICK);
+          }
+          expect(f.bots.reduce((sum, b) => sum + b.score, 0)).toBe(f.gems.filter((g) => g.taken).length);
+          for (const gem of f.gems.filter((g) => g.taken)) {
+            expect(f.bots.some((b) => b.id === gem.claimedBy)).toBe(true);
+            expect(gem.claimedTick).toBeLessThanOrEqual(f.tick);
+          }
         }
         return f;
       };
       expect(run()).toEqual(run());
     });
-  it("counts search plus weighted movement, and awards simultaneous finishes fairly", () => {
+  it("counts computation plus movement and stops at the first winning tick", () => {
     const level = fixture(),
       e = new MatchEngine(level, { player: "astar", opponents: ["greedy"], seed: 1 });
     let f = e.snapshot();
     while (f.phase !== "finished") f = e.step();
-    expect(f.winners).toEqual(["bot-0", "bot-1"]);
-    for (const b of f.bots) {
+    expect(f.winners).toEqual(["bot-1"]);
+    expect(f.bots[0].status).toBe("stopped");
+    expect(f.bots[0].finishTick).toBeNull();
+    for (const b of f.bots.filter((b) => b.finishTick !== null)) {
       expect(b.finishTick).toBe(b.searchTicks + b.moveTicks);
+      expect(b.finishTick).toBe(f.tick);
       expect(b.cost).toBe(4);
       expect(b.moveTicks).toBe(16);
     }
+    expect(e.step()).toEqual(f);
   });
-  it("collects a shared gem atomically without giving either bot ordering advantage", () => {
+  it("resolves every participant before awarding a simultaneous finish", () => {
+    const base = fixture();
+    const e = new MatchEngine(fixture({ board: { ...base.board, goal: base.board.spawn } }), { player: "astar", opponents: ["greedy", "weighted-astar"], seed: 1 });
+    const f = e.step();
+    expect(f.phase).toBe("finished");
+    expect(f.winners).toEqual(["bot-0", "bot-1", "bot-2"]);
+    expect(f.bots.every((b) => b.finishTick === 1)).toBe(true);
+  });
+  it("awards a simultaneous gem to one owner independently of player slot", () => {
     const base = fixture(),
-      level = fixture({ mode: "gems", board: { ...base.board, goal: undefined, gems: [{ x: 4, y: 1 }] } });
-    const e = new MatchEngine(level, { player: "astar", opponents: ["greedy"], seed: 1 });
+      level = fixture({ mode: "gems", board: { ...base.board, goal: undefined, gems: [base.board.spawn] } });
+    const owners = new Set<string>();
+    for (let seed = 1; seed <= 32; seed++) {
+      const run = (player: "astar" | "greedy", opponent: "astar" | "greedy") => {
+        const e = new MatchEngine(level, { player, opponents: [opponent], seed });
+        const f = e.step();
+        expect(f.bots.reduce((sum, b) => sum + b.score, 0)).toBe(1);
+        expect(f.gems[0].claimedTick).toBe(1);
+        expect(f.winners).toEqual([f.gems[0].claimedBy]);
+        expect(e.step()).toEqual(f);
+        return f.bots.find((b) => b.id === f.gems[0].claimedBy)!.algorithm;
+      };
+      const owner = run("astar", "greedy");
+      expect(run("greedy", "astar")).toBe(owner);
+      owners.add(owner);
+    }
+    expect(owners.size).toBe(2);
+  });
+  it("charges fresh computation when a rival takes the current target", () => {
+    const base = fixture();
+    const e = new MatchEngine(
+      fixture({
+        mode: "gems",
+        board: {
+          ...base.board,
+          goal: undefined,
+          gems: [
+            { x: 4, y: 1 },
+            { x: 4, y: 0 },
+          ],
+        },
+      }),
+      { player: "astar", opponents: ["greedy"], seed: 1 }
+    );
     let f = e.snapshot();
-    while (f.phase !== "finished") f = e.step();
-    expect(f.gems[0].taken).toBe(true);
-    expect(f.bots.map((b) => b.score)).toEqual([1, 1]);
-    expect(f.winners).toEqual(["bot-0", "bot-1"]);
+    while (!f.gems[0].taken) f = e.step();
+    expect(f.bots[0].score).toBe(0);
+    expect(f.bots[0].status).toBe("searching");
+    expect(f.bots[0].route).toEqual([]);
+    const replanned = e.step();
+    expect(replanned.bots[0].computeOps).toBeGreaterThan(f.bots[0].computeOps);
+    expect(replanned.bots[0].searchTicks).toBe(f.bots[0].searchTicks + 1);
   });
   it("reports unreachable targets and stops at a configured limit", () => {
     const base = fixture(),
@@ -68,6 +124,12 @@ describe("live level simulation", () => {
     expect(f.bots.every((b) => b.status === "unreachable")).toBe(true);
     const timed = new MatchEngine(fixture({ timeLimit: 1 }), { player: "astar", opponents: ["dfs"], seed: 1 });
     expect(timed.step().bots.every((b) => b.status === "timeout")).toBe(true);
+    const noGems = new MatchEngine(fixture({ mode: "gems", timeLimit: 1, board: { ...base.board, goal: undefined, gems: [{ x: 4, y: 1 }] } }), {
+      player: "astar",
+      opponents: ["greedy"],
+      seed: 1,
+    });
+    expect(noGems.step().winners).toEqual([]);
   });
   it("defers closing occupied cells and replans when the shared map changes", () => {
     const base = fixture(),
@@ -76,7 +138,8 @@ describe("live level simulation", () => {
     let f = e.snapshot();
     while (f.phase !== "finished") f = e.step();
     expect(f.terrain[5]).toBe("wall");
-    expect(f.bots.every((b) => b.finishTick !== null)).toBe(true);
+    expect(f.winners).toHaveLength(1);
+    expect(f.bots.some((b) => b.finishTick !== null)).toBe(true);
   });
   it("rejects duplicate participants, unsupported terrain, and invalid boards", () => {
     expect(() => new MatchEngine(fixture(), { player: "astar", opponents: ["astar"], seed: 1 })).toThrow();
@@ -90,6 +153,24 @@ describe("live level simulation", () => {
   });
 });
 describe("incremental algorithms", () => {
+  it("limits work to the supplied budget and preserves results across budget sizes", () => {
+    const level = fixture();
+    for (const algorithm of algorithms) {
+      const runs = [1, 7, 16, 64].map((budget) => {
+        const s = createSearch(5, 3, level.board.terrain, level.board.spawn, level.board.goal!, algorithm.id);
+        expect(s.advance(0)).toBe(0);
+        expect(s.operations).toBe(0);
+        while (!s.done) {
+          const before = s.operations;
+          expect(s.advance(budget)).toBeLessThanOrEqual(budget);
+          expect(s.operations - before).toBeLessThanOrEqual(budget);
+        }
+        expect(s.advance(budget)).toBe(0);
+        return { path: s.path, operations: s.operations, expanded: s.expanded };
+      });
+      runs.forEach((run) => expect(run).toEqual(runs[0]));
+    }
+  });
   it("A* avoids an expensive direct route while Greedy takes the gamble", () => {
     const level = fixture(),
       terrain = [...level.board.terrain];
@@ -188,18 +269,34 @@ describe("simulation control", () => {
     expect(c.getSnapshot().cursor).toBe(1);
     c.dispose();
   });
-  it("produces the same result at every playback speed", () => {
-    const results = [0.5, 1, 2, 4].map((speed) => {
-      const c = new SimulationController(fixture(), () => new LocalWorker());
-      c.setSpeed(speed);
-      c.play();
-      for (let i = 0; i < 1000 && c.getSnapshot().phase !== "finished"; i++) c.tick(100);
-      expect(c.getSnapshot().phase).toBe("finished");
-      const result = c.getSnapshot().result;
-      c.dispose();
-      return result;
-    });
-    results.forEach((result) => expect(result).toEqual(results[0]));
+  it("produces identical final frames at every playback speed in both modes", () => {
+    const base = fixture();
+    for (const level of [
+      base,
+      fixture({
+        mode: "gems",
+        board: {
+          ...base.board,
+          goal: undefined,
+          gems: [
+            { x: 4, y: 1 },
+            { x: 3, y: 0 },
+          ],
+        },
+      }),
+    ]) {
+      const results = [0.5, 1, 2, 4].map((speed) => {
+        const c = new SimulationController(level, () => new LocalWorker());
+        c.setSpeed(speed);
+        c.play();
+        for (let i = 0; i < 1000 && c.getSnapshot().phase !== "finished"; i++) c.tick(100);
+        expect(c.getSnapshot().phase).toBe("finished");
+        const result = { result: c.getSnapshot().result, frame: c.getSnapshot().frame };
+        c.dispose();
+        return result;
+      });
+      results.forEach((result) => expect(result).toEqual(results[0]));
+    }
   });
   it("does not skip rewound history when an in-flight batch arrives", () => {
     const port = new LocalWorker(),
@@ -248,6 +345,27 @@ describe("progress", () => {
     };
     expect(Object.keys(readProgress(store).levels)).toEqual(["navigation-1"]);
     expect(readProgress({ getItem: () => "{bad", setItem: () => {} })).toEqual(emptyProgress());
+  });
+  it("keeps unlocked levels and match history while starting records for the new rules", () => {
+    const old = {
+      version: 2,
+      levels: {
+        "navigation-1": { completed: true, matches: 4, wins: 2, bestTicks: 10, bestGems: 0 },
+        "gems-1": { completed: true, matches: 2, wins: 1, bestTicks: null, bestGems: 7 },
+      },
+    };
+    const original = JSON.stringify(old);
+    const data = new Map([["grid-puzzle.progress.v2", original]]);
+    const progress = readProgress({
+      getItem: (key) => data.get(key) ?? null,
+      setItem: (key, value) => {
+        data.set(key, value);
+      },
+    });
+    expect(progress.version).toBe(3);
+    expect(progress.levels["navigation-1"]).toEqual({ ...old.levels["navigation-1"], bestTicks: null });
+    expect(progress.levels["gems-1"].bestGems).toBe(0);
+    expect(data.get("grid-puzzle.progress.v2")).toBe(original);
   });
   it("retains session progress when existing storage cannot be written", async () => {
     const store = {
