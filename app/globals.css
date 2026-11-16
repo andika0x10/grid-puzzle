@@ -113,6 +113,7 @@ summary:focus-visible,
 }
 .button.primary {
   background: var(--green);
+  color: #fff;
   border-color: var(--green);
   border-bottom-color: var(--edge);
 }
@@ -231,6 +232,7 @@ progress::-moz-progress-bar {
   gap: 20px;
   min-height: 104px;
   background: var(--green);
+  color: #fff;
   border-radius: 16px;
   border-bottom: 5px solid var(--edge);
   padding: 18px 22px;
@@ -273,6 +275,7 @@ progress::-moz-progress-bar {
 }
 .section-locked .unit-heading {
   background: #f0f0f0;
+  color: #000;
   border-color: #ddd;
 }
 .section-locked .unit-guide {
@@ -713,6 +716,7 @@ progress::-moz-progress-bar {
   height: 48px;
   border-radius: 12px;
   background: var(--green);
+  color: #fff;
   border-bottom: 4px solid var(--edge);
   flex-shrink: 0;
   font-size: 15px;

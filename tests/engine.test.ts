@@ -222,6 +222,35 @@ describe("incremental algorithms", () => {
   });
 });
 describe("simulation control", () => {
+  it("configures a ready preview, clears history and ignores responses from the previous worker", () => {
+    const ports: LocalWorker[] = [];
+    const level = fixture();
+    const controller = new SimulationController(level, () => {
+      const port = new LocalWorker();
+      ports.push(port);
+      return port;
+    });
+    controller.play();
+    controller.tick(100);
+    expect(controller.getSnapshot().head).toBeGreaterThan(0);
+    ports[0].deferred = true;
+    controller.tick(100);
+    const config = { player: "dfs" as const, opponents: ["greedy" as const], seed: level.seed };
+    controller.configure(config);
+    expect(ports[0].terminated).toBe(true);
+    const ready = controller.getSnapshot();
+    expect(ready).toMatchObject({ phase: "ready", cursor: 0, head: 0, config, result: null, error: null });
+    expect(ready.frame.bots.map((bot) => bot.algorithm)).toEqual(["dfs", "greedy"]);
+    ports[0].flush();
+    controller.tick(100);
+    controller.step(1);
+    expect(controller.getSnapshot()).toBe(ready);
+    expect(ports).toHaveLength(1);
+    controller.play();
+    expect(ports).toHaveLength(2);
+    expect(ports[1].engine!.config).toEqual(config);
+    controller.dispose();
+  });
   it("does no work before Play, freezes on Pause, steps live, and restarts cleanly", () => {
     const ports: LocalWorker[] = [],
       c = new SimulationController(fixture(), () => {

@@ -98,13 +98,16 @@ try {
     assert.equal(workers, 0, "Worker started before Play");
     await layout(page, `ready-${width}`);
     {
-      await page.getByRole("button", { name: "Peserta", exact: true }).click();
       const dialog = page.getByRole("dialog", { name: "Pilih peserta" });
+      await dialog.waitFor();
       assert.equal(await dialog.locator(".algorithm-entry").count(), 5);
       await dialog.getByRole("radio", { name: "Gunakan Bidirectional BFS" }).check();
       await dialog.getByRole("checkbox", { name: "Lawan Depth-First Search" }).check();
-      await dialog.getByRole("button", { name: "Mulai pertandingan", exact: true }).click();
+      await dialog.getByRole("button", { name: "Save", exact: true }).click();
+      assert.equal(workers, 0, "Save started a worker");
     }
+    await layout(page, `saved-${width}`);
+    await page.getByRole("button", { name: "Mulai pertandingan", exact: true }).click();
     await page.waitForFunction(() => parseFloat(document.querySelector(".arena-meta b").textContent) >= 0.3);
     await page.getByRole("button", { name: "Jeda pertandingan", exact: true }).click();
     assert.equal(workers, 1);
@@ -135,6 +138,17 @@ try {
       for (const level of catalog.levels) {
         await page.goto(`${root}/play/${level.id}`, { waitUntil: "networkidle" });
         await ready(page);
+        const roster = page.getByRole("dialog", { name: "Pilih peserta" });
+        await roster.waitFor();
+        const saved = await page.evaluate(() => JSON.parse(localStorage.getItem("grid-puzzle.participants.v1")));
+        const unsupported = level.board.terrain.includes("slow") || level.changes.some((change) => change.terrain === "slow");
+        const expectedPlayer =
+          saved.player === "bidirectional" && unsupported
+            ? "A*"
+            : { astar: "A*", "weighted-astar": "Weighted A*", greedy: "Greedy Best-First", dfs: "Depth-First Search", bidirectional: "Bidirectional BFS" }[saved.player];
+        assert.ok(await roster.getByRole("radio", { name: `Gunakan ${expectedPlayer}`, exact: true }).isChecked(), "Saved player was not restored");
+        await layout(page, `roster-${level.id}-${width}`);
+        await roster.getByRole("button", { name: "Save", exact: true }).click();
         await layout(page, `${level.id}-${width}`);
         await page.getByRole("combobox", { name: "Kecepatan simulasi" }).selectOption("4");
         await page.getByRole("button", { name: "Mulai pertandingan", exact: true }).click();

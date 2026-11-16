@@ -9,7 +9,7 @@ npm install
 npm run dev
 ```
 
-Buka URL Vite. Pilih algoritmamu dan satu sampai tiga lawan, lalu tekan Play. Tombol Peserta membuka daftar lengkap algoritma. Menang atau kalah tetap membuka level berikutnya.
+Buka URL Vite. Setiap masuk halaman level, popup Pilih peserta menampilkan algoritmamu dan satu sampai tiga lawan. Tekan Save untuk menyimpan pilihan, lalu Mulai untuk bermain. Tombol Peserta membuka kembali pengaturan; Save saat pertandingan berlangsung mengembalikan arena ke kondisi siap mulai. Menang atau kalah tetap membuka level berikutnya.
 
 ## Simulasi langsung
 
@@ -26,6 +26,8 @@ Penjelajah tidak saling menghalangi. Satu gem hanya memberi satu poin kepada sat
 Popup langsung mengumumkan algoritma pemenang, pemilik bot, serta waktu finis atau jumlah gem. Hasil seri ditampilkan secara eksplisit. Main lagi mempertahankan peserta; Ganti algoritma membuka pilihan peserta. Popup otomatis muncul sekali per pertandingan, dapat ditutup dengan Escape, dan dapat dibuka kembali lewat Lihat hasil tanpa menggandakan progres.
 
 ## Progres
+
+Pilihan algoritma dan lawan tersimpan terpisah di `grid-puzzle.participants.v1` dan digunakan kembali setelah pindah level atau membuka ulang browser. Seed tetap mengikuti level. Pilihan yang tidak mendukung medan disesuaikan otomatis dengan pemberitahuan; perubahan baru tersimpan setelah Save. X, Escape, atau klik di luar popup membatalkan perubahan. Jika penyimpanan diblokir, pilihan tetap diingat selama tab aktif.
 
 Browser menyimpan ringkasan progres dan rekor melalui `grid-puzzle.progress.v3`; riwayat pertandingan tidak dipersistenkan. Level terbuka dan riwayat menang/main dari v2 tetap dibawa. Rekor waktu dan gem dimulai kembali karena aturan kompetisi berubah; data v2 asli tetap tersedia di key lamanya. Penyimpanan membaca progres terbaru dan menggunakan Web Locks ketika tersedia, serta menyinkronkan perubahan antar-tab. Penyimpanan yang diblokir memakai memori tab. Progres navigasi versi demo lama dimigrasikan menjadi level selesai, tanpa mempertahankan hasil ilustratifnya.
 

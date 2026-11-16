@@ -46,6 +46,12 @@ export class SimulationController {
     this.state = { ...this.state, ...next };
     this.listeners.forEach((l) => l());
   }
+  configure(config: MatchConfig) {
+    this.stopWorker();
+    this.history = [];
+    this.stepping = false;
+    this.update({ phase: "ready", config, frame: previewFrame(this.level, config), cursor: 0, head: 0, result: null, error: null });
+  }
   start(config = this.state.config) {
     this.stopWorker();
     this.history = [];

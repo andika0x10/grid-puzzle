@@ -9,6 +9,7 @@ import BoardCanvas from "./BoardCanvas";
 import { getLevel, levels, sections } from "../game/provider";
 import { algorithms, BOT_COLORS, getAlgorithm, unavailableReason, type AlgorithmId, type MatchConfig } from "../game/algorithms";
 import { emptyProgress, isLevelUnlocked, readProgress, recordMatch, subscribeProgress } from "../game/progress";
+import { readParticipants, resolveParticipants, saveParticipants } from "../game/participants";
 import { SimulationController } from "../game/simulation";
 import { themes } from "../game/themes";
 import { TICK_MS, type BotStatus } from "../game/engine";
@@ -39,7 +40,9 @@ function GameSession({ levelId }: { levelId: string }) {
     [help, setHelp] = useState(false),
     [showResult, setShowResult] = useState(false),
     [focused, setFocused] = useState("bot-0"),
-    [storageWarning, setStorageWarning] = useState(false);
+    [storageWarning, setStorageWarning] = useState(false),
+    [participantsWarning, setParticipantsWarning] = useState(false),
+    [participantsAdjusted, setParticipantsAdjusted] = useState(false);
   const [draft, setDraft] = useState<MatchConfig>(state.config),
     [savedRun, setSavedRun] = useState(0);
   const recorded = useRef(0),
@@ -51,10 +54,15 @@ function GameSession({ levelId }: { levelId: string }) {
     result = state.phase === "finished" ? state.result : null;
   const next = levels[levels.findIndex((l) => l.id === levelId) + 1];
   useEffect(() => {
+    const { config, adjusted } = resolveParticipants(level, readParticipants());
+    controller.configure(config);
+    setDraft(config);
+    setParticipantsAdjusted(adjusted);
+    setPanel(true);
     setProgress(readProgress());
     setLoaded(true);
     return subscribeProgress(() => setProgress(readProgress()));
-  }, []);
+  }, [controller, level]);
   useEffect(() => {
     let raf = 0,
       last = performance.now();
@@ -138,6 +146,18 @@ function GameSession({ levelId }: { levelId: string }) {
     setHelp(false);
     setFocused("bot-0");
     controller.start(config);
+    requestAnimationFrame(() => playButton.current?.focus({ preventScroll: true }));
+  }
+  function saveSettings() {
+    const { persisted } = saveParticipants(draft);
+    setParticipantsWarning(!persisted);
+    setParticipantsAdjusted(false);
+    setPanel(false);
+    setShowResult(false);
+    setStats(false);
+    setHelp(false);
+    setFocused("bot-0");
+    controller.configure(draft);
     requestAnimationFrame(() => playButton.current?.focus({ preventScroll: true }));
   }
   function selectPlayer(id: AlgorithmId) {
@@ -275,7 +295,7 @@ function GameSession({ levelId }: { levelId: string }) {
                 </span>
                 <p>
                   {state.phase === "ready"
-                    ? "Pilih peserta atau langsung mulai."
+                    ? "Tekan Mulai untuk menjalankan pertandingan."
                     : `${getAlgorithm(observed.algorithm).short}: ${statusText[observed.status].toLowerCase()} · ${observed.computeOps} operasi`}
                 </p>
               </div>
@@ -383,15 +403,24 @@ function GameSession({ levelId }: { levelId: string }) {
             Progres belum tersimpan. Kamu tetap dapat bermain di tab ini.
           </p>
         )}
+        {participantsWarning && (
+          <p className="storage-warning" role="alert">
+            Pilihan peserta belum tersimpan di browser. Pilihan tetap digunakan selama tab ini terbuka.
+          </p>
+        )}
       </footer>
       {panel && (
         <Modal title="Pilih peserta" onClose={() => setPanel(false)}>
           <p className="modal-intro">Pilih algoritmamu dan satu sampai tiga lawan.</p>
+          {participantsAdjusted && (
+            <p className="modal-note" role="status">
+              Pilihan tersimpan disesuaikan karena Bidirectional BFS membutuhkan medan dengan biaya gerak seragam. Periksa peserta sebelum menekan Save.
+            </p>
+          )}
           <Roster level={level} draft={draft} selectPlayer={selectPlayer} toggleOpponent={toggleOpponent} />
           <div className="modal-sticky-action">
-            <button className="button primary full" disabled={!boardReady || draft.opponents.length < 1 || draft.opponents.length > 3} onClick={() => start(draft)}>
-              <Icon name="play" size={17} />
-              Mulai pertandingan
+            <button className="button primary full" disabled={draft.opponents.length < 1 || draft.opponents.length > 3} onClick={saveSettings}>
+              Save
             </button>
           </div>
         </Modal>
