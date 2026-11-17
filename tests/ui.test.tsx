@@ -4,13 +4,13 @@ import { act, cleanup, fireEvent, render, screen, waitFor, within } from "@testi
 import { useEffect } from "react";
 import Home from "../components/Home";
 import Game from "../components/Game";
-import ResultDialog from "../components/ResultDialog";
+import ResultDialog, { resultHeadline } from "../components/ResultDialog";
 import { previewFrame } from "../game/engine";
 import { defaultConfig } from "../game/algorithms";
 import { fixture, LocalWorker } from "./fixtures";
 import { STORAGE_KEY } from "../game/progress";
 import { PARTICIPANTS_STORAGE_KEY, saveParticipants } from "../game/participants";
-import { getLevel, levels } from "../game/provider";
+import { getLevel, levels, sections } from "../game/provider";
 import { themeIds, characterPortrait } from "../game/themes";
 vi.mock("../components/BoardCanvas", () => ({
   default: ({ onReady }: { onReady: (v: boolean) => void }) => {
@@ -51,7 +51,7 @@ async function saveRoster() {
 function unlockLevels() {
   localStorage.setItem(
     STORAGE_KEY,
-    JSON.stringify({ version: 4, levels: Object.fromEntries(levels.map((level) => [level.id, { completed: true, matches: 1, wins: 0, bestTicks: null, bestGems: 0 }])) })
+    JSON.stringify({ version: 5, levels: Object.fromEntries(levels.map((level) => [level.id, { completed: true, matches: 1, wins: 0, bestMetric: null, rulesVersion: 4 }])) })
   );
 }
 describe("penjelajah arena interface", () => {
@@ -62,17 +62,17 @@ describe("penjelajah arena interface", () => {
   });
   it("shows seven categories and seven themes, with progression", async () => {
     render(<Home />);
-    expect(await screen.findByRole("link", { name: /Level 1 Tiga arah/ })).toBeTruthy();
-    expect(screen.getByRole("heading", { name: "Perebutan gem" })).toBeTruthy();
+    expect(await screen.findByRole("link", { name: /Level 1 Simpang pertama/ })).toBeTruthy();
+    expect(screen.getByRole("heading", { name: "Perburuan Bergerak" })).toBeTruthy();
     expect(screen.getAllByText("Luar angkasa")).toHaveLength(7);
-    expect(screen.queryByRole("link", { name: /Gerbang gurun/ })).toBeNull();
+    expect(screen.queryByRole("link", { name: /Ruang tersembunyi/ })).toBeNull();
   });
   it("opens the roster automatically and saves without starting a worker", async () => {
-    render(<Game levelId="navigation-1" />);
+    render(<Game levelId="fog-1" />);
     const dialog = await screen.findByRole("dialog", { name: "Pilih peserta" });
     expect(screen.getAllByRole("heading", { name: "Bidirectional BFS" })).toHaveLength(1);
     expect(ports).toHaveLength(0);
-    expect(screen.getAllByText("Terobos satu cabang. Bisa menang besar kalau jalurnya tepat.")).toHaveLength(1);
+    expect(screen.getAllByText("Telusuri satu cabang tindakan sebelum mencoba yang lain.")).toHaveLength(1);
     fireEvent.click(screen.getByRole("radio", { name: "Gunakan Bidirectional BFS" }));
     fireEvent.click(screen.getByRole("checkbox", { name: "Lawan Depth-First Search" }));
     expect(within(dialog).queryByRole("button", { name: "Mulai pertandingan" })).toBeNull();
@@ -85,27 +85,27 @@ describe("penjelajah arena interface", () => {
   });
   it("restores all participants on each level visit and after remounting, using the current level seed", async () => {
     unlockLevels();
-    const { rerender, unmount } = render(<Game levelId="navigation-1" />);
+    const { rerender, unmount } = render(<Game levelId="fog-1" />);
     await screen.findByRole("dialog", { name: "Pilih peserta" });
     fireEvent.click(screen.getByRole("radio", { name: "Gunakan Depth-First Search" }));
     fireEvent.click(screen.getByRole("checkbox", { name: "Lawan A*" }));
     await saveRoster();
     const saved = JSON.parse(localStorage.getItem(PARTICIPANTS_STORAGE_KEY)!);
     expect(saved).toEqual({ version: 1, player: "dfs", opponents: ["weighted-astar", "greedy", "astar"] });
-    rerender(<Game levelId="navigation-2" />);
+    rerender(<Game levelId="fog-2" />);
     expect(await screen.findByRole("dialog", { name: "Pilih peserta" })).toBeTruthy();
     expect((screen.getByRole("radio", { name: "Gunakan Depth-First Search" }) as HTMLInputElement).checked).toBe(true);
     for (const name of ["Weighted A*", "Greedy Best-First", "A*"]) expect((screen.getByRole("checkbox", { name: `Lawan ${name}` }) as HTMLInputElement).checked).toBe(true);
     await saveRoster();
-    rerender(<Game levelId="navigation-2" />);
+    rerender(<Game levelId="fog-2" />);
     expect(screen.queryByRole("dialog")).toBeNull();
     fireEvent.click(screen.getByRole("button", { name: "Mulai pertandingan" }));
-    expect(ports[0].engine!.config).toEqual({ player: saved.player, opponents: saved.opponents, seed: getLevel("navigation-2")!.seed });
-    rerender(<Game levelId="navigation-1" />);
+    expect(ports[0].engine!.config).toEqual({ player: saved.player, opponents: saved.opponents, seed: getLevel("fog-2")!.seed });
+    rerender(<Game levelId="fog-1" />);
     expect(await screen.findByRole("dialog", { name: "Pilih peserta" })).toBeTruthy();
     expect(ports[0].terminated).toBe(true);
     unmount();
-    render(<Game levelId="navigation-1" />);
+    render(<Game levelId="fog-1" />);
     expect(await screen.findByRole("dialog", { name: "Pilih peserta" })).toBeTruthy();
     expect((screen.getByRole("radio", { name: "Gunakan Depth-First Search" }) as HTMLInputElement).checked).toBe(true);
     expect(localStorage.getItem(PARTICIPANTS_STORAGE_KEY)).toBe(JSON.stringify(saved));
@@ -113,7 +113,7 @@ describe("penjelajah arena interface", () => {
   it.each(["close", "escape", "backdrop"])("discards unsaved changes on %s", async (method) => {
     saveParticipants({ player: "dfs", opponents: ["astar", "greedy"] });
     const saved = localStorage.getItem(PARTICIPANTS_STORAGE_KEY);
-    render(<Game levelId="navigation-1" />);
+    render(<Game levelId="fog-1" />);
     const dialog = await screen.findByRole("dialog", { name: "Pilih peserta" });
     fireEvent.click(screen.getByRole("radio", { name: "Gunakan Greedy Best-First" }));
     if (method === "close") fireEvent.click(within(dialog).getByRole("button", { name: "Tutup dialog" }));
@@ -130,7 +130,7 @@ describe("penjelajah arena interface", () => {
     unlockLevels();
     saveParticipants({ player: "bidirectional", opponents: ["astar", "greedy", "dfs"] });
     const saved = localStorage.getItem(PARTICIPANTS_STORAGE_KEY);
-    render(<Game levelId="navigation-3" />);
+    render(<Game levelId="fog-3" />);
     const dialog = await screen.findByRole("dialog", { name: "Pilih peserta" });
     expect(within(dialog).getByText(/Pilihan tersimpan disesuaikan/)).toBeTruthy();
     expect((screen.getByRole("radio", { name: "Gunakan Bidirectional BFS" }) as HTMLInputElement).disabled).toBe(true);
@@ -138,12 +138,12 @@ describe("penjelajah arena interface", () => {
     expect(localStorage.getItem(PARTICIPANTS_STORAGE_KEY)).toBe(saved);
     await saveRoster();
     fireEvent.click(screen.getByRole("button", { name: "Mulai pertandingan" }));
-    expect(ports[0].engine!.config).toEqual({ player: "astar", opponents: ["greedy", "dfs", "weighted-astar"], seed: getLevel("navigation-3")!.seed });
+    expect(ports[0].engine!.config).toEqual({ player: "astar", opponents: ["greedy", "dfs", "weighted-astar"], seed: getLevel("fog-3")!.seed });
     expect(JSON.parse(localStorage.getItem(PARTICIPANTS_STORAGE_KEY)!).player).toBe("astar");
   });
   it("can save while the board is still loading", async () => {
     boardReady = false;
-    render(<Game levelId="navigation-1" />);
+    render(<Game levelId="fog-1" />);
     await saveRoster();
     expect(localStorage.getItem(PARTICIPANTS_STORAGE_KEY)).not.toBeNull();
     expect((screen.getByRole("button", { name: "Mulai pertandingan" }) as HTMLButtonElement).disabled).toBe(true);
@@ -159,17 +159,17 @@ describe("penjelajah arena interface", () => {
       },
     };
     vi.spyOn(window, "localStorage", "get").mockReturnValue(blockedStorage as unknown as Storage);
-    const { rerender } = render(<Game levelId="navigation-1" />);
+    const { rerender } = render(<Game levelId="fog-1" />);
     await screen.findByRole("dialog", { name: "Pilih peserta" });
     fireEvent.click(screen.getByRole("radio", { name: "Gunakan Depth-First Search" }));
     await saveRoster();
     expect(screen.getByRole("alert").textContent).toContain("Pilihan peserta belum tersimpan di browser");
-    rerender(<Game levelId="navigation-2" />);
+    rerender(<Game levelId="fog-2" />);
     expect(await screen.findByRole("dialog", { name: "Pilih peserta" })).toBeTruthy();
     expect((screen.getByRole("radio", { name: "Gunakan Depth-First Search" }) as HTMLInputElement).checked).toBe(true);
   });
   it("returns to ready after saving during a match and leaves a cancelled match paused", async () => {
-    render(<Game levelId="navigation-1" />);
+    render(<Game levelId="fog-1" />);
     await saveRoster();
     fireEvent.click(screen.getByRole("button", { name: "Mulai pertandingan" }));
     fireEvent.click(screen.getByRole("button", { name: "Peserta" }));
@@ -192,7 +192,7 @@ describe("penjelajah arena interface", () => {
     expect(screen.queryByRole("dialog")).toBeNull();
   });
   it("starts on Play, pauses, steps, and reinitializes on restart", async () => {
-    render(<Game levelId="navigation-1" />);
+    render(<Game levelId="fog-1" />);
     await saveRoster();
     const play = await screen.findByRole("button", { name: "Mulai pertandingan" });
     await waitFor(() => expect((play as HTMLButtonElement).disabled).toBe(false));
@@ -209,20 +209,29 @@ describe("penjelajah arena interface", () => {
     expect(ports[1].engine?.snapshot().tick).toBe(0);
   });
   it("keeps direct links to future levels locked", async () => {
-    render(<Game levelId="gems-1" />);
+    render(<Game levelId="hunt-2" />);
     expect(await screen.findByRole("heading", { name: "Arena ini belum terbuka." })).toBeTruthy();
     expect(screen.queryByRole("dialog")).toBeNull();
     expect(ports).toHaveLength(0);
   });
+  it.each(sections)("allows a direct visit to $id without completing other categories", async (section) => {
+    const id = section.levelIds[0];
+    render(<Game levelId={id} />);
+    await saveRoster();
+    expect(screen.queryByRole("heading", { name: "Arena ini belum terbuka." })).toBeNull();
+    fireEvent.click(screen.getByRole("button", { name: "Mulai pertandingan" }));
+    expect(ports[0].engine!.level.id).toBe(id);
+    expect(ports[0].engine!.snapshot().tick).toBe(0);
+  });
   it("announces the winning opponent immediately and reopens only on request", async () => {
-    render(<Game levelId="navigation-1" />);
+    render(<Game levelId="fog-1" />);
     await saveRoster();
     fireEvent.click(await screen.findByRole("button", { name: "Mulai pertandingan" }));
     finishMatch();
-    const dialog = await screen.findByRole("dialog", { name: "Greedy Best-First menang!" });
-    expect(within(dialog).getByText("Bot lawan memenangkan pertandingan.")).toBeTruthy();
+    const dialog = await screen.findByRole("dialog", { name: resultHeadline(ports.at(-1)!.engine!.snapshot()) });
+    expect(within(dialog).getByRole("list", { name: "Hasil peserta" })).toBeTruthy();
     expect(within(dialog).getByText("Bot kamu menggunakan A*.")).toBeTruthy();
-    expect(within(dialog).getAllByText("Belum finis")).toHaveLength(2);
+    expect(within(dialog).getAllByText(/Pemenang/).length).toBeGreaterThan(0);
     expect(await within(dialog).findByRole("link", { name: "Level berikutnya" })).toBeTruthy();
     fireEvent.click(within(dialog).getByRole("button", { name: "Tutup dialog" }));
     expect(screen.queryByRole("dialog")).toBeNull();
@@ -230,14 +239,14 @@ describe("penjelajah arena interface", () => {
     fireEvent.click(screen.getByRole("button", { name: "Langkah berikutnya" }));
     expect(screen.queryByRole("dialog")).toBeNull();
     fireEvent.click(screen.getByRole("button", { name: "Lihat hasil" }));
-    expect(screen.getByRole("dialog", { name: "Greedy Best-First menang!" })).toBeTruthy();
-    expect(JSON.parse(localStorage.getItem(STORAGE_KEY)!).levels["navigation-1"].matches).toBe(1);
+    expect(screen.getByRole("dialog", { name: resultHeadline(ports.at(-1)!.engine!.snapshot()) })).toBeTruthy();
+    expect(JSON.parse(localStorage.getItem(STORAGE_KEY)!).levels["fog-1"].matches).toBe(1);
     fireEvent.click(screen.getByRole("button", { name: "Ganti algoritma" }));
     expect(screen.getByRole("dialog", { name: "Pilih peserta" })).toBeTruthy();
     expect((screen.getByRole("radio", { name: "Gunakan A*" }) as HTMLInputElement).checked).toBe(true);
   });
   it("uses the selected player algorithm and preserves it on replay", async () => {
-    render(<Game levelId="navigation-1" />);
+    render(<Game levelId="fog-1" />);
     await screen.findByRole("dialog", { name: "Pilih peserta" });
     fireEvent.click(screen.getByRole("radio", { name: "Gunakan Greedy Best-First" }));
     await saveRoster();
@@ -245,27 +254,27 @@ describe("penjelajah arena interface", () => {
     const config = ports[0].engine!.config;
     expect(config.player).toBe("greedy");
     finishMatch();
-    const dialog = await screen.findByRole("dialog", { name: "Greedy Best-First menang!" });
-    expect(within(dialog).getByText("Bot kamu memenangkan pertandingan!")).toBeTruthy();
+    const dialog = await screen.findByRole("dialog", { name: resultHeadline(ports.at(-1)!.engine!.snapshot()) });
+    expect(within(dialog).getByText("Bot kamu menggunakan Greedy Best-First.")).toBeTruthy();
     await within(dialog).findByRole("link", { name: "Level berikutnya" });
     fireEvent.click(within(dialog).getByRole("button", { name: "Main lagi" }));
     expect(screen.queryByRole("dialog")).toBeNull();
     expect(ports[0].terminated).toBe(true);
     expect(ports[1].engine!.config).toEqual(config);
     finishMatch();
-    const replayDialog = await screen.findByRole("dialog", { name: "Greedy Best-First menang!" });
+    const replayDialog = await screen.findByRole("dialog", { name: resultHeadline(ports.at(-1)!.engine!.snapshot()) });
     await within(replayDialog).findByRole("link", { name: "Level berikutnya" });
-    expect(JSON.parse(localStorage.getItem(STORAGE_KEY)!).levels["navigation-1"].matches).toBe(2);
+    expect(JSON.parse(localStorage.getItem(STORAGE_KEY)!).levels["fog-1"].matches).toBe(2);
     fireEvent.keyDown(window, { code: "Space" });
     expect(ports).toHaveLength(2);
     fireEvent(replayDialog, new Event("cancel", { cancelable: true }));
     expect(screen.queryByRole("dialog")).toBeNull();
   });
-  it.each(["race", "gems"] as const)("renders ties, no winner and the save gate in %s results", (mode) => {
+  it.each(["fog", "hunt"] as const)("renders ties, no winner and the save gate in %s results", (mode) => {
     const frame = previewFrame(fixture(), defaultConfig(1));
     frame.phase = "finished";
     frame.winners = ["bot-0", "bot-1"];
-    const props = { frame, mode, onClose: vi.fn(), onReplay: vi.fn(), onSettings: vi.fn(), nextHref: "/play/navigation-2", saved: false };
+    const props = { frame, mode, onClose: vi.fn(), onReplay: vi.fn(), onSettings: vi.fn(), nextHref: "/play/fog-2", saved: false };
     const { rerender } = render(<ResultDialog {...props} />);
     expect(screen.getByRole("dialog", { name: "Hasil seri" })).toBeTruthy();
     expect(screen.getByText(/A\* dan Weighted A\* berbagi kemenangan/)).toBeTruthy();
@@ -273,14 +282,18 @@ describe("penjelajah arena interface", () => {
     expect(screen.queryByRole("link", { name: "Level berikutnya" })).toBeNull();
     rerender(<ResultDialog {...props} frame={{ ...frame, winners: [] }} saved />);
     expect(screen.getByRole("dialog", { name: "Belum ada pemenang" })).toBeTruthy();
-    expect(screen.getByText(mode === "race" ? "Tidak ada bot yang mencapai finis." : "Belum ada gem yang berhasil direbut.")).toBeTruthy();
+    expect(screen.getByText(mode === "fog" ? "Tidak ada bot yang mencapai finis." : "Belum ada poin yang diperoleh.")).toBeTruthy();
     expect(screen.getByRole("link", { name: "Level berikutnya" })).toBeTruthy();
     fireEvent.click(screen.getByRole("button", { name: "Tutup dialog" }));
     expect(props.onClose).toHaveBeenCalledOnce();
   });
-  it("reads migrated progress and unlocks the next navigation level", async () => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify({ version: 4, levels: { "navigation-1": { completed: true, matches: 1, wins: 0, bestTicks: null, bestGems: 0 } } }));
+  it("deletes the retired campaign and opens the first arena in every category", async () => {
+    localStorage.setItem("grid-puzzle.progress.v4", JSON.stringify({ version: 4, levels: { "navigation-1": { completed: true } } }));
     render(<Home />);
-    expect(await screen.findByRole("link", { name: /Level 2 Gerbang gurun/ })).toBeTruthy();
+    expect(await screen.findByRole("link", { name: /Level 1 Simpang pertama/ })).toBeTruthy();
+    for (const section of sections) expect(screen.getByRole("link", { name: new RegExp(`Level 1 ${getLevel(section.levelIds[0])!.title}`) })).toBeTruthy();
+    expect(screen.queryByRole("link", { name: /Level 2 Ruang tersembunyi/ })).toBeNull();
+    expect(screen.queryByText("Selesaikan kategori sebelumnya untuk membuka arena ini.")).toBeNull();
+    expect(localStorage.getItem("grid-puzzle.progress.v4")).toBeNull();
   });
 });

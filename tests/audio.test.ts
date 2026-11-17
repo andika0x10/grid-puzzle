@@ -202,53 +202,34 @@ describe("audio preferences", () => {
 });
 
 describe("match audio cues", () => {
-  it.each(["race", "gems", "cargo", "territory", "keys", "outposts", "survival"] as const)("maps important %s events", (mode) => {
-    const level = levels.find((item) => item.mode === mode)!;
-    const previous = previewFrame(level, defaultConfig(level.seed));
-    const next = structuredClone(previous);
-    let expected: SoundCue[] = [];
-    if (mode === "race") {
-      next.bots[0].checkpoints.push(0);
-      expected = ["checkpoint"];
-    }
-    if (mode === "gems") {
-      next.gems[0].taken = true;
-      expected = ["pickup"];
-    }
-    if (mode === "cargo") {
-      next.modeState.parcels[0].state = "carried";
-      expected = ["pickup"];
-    }
-    if (mode === "territory") {
-      next.modeState.territory[0] = "bot-0";
-      expected = ["claim"];
-    }
-    if (mode === "keys") {
-      next.bots[0].keys.push("red");
-      expected = ["pickup"];
-    }
-    if (mode === "outposts") {
-      next.modeState.posts[0].owner = "bot-0";
-      expected = ["claim"];
-    }
-    if (mode === "survival") {
-      next.tick = level.waves[0].tick;
-      next.bots[0].eliminatedTick = next.tick;
-      expected = ["danger", "eliminated"];
-    }
-    expect(matchSoundCues(level, previous, [next]).sort()).toEqual(expected.sort());
+  it.each([
+    ["toggle", "checkpoint"],
+    ["catch", "claim"],
+    ["collect", "pickup"],
+    ["build", "claim"],
+    ["dock", "deposit"],
+    ["collapse", "danger"],
+    ["eliminated", "eliminated"],
+  ] as const)("maps %s events to %s", (kind, cue) => {
+    const level = levels[0],
+      previous = previewFrame(level, defaultConfig(level.seed)),
+      next = structuredClone(previous);
+    next.modeState.events = [{ kind, botId: "bot-0" }];
+    expect(matchSoundCues(level, previous, [next])).toEqual([cue]);
   });
-
-  it("preserves intermediate events in a batch and only follows the player's footsteps", () => {
-    const level = levels.find((item) => item.mode === "cargo")!;
-    const previous = previewFrame(level, defaultConfig(level.seed));
+  it("preserves intermediate events and follows only player footsteps", () => {
+    const level = levels[0],
+      previous = previewFrame(level, defaultConfig(level.seed));
     const picked = structuredClone(previous);
-    picked.modeState.parcels[0].state = "carried";
-    picked.bots[1].x++;
-    expect(matchSoundCues(level, previous, [picked])).toEqual(["pickup"]);
-    const delivered = structuredClone(picked);
-    delivered.modeState.parcels[0].state = "delivered";
-    delivered.bots[0].x++;
+    picked.modeState.events = [
+      { kind: "collect", botId: "bot-1" },
+      { kind: "step", botId: "bot-1" },
+    ];
+    const delivered = structuredClone(previous);
+    delivered.modeState.events = [
+      { kind: "dock", botId: "bot-0" },
+      { kind: "step", botId: "bot-0" },
+    ];
     expect(matchSoundCues(level, previous, [picked, delivered]).sort()).toEqual(["deposit", "pickup", "step"]);
   });
 

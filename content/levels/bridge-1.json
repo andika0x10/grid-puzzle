@@ -1,0 +1,193 @@
+{
+  "schemaVersion": 4,
+  "rulesVersion": 4,
+  "id": "bridge-1",
+  "sectionId": "bridge",
+  "order": 1,
+  "title": "Bentang pertama",
+  "mission": "Bangun jalan, rebut pulau, capai keluar.",
+  "briefing": "Pembuat jembatan mendapat poin, penjelajah lain mendapat akses. Bandingkan keuntungan membangun, merebut penanda pulau, dan mengejar bonus keluar.",
+  "theme": "farm",
+  "seed": 46001,
+  "timeLimit": 1200,
+  "board": {
+    "width": 11,
+    "height": 9,
+    "terrain": [
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "ground",
+      "ground",
+      "ground",
+      "wall",
+      "water",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "wall",
+      "wall",
+      "ground",
+      "ground",
+      "ground",
+      "wall",
+      "water",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "wall",
+      "wall",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "water",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "wall",
+      "wall",
+      "ground",
+      "ground",
+      "ground",
+      "wall",
+      "water",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "wall",
+      "wall",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "water",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "wall",
+      "wall",
+      "ground",
+      "wall",
+      "wall",
+      "ground",
+      "water",
+      "ground",
+      "wall",
+      "wall",
+      "ground",
+      "wall",
+      "wall",
+      "path",
+      "ground",
+      "ground",
+      "ground",
+      "water",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall"
+    ],
+    "spawn": {
+      "x": 1,
+      "y": 7
+    },
+    "goal": {
+      "x": 9,
+      "y": 1
+    },
+    "decorations": [
+      {
+        "x": 0,
+        "y": 0
+      },
+      {
+        "x": 10,
+        "y": 8
+      }
+    ]
+  },
+  "mode": "bridge",
+  "bridge": {
+    "spans": [
+      {
+        "banks": [
+          {
+            "x": 4,
+            "y": 3
+          },
+          {
+            "x": 6,
+            "y": 3
+          }
+        ],
+        "cells": [
+          {
+            "x": 5,
+            "y": 3
+          }
+        ]
+      },
+      {
+        "banks": [
+          {
+            "x": 4,
+            "y": 7
+          },
+          {
+            "x": 6,
+            "y": 7
+          }
+        ],
+        "cells": [
+          {
+            "x": 5,
+            "y": 7
+          }
+        ]
+      }
+    ],
+    "supplies": [
+      {
+        "x": 1,
+        "y": 1
+      },
+      {
+        "x": 1,
+        "y": 5
+      }
+    ],
+    "markers": [
+      {
+        "x": 7,
+        "y": 3
+      }
+    ]
+  }
+}

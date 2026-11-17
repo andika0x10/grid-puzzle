@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
-import { gemActive, gemPending } from "../game/classic";
+import { cellOf } from "../game/modes";
 import type { LevelDefinition } from "../game/schema";
 import type { MatchFrame } from "../game/engine";
 import type { BoardRenderer } from "../game/renderer";
@@ -59,6 +59,7 @@ export default function BoardCanvas({
     renderer.current?.setFrame(frame);
     renderer.current?.setFocus(focused);
   }, [frame, playing, focused]);
+  const observed = frame.bots.find((b) => b.id === focused) ?? frame.bots[0];
   return (
     <div className="board-wrap">
       <div ref={host} className="canvas-host" role="img" aria-label="Papan permainan" />
@@ -78,13 +79,11 @@ export default function BoardCanvas({
       )}
       <p className="sr-only">
         Tick {frame.tick}. {level.mission}{" "}
-        {level.mode === "gems"
-          ? `${frame.gems.filter((g) => gemActive(g, frame.tick)).length} gem aktif dan ${frame.gems.filter((g) => gemPending(g, frame.tick)).length} gem akan muncul.`
-          : ""}{" "}
         {frame.bots
+          .filter((b) => level.mode !== "fog" || b.id === observed.id || observed.visible.includes(cellOf(b, level.board.width)))
           .map(
             (b) =>
-              `${b.algorithm}: kolom ${b.x + 1}, baris ${b.y + 1}, skor ${b.score}, ${b.checkpoints.length}/${b.checkpointTotal} pos, tas ${b.inventory}, ${b.keys.length} kunci${b.eliminatedTick !== null ? ", tereliminasi" : ""}`
+              `${b.algorithm}: kolom ${b.x + 1}, baris ${b.y + 1}, skor ${b.score}, ${b.id === observed.id || level.mode !== "fog" ? b.detail : ""}${b.eliminatedTick !== null ? ", tereliminasi" : ""}`
           )
           .join(". ")}
       </p>

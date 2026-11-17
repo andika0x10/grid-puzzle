@@ -194,7 +194,7 @@ function GameSession({ levelId }: { levelId: string }) {
         <main className="locked-page shell">
           <Icon name="lock" size={42} />
           <h1>Arena ini belum terbuka.</h1>
-          <p>Selesaikan pertandingan di level sebelumnya untuk melanjutkan.</p>
+          <p>Selesaikan pertandingan di level sebelumnya dalam kategori ini untuk melanjutkan.</p>
           <Link className="button primary" href="/">
             Lihat perjalanan
           </Link>
@@ -265,19 +265,15 @@ function GameSession({ levelId }: { levelId: string }) {
                 <span className="participant-score" id={`participant-metric-${bot.id}`}>
                   {hasStarted && (
                     <>
-                      <span className="participant-value">{botMetricText(level.mode, bot, state.frame.tick, level.mode === "cargo" || state.phase === "finished")}</span>
-                      {level.mode === "cargo" && (
-                        <span className="participant-detail">
-                          Tas {bot.inventory}/{level.cargoCapacity}
-                        </span>
-                      )}
+                      <span className="participant-value">{botMetricText(level.mode, bot, state.frame.tick, state.phase === "finished")}</span>
+                      {(level.mode === "energy" || level.mode === "bridge") && bot.detail && <span className="participant-detail">{bot.detail}</span>}
                     </>
                   )}
                 </span>
               </button>
             ))}
           </div>
-          <RuleRibbon level={level} frame={state.frame} />
+          <RuleRibbon level={level} frame={state.frame} focused={focused} />
           <div className="arena-meta">
             <span style={{ color: theme.color }}>
               <i style={{ background: theme.color }} />
@@ -311,7 +307,7 @@ function GameSession({ levelId }: { levelId: string }) {
                 <p>
                   {state.phase === "ready"
                     ? "Tekan Mulai untuk menjalankan pertandingan."
-                    : `${getAlgorithm(observed.algorithm).short}: ${statusText[observed.status].toLowerCase()}${level.mode === "race" && level.board.checkpoints.length ? ` · ${observed.checkpoints.length}/${level.board.checkpoints.length} pos` : level.mode === "keys" ? ` · ${observed.keys.length}/${level.board.keys.length} kunci` : level.mode === "cargo" ? ` · tas ${observed.inventory}/${level.cargoCapacity}` : ""} · ${observed.computeOps} operasi`}
+                    : `${getAlgorithm(observed.algorithm).short}: ${statusText[observed.status].toLowerCase()}${observed.detail ? ` - ${observed.detail}` : ""} - ${observed.computeOps} operasi`}
                 </p>
               </div>
             </div>
@@ -433,7 +429,7 @@ function GameSession({ levelId }: { levelId: string }) {
           <p className="modal-intro">Pilih algoritmamu dan satu sampai tiga lawan. Setiap peserta memakai algoritma berbeda.</p>
           {participantsAdjusted && (
             <p className="modal-note" role="status">
-              Pilihan tersimpan disesuaikan karena Bidirectional BFS membutuhkan medan dengan biaya gerak seragam. Periksa peserta sebelum menekan Save.
+              Pilihan tersimpan disesuaikan dengan tindakan dan biaya medan arena ini. Periksa peserta sebelum menekan Save.
             </p>
           )}
           <Roster level={level} draft={draft} selectPlayer={selectPlayer} toggleOpponent={toggleOpponent} />
@@ -452,7 +448,7 @@ function GameSession({ levelId }: { levelId: string }) {
               <thead>
                 <tr>
                   <th>Penjelajah</th>
-                  <th>Petak</th>
+                  <th>Ekspansi</th>
                   <th>Operasi</th>
                   <th>State</th>
                   <th>Biaya</th>

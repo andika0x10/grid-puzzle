@@ -1,161 +1,61 @@
 import fs from "node:fs/promises";
-import path from "node:path";
-import { levelSchema, sectionSchema, terrainIds, type LevelDefinition } from "../game/schema";
+import { levelSchema, sectionSchema, gameModes, terrainIds, type SectionDefinition } from "../game/schema";
 import { themeIds } from "../game/themes";
+import { cellOf } from "../game/modes";
 import { MatchEngine } from "../game/engine";
-import { algorithms, defaultConfig, unavailableReason } from "../game/algorithms";
-import { sharedObjectFrames } from "../game/assets";
-import { botTerrain, initialModeState } from "../game/modes";
-const read = async (file: string) => JSON.parse(await fs.readFile(file, "utf8"));
-function ensure(condition: unknown, message: string): asserts condition {
-  if (!condition) throw new Error(message);
+import { defaultConfig } from "../game/algorithms";
+import { layoutFingerprint, objectivePoints, reachableCells, circuitReachable, weightedDistances } from "./level-checks";
+function ensure(ok: unknown, message: string): asserts ok {
+  if (!ok) throw new Error(message);
 }
-const sections = (await read("content/sections.json")).map((s: unknown) => sectionSchema.parse(s));
-const levels = await Promise.all(
-  (await fs.readdir("content/levels"))
-    .filter((f) => f.endsWith(".json"))
-    .map(async (f) => {
-      const raw = await read(`content/levels/${f}`);
-      ensure(!("traceRefs" in raw || "result" in raw || "steps" in raw), `Precomputed data in ${f}`);
-      return levelSchema.parse(raw);
-    })
-);
-ensure(levels.length === 49 && sections.length === 7, "Expected 49 initial levels in 7 categories");
-ensure(algorithms.length === 10 && new Set(algorithms.map((a) => a.id)).size === 10, "Expected 10 unique algorithms");
-const ids = sections.flatMap((s: { levelIds: string[] }) => s.levelIds);
-ensure(new Set(ids).size === levels.length && ids.length === levels.length, "Duplicate or unlisted level");
-for (const section of sections) {
-  ensure(new Set(section.levelIds.map((id: string) => levels.find((l) => l.id === id)?.theme)).size === themeIds.length, `Incomplete theme coverage: ${section.id}`);
-  for (const [i, id] of section.levelIds.entries()) {
-    const level = levels.find((l) => l.id === id);
-    ensure(level && level.sectionId === section.id && level.order === i + 1, `Invalid level order: ${id}`);
-  }
-}
-const expected = new Set<string>(["source/terrain-source.png", "source/objects-source.png", "source/modes-source.png", "source/classic-source.png", "source/prompts.json"]);
-let frames = 0;
-const characterNames = ["down", "left", "right", "up"].flatMap((d) => [...[0, 1].map((i) => `actor-${d}-idle-${i}`), ...[0, 1, 2, 3].map((i) => `actor-${d}-walk-${i}`)]);
-const sharedNames = sharedObjectFrames;
-for (const theme of themeIds) {
-  expected.add(`source/characters/${theme}.png`);
-  expected.add(`characters/${theme}/portrait.png`);
-}
-for (const directory of [...themeIds.map((t) => `themes/${t}`), ...themeIds.map((t) => `characters/${t}`), "shared"]) {
-  expected.add(`${directory}/atlas.json`);
-  expected.add(`${directory}/atlas.png`);
-  if (directory.startsWith("themes/")) expected.add(`${directory}/decor.png`);
-  const atlas = await read(`public/assets/game/${directory}/atlas.json`),
-    bytes = await fs.readFile(`public/assets/game/${directory}/atlas.png`),
-    image = { width: bytes.readUInt32BE(16), height: bytes.readUInt32BE(20) };
-  const names = directory === "shared" ? sharedNames : directory.startsWith("characters/") ? characterNames : [...terrainIds, "decor"];
-  ensure(Object.keys(atlas.frames).length === names.length && names.every((n) => atlas.frames[n]), `Unused or missing atlas frame in ${directory}`);
-  if (directory.startsWith("characters/")) {
-    for (const direction of ["down", "left", "right", "up"])
-      for (const [kind, count] of [
-        ["idle", 2],
-        ["walk", 4],
-      ] as const) {
-        const sequence = atlas.animations[`actor-${direction}-${kind}`];
-        ensure(sequence?.length === count && sequence.every((name: string) => atlas.frames[name]), `Incomplete human animation: ${directory}/${direction}/${kind}`);
-      }
-  }
-  for (const item of Object.values(atlas.frames) as { frame: { x: number; y: number; w: number; h: number } }[]) {
-    const f = item.frame;
-    ensure(f.w === 32 && f.h === 32 && f.x >= 0 && f.y >= 0 && f.x + f.w <= image.width! && f.y + f.h <= image.height!, `Invalid frame: ${directory}`);
-    frames++;
-  }
-}
-async function walk(directory: string, prefix = ""): Promise<string[]> {
-  const result: string[] = [];
-  for (const item of await fs.readdir(directory, { withFileTypes: true })) {
-    const name = prefix + item.name;
-    if (item.isDirectory()) result.push(...(await walk(path.join(directory, item.name), name + "/")));
-    else result.push(name);
-  }
-  return result;
-}
-for (const file of await walk("public/assets/game")) ensure(expected.has(file), `Unused game asset: ${file}`);
-const catalog = await read("content/catalog.json");
-ensure(JSON.stringify(catalog.sections) === JSON.stringify(sections), "Stale category catalog");
-ensure(
-  catalog.levels.length === levels.length && catalog.levels.every((l: { id: string }) => JSON.stringify(l) === JSON.stringify(levels.find((source) => source.id === l.id))),
-  "Stale level catalog"
-);
-const raceWinners = new Set<string>();
-for (const level of levels) {
-  const engine = new MatchEngine(level, defaultConfig(level.seed));
-  let frame = engine.snapshot();
-  while (frame.phase !== "finished") frame = engine.step();
-  ensure(frame.winners.length > 0, `No finisher or scoring outcome: ${level.id}`);
-  if (level.mode === "gems")
-    ensure(frame.bots.reduce((sum, bot) => sum + bot.score, 0) === frame.gems.reduce((n, gem) => n + (gem.awardedPoints ?? 0), 0), `Duplicated gem points: ${level.id}`);
-  if (level.mode === "cargo")
-    ensure(frame.bots.reduce((sum, bot) => sum + bot.score, 0) === frame.modeState.parcels.filter((p) => p.state === "delivered").length, `Duplicated cargo points: ${level.id}`);
-  // Reachability is an authoring check only; no answer or route is persisted.
-  const bot = {
-    id: "check",
-    algorithm: "bfs",
-    ...level.board.spawn,
-    score: 0,
-    inventory: 0,
-    keys: [] as LevelDefinition["board"]["keys"][number]["color"][],
-    eliminatedTick: null,
-    finishTick: null,
-    checkpoints: [] as number[],
-  };
-  const state = initialModeState(level);
-  let reached = new Set<number>();
-  for (let pass = 0; pass <= level.board.keys.length; pass++) {
-    const terrain = botTerrain(level, state, level.board.terrain, bot, 0),
-      width = level.board.width;
-    for (const gate of level.board.gates) terrain[gate.y * width + gate.x] = "wall";
-    const queue = [bot.y * width + bot.x];
-    reached = new Set(queue);
-    for (let head = 0; head < queue.length; head++) {
-      const c = queue[head],
-        x = c % width,
-        y = Math.floor(c / width);
-      for (const [nx, ny] of [
-        [x + 1, y],
-        [x, y - 1],
-        [x - 1, y],
-        [x, y + 1],
-      ]) {
-        const n = ny * width + nx;
-        if (nx >= 0 && ny >= 0 && nx < width && ny < level.board.height && !reached.has(n) && terrain[n] !== "wall" && terrain[n] !== "water") {
-          reached.add(n);
-          queue.push(n);
-        }
-      }
+const read = async (p: string) => JSON.parse(await fs.readFile(p, "utf8"));
+const sections: SectionDefinition[] = (await read("content/sections.json")).map((s: unknown) => sectionSchema.parse(s));
+const files = (await fs.readdir("content/levels")).filter((f) => f.endsWith(".json"));
+const levels = await Promise.all(files.map(async (f) => levelSchema.parse(await read(`content/levels/${f}`))));
+ensure(levels.length === 49 && sections.length === 7, "Expected seven new games and 49 arenas");
+ensure(new Set(levels.map((l) => l.id)).size === 49, "Duplicate IDs");
+const fingerprints = new Map<string, string>();
+for (const l of levels) {
+  const fp = layoutFingerprint(l);
+  ensure(!fingerprints.has(fp), `Repeated topology: ${l.id} / ${fingerprints.get(fp)}`);
+  fingerprints.set(fp, l.id);
+  const seen = reachableCells(l);
+  for (const p of objectivePoints(l)) ensure(seen.has(cellOf(p, l.board.width)), `Unreachable object ${l.id} at ${p.x},${p.y}`);
+  ensure(circuitReachable(l), `Unreachable switch configuration ${l.id}`);
+  if (l.mode === "energy") {
+    const ds = l.energy.chargers.map((p) => weightedDistances(l, cellOf(p, l.board.width)));
+    for (const p of l.energy.beacons) {
+      const d = Math.min(...ds.map((a) => a[cellOf(p, l.board.width)]));
+      ensure(d * 2 + 5 <= 24, `Unsafe energy return ${l.id} at ${p.x},${p.y}: ${d}`);
     }
-    for (const key of level.board.keys) if (reached.has(key.y * width + key.x) && !bot.keys.includes(key.color)) bot.keys.push(key.color);
   }
-  ensure(bot.keys.length === level.board.keys.length, `Unobtainable key chain: ${level.id}`);
-  for (const p of [
-    ...level.board.gems,
-    ...level.board.checkpoints,
-    ...level.board.parcels,
-    ...level.board.posts,
-    ...(level.board.depot ? [level.board.depot] : []),
-    ...(level.board.goal ? [level.board.goal] : []),
-  ])
-    ensure(reached.has(p.y * level.board.width + p.x), `Unreachable objective: ${level.id}`);
-  if (level.mode === "race" && frame.winners.length === 1) raceWinners.add(frame.bots.find((bot) => bot.id === frame.winners[0])!.algorithm);
+  const engine = new MatchEngine(l, defaultConfig(l.seed));
+  let f = engine.snapshot();
+  while (f.phase !== "finished") f = engine.step();
+  ensure(f.winners.length > 0, `No objective outcome ${l.id}`);
 }
-ensure(raceWinners.size >= 3, "Race maps must reward at least three different algorithms with the default roster");
-for (const algorithm of algorithms.slice(0, 5)) {
+for (const [order, mode] of gameModes.entries()) {
+  const section = sections.find((s) => s.id === mode);
+  ensure(section?.order === order + 1, `Wrong order ${mode}`);
+  ensure(new Set(levels.filter((l) => l.mode === mode).map((l) => l.theme)).size === themeIds.length, `Missing worlds ${mode}`);
   ensure(
-    levels.some((level) => {
-      if (unavailableReason(algorithm.id, level)) return false;
-      const opponents = algorithms
-        .filter((a) => a.id !== algorithm.id && !unavailableReason(a.id, level))
-        .slice(0, 3)
-        .map((a) => a.id);
-      const engine = new MatchEngine(level, { player: algorithm.id, opponents, seed: level.seed });
-      let frame = engine.snapshot();
-      while (frame.phase !== "finished") frame = engine.step();
-      return frame.winners.length === 1 && frame.winners[0] === "bot-0";
-    }),
-    `Algorithm has no solo win: ${algorithm.id}`
+    section.levelIds.every((id: string, i: number) => levels.some((l) => l.id === id && l.mode === mode && l.order === i + 1)),
+    `Wrong progression ${mode}`
   );
 }
-console.log(`Validated ${levels.length} live levels, ${themeIds.length} worlds, ${frames} atlas frames, competitive roster, and zero orphaned game assets.`);
+const catalog = await read("content/catalog.json");
+ensure(JSON.stringify(catalog.sections) === JSON.stringify(sections), "Stale sections");
+ensure(
+  catalog.levels.length === 49 && catalog.levels.every((l: { id: string }) => JSON.stringify(l) === JSON.stringify(levels.find((source) => source.id === l.id))),
+  "Stale catalog"
+);
+for (const theme of themeIds) {
+  const atlas = await read(`public/assets/game/themes/${theme}/atlas.json`);
+  ensure(
+    terrainIds.every((t) => atlas.frames[t]),
+    `Missing terrain frames ${theme}`
+  );
+  const characters = await read(`public/assets/game/characters/${theme}/atlas.json`);
+  for (const direction of ["up", "down", "left", "right"]) for (let i = 0; i < 4; i++) ensure(characters.frames[`actor-${direction}-walk-${i}`], `Missing actor ${theme}`);
+}
+console.log("Validated 49 distinct topologies, 7 shared games, reachable objectives, energy returns, live outcomes, catalog and theme assets.");

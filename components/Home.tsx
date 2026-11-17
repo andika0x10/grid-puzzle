@@ -18,8 +18,7 @@ export default function Home() {
     setLoaded(true);
     return subscribeProgress(() => setProgress(readProgress()));
   }, []);
-  const completed = levels.filter((l) => progress.levels[l.id]?.completed).length,
-    next = levels.find((l) => isLevelUnlocked(l.id, sections, progress) && !progress.levels[l.id]?.completed);
+  const completed = levels.filter((l) => progress.levels[l.id]?.completed).length;
   return (
     <>
       <Header completed={completed} total={levels.length} />
@@ -27,9 +26,9 @@ export default function Home() {
         <h1 className="sr-only">Perjalanan Grid Puzzle</h1>
         {sections.map((section) => {
           const done = section.levelIds.filter((id) => progress.levels[id]?.completed).length,
-            locked = !isLevelUnlocked(section.levelIds[0], sections, progress);
+            next = section.levelIds.find((id) => isLevelUnlocked(id, sections, progress) && !progress.levels[id]?.completed);
           return (
-            <section key={section.id} className={`journey-section ${locked ? "section-locked" : ""}`} aria-labelledby={`section-${section.id}`}>
+            <section key={section.id} className="journey-section" aria-labelledby={`section-${section.id}`}>
               <div className="unit-heading">
                 <div>
                   <p>
@@ -51,7 +50,7 @@ export default function Home() {
                     theme = themes[level.theme],
                     entry = progress.levels[id],
                     unlocked = loaded && isLevelUnlocked(id, sections, progress),
-                    current = next?.id === id;
+                    current = next === id;
                   const contents = (
                     <>
                       <span className="level-node">
@@ -91,12 +90,6 @@ export default function Home() {
                   );
                 })}
               </ol>
-              {locked && (
-                <p className="section-unlock">
-                  <Icon name="lock" size={14} />
-                  Selesaikan kategori sebelumnya untuk membuka arena ini.
-                </p>
-              )}
             </section>
           );
         })}

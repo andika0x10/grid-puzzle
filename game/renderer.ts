@@ -1,43 +1,42 @@
-import { Application, Assets, Container, Graphics, Sprite, Text, type Spritesheet } from "pixi.js";
+import { Application, Assets, Container, Graphics, GraphicsContext, Sprite, type Spritesheet } from "pixi.js";
 import { BOT_COLORS } from "./algorithms";
 import type { MatchFrame } from "./engine";
 import type { LevelDefinition } from "./schema";
-import { isWalkable } from "./schema";
-import { feverMultiplier, gemActive, gemPending } from "./classic";
-
+import { cellOf } from "./modes";
+type Glyph = "target" | "switch" | "terminal" | "charger" | "beacon" | "supply" | "bridge" | "dock" | "box";
+const ink = 0x26343b,
+  cream = 0xfff2ca;
 export class BoardRenderer {
   private app = new Application();
   private world = new Container();
+  private objects = new Container();
+  private actorsLayer = new Container();
   private overlay = new Graphics();
-  private ownership = new Graphics();
-  private modeLayer = new Container();
-  private modeSprites = new Map<string, Sprite>();
-  private postLabels = new Map<string, Text>();
-  private actors = new Map<string, { container: Container; sprite: Sprite; cargo: Sprite; x: number; y: number }>();
+  private effects = new Graphics();
+  private fog = new Graphics();
+  private routes = new Graphics();
+  private contexts = new Map<Glyph, GraphicsContext>();
+  private objectViews = new Map<string, Graphics>();
+  private actors = new Map<string, { container: Container; sprite: Sprite; ring: Graphics; x: number; y: number }>();
   private tiles: Sprite[] = [];
-  private gems = new Map<string, { gem: Sprite; pickup: Sprite; label: Text; life: Graphics; bucket: number | null; until: number }>();
-  private gateCells = new Set<number>();
-  private shared!: Spritesheet;
-  private character!: Spritesheet;
   private terrain!: Spritesheet;
+  private character!: Spritesheet;
+  private shared!: Spritesheet;
+  private goalView: Sprite | null = null;
   private observer: ResizeObserver | null = null;
   private promise: Promise<void>;
   private disposed = false;
   private initialized = false;
-  private clock = 0;
   private playing = false;
   private focused = "bot-0";
-  private focusedApplied = false;
-  private renderedFrame: MatchFrame | null = null;
-  private modeSignature = "";
-  private frame: MatchFrame;
+  private clock = 0;
+  private signature = "";
   constructor(
     private host: HTMLElement,
     private level: LevelDefinition,
-    frame: MatchFrame,
+    private frame: MatchFrame,
     private reduced: boolean
   ) {
-    this.frame = frame;
     this.promise = this.initialize();
   }
   ready() {
@@ -50,7 +49,7 @@ export class BoardRenderer {
       Assets.load<Spritesheet>({ src: "/assets/game/shared/atlas.json", data: { cachePrefix: "shared/" } }),
     ]);
     if (this.disposed) return;
-    for (const sheet of [this.shared, this.character, this.terrain]) for (const texture of Object.values(sheet.textures)) texture.source.scaleMode = "nearest";
+    for (const sheet of [this.terrain, this.character, this.shared]) for (const t of Object.values(sheet.textures)) t.source.scaleMode = "nearest";
     await this.app.init({
       width: 32,
       height: 32,
@@ -64,290 +63,297 @@ export class BoardRenderer {
     this.initialized = true;
     if (this.disposed) return;
     this.host.appendChild(this.app.canvas);
-    this.app.ticker.maxFPS = this.reduced ? 30 : 60;
     this.app.canvas.setAttribute("aria-hidden", "true");
+    this.app.ticker.maxFPS = this.reduced ? 30 : 60;
     this.app.stage.addChild(this.world);
-    this.level.board.gates.forEach((g) => this.gateCells.add(g.y * this.level.board.width + g.x));
-    this.level.board.terrain.forEach((name, i) => {
-      const s = new Sprite({
-        texture: this.terrain.textures[this.gateCells.has(i) ? "path" : name],
-        x: (i % this.level.board.width) * 32,
-        y: Math.floor(i / this.level.board.width) * 32,
-      });
-      this.tiles.push(s);
-      this.world.addChild(s);
+    this.level.board.terrain.forEach((name, c) => {
+      const tile = new Sprite({ texture: this.terrain.textures[name], x: (c % this.level.board.width) * 32, y: Math.floor(c / this.level.board.width) * 32 });
+      this.tiles.push(tile);
+      this.world.addChild(tile);
     });
-    this.world.addChild(this.ownership, this.overlay, this.modeLayer);
-    const spawn = this.level.board.spawn;
-    this.world.addChild(new Sprite({ texture: this.shared.textures.start, x: spawn.x * 32, y: spawn.y * 32 }));
-    if (this.level.board.goal) {
-      const goal = this.level.board.goal;
-      this.world.addChild(new Sprite({ texture: this.shared.textures.finish, x: goal.x * 32, y: goal.y * 32 }));
-    }
+    this.world.addChild(this.routes, this.overlay, this.objects, this.effects, this.actorsLayer, this.fog);
     for (const p of this.level.board.decorations) this.world.addChild(new Sprite({ texture: this.terrain.textures.decor, x: p.x * 32, y: p.y * 32 }));
-    for (const g of this.frame.gems) {
-      const gem = new Sprite({ texture: this.shared.textures["gem-0"], x: g.x * 32, y: g.y * 32 });
-      const pickup = new Sprite({ texture: this.shared.textures.pickup, x: g.x * 32, y: g.y * 32, visible: false });
-      const label = new Text({
-        text: String(g.value ?? 1),
-        style: { fontFamily: "Geist, sans-serif", fontSize: 10, fontWeight: "900", fill: "#ffffff", stroke: { color: "#252b32", width: 3 } },
-        x: g.x * 32 + 25,
-        y: g.y * 32 + 2,
-        resolution: 2,
-      });
-      const life = new Graphics();
-      this.world.addChild(gem, pickup, life, label);
-      this.gems.set(g.id, { gem, pickup, label, life, bucket: null, until: 0 });
+    const spawn = this.level.board.spawn;
+    this.objects.addChild(new Sprite({ texture: this.shared.textures.start, x: spawn.x * 32, y: spawn.y * 32 }));
+    if (this.level.board.goal) {
+      const p = this.level.board.goal;
+      this.goalView = new Sprite({ texture: this.shared.textures.finish, x: p.x * 32, y: p.y * 32 });
+      this.world.addChild(this.goalView);
     }
-    const object = (id: string, texture: string, p: { x: number; y: number }) => {
-      const sprite = new Sprite({ texture: this.shared.textures[texture], x: p.x * 32, y: p.y * 32 });
-      this.modeSprites.set(id, sprite);
-      this.modeLayer.addChild(sprite);
-      return sprite;
-    };
-    if (this.level.board.depot) object("depot", "depot", this.level.board.depot);
-    for (const parcel of this.frame.modeState.parcels) object(parcel.id, "parcel", parcel);
-    for (const key of this.level.board.keys) object(`key-${key.color}`, `key-${key.color}`, key);
-    for (const [i, door] of this.level.board.doors.entries()) object(`door-${i}`, `door-${door.color}`, door);
-    for (const [i, p] of this.level.board.checkpoints.entries()) {
-      object(`checkpoint-${i}`, "checkpoint-idle", p);
-      const label = new Text({
-        text: String(i + 1),
-        style: { fontFamily: "Geist, sans-serif", fontSize: 9, fontWeight: "900", fill: "#ffffff", stroke: { color: "#252b32", width: 2 } },
-        x: p.x * 32 + 24,
-        y: p.y * 32 + 3,
-        resolution: 2,
-      });
-      this.modeLayer.addChild(label);
+    for (const [i, bot] of this.frame.bots.entries()) {
+      const container = new Container(),
+        sprite = new Sprite({ texture: this.character.textures["actor-up-idle-0"] }),
+        ring = new Graphics().rect(3, 27, 26, 4).fill(BOT_COLORS[i]);
+      container.addChild(ring, sprite);
+      const number = new Graphics().rect(23, 0, 9, 10).fill(ink);
+      this.number(number, i + 1, 25, 2, 0xffffff);
+      container.addChild(number);
+      container.position.set(bot.x * 32, bot.y * 32);
+      this.actorsLayer.addChild(container);
+      this.actors.set(bot.id, { container, sprite, ring, x: bot.x * 32, y: bot.y * 32 });
     }
-    this.level.board.gates.forEach((p, i) => object(`gate-${i}`, "gate-open", p));
-    for (const [i, post] of this.frame.modeState.posts.entries()) {
-      object(post.id, "outpost", post);
-      const label = new Text({
-        text: String(i + 1),
-        style: { fontFamily: "Geist, sans-serif", fontSize: 9, fontWeight: "900", fill: "#ffffff", stroke: { color: "#252b32", width: 2 } },
-        x: post.x * 32 + 25,
-        y: post.y * 32 + 3,
-        resolution: 2,
-      });
-      this.postLabels.set(post.id, label);
-      this.modeLayer.addChild(label);
-    }
-    this.frame.modeState.dangerAt.forEach((at, c) => {
-      if (!at) return;
-      const p = { x: c % this.level.board.width, y: Math.floor(c / this.level.board.width) };
-      object(`hazard-${c}`, "hazard-warning", p);
-    });
+    this.staticRoutes();
     const resize = () => {
       if (this.disposed) return;
       const width = Math.max(1, this.host.clientWidth),
         height = Math.max(1, this.host.clientHeight),
-        boardWidth = this.level.board.width * 32,
-        boardHeight = this.level.board.height * 32;
-      const scale = Math.min((width - 16) / boardWidth, (height - 16) / boardHeight);
-      this.world.scale.set(Math.max(0.1, scale));
-      this.world.position.set(Math.round((width - boardWidth * scale) / 2), Math.round((height - boardHeight * scale) / 2));
+        bw = this.level.board.width * 32,
+        bh = this.level.board.height * 32,
+        scale = Math.max(0.1, Math.min((width - 16) / bw, (height - 16) / bh));
       this.app.renderer.resize(width, height);
+      this.world.scale.set(scale);
+      this.world.position.set(Math.round((width - bw * scale) / 2), Math.round((height - bh * scale) / 2));
       this.app.render();
     };
     this.observer = new ResizeObserver(resize);
     this.observer.observe(this.host);
-    resize();
     this.setFrame(this.frame);
+    resize();
     this.app.ticker.add((ticker) => {
       if (this.disposed) return;
       if (this.playing) this.clock += ticker.deltaMS;
-      this.frame.bots.forEach((bot) => {
-        const actor = this.actors.get(bot.id);
-        if (!actor) return;
-        const smooth = this.playing && !this.reduced,
-          blend = smooth ? Math.min(1, ticker.deltaMS / 45) : 1;
+      for (const bot of this.frame.bots) {
+        const actor = this.actors.get(bot.id)!;
+        const blend = this.playing && !this.reduced ? Math.min(1, ticker.deltaMS / 45) : 1;
         actor.container.x += (actor.x - actor.container.x) * blend;
         actor.container.y += (actor.y - actor.container.y) * blend;
-        const moving = this.playing && bot.status === "moving" && !this.reduced;
-        const index = moving ? Math.floor(this.clock / 110) % 4 : !this.reduced && this.playing ? Math.floor(this.clock / 650) % 2 : 0;
+        const moving = this.playing && bot.status === "moving" && bot.action !== "wait" && !this.reduced,
+          index = moving ? Math.floor(this.clock / 110) % 4 : 0;
         actor.sprite.texture = this.character.textures[`actor-${bot.facing}-${moving ? "walk" : "idle"}-${index}`];
-      });
-      for (const g of this.frame.gems) {
-        const view = this.gems.get(g.id)!;
-        view.gem.texture = this.shared.textures[this.gemTexture(g)];
-        view.pickup.visible = !this.reduced && this.clock < view.until;
       }
     });
+  }
+  private number(g: Graphics, n: number, x: number, y: number, color: number) {
+    const patterns = [
+      "111101101101111",
+      "010110010010111",
+      "111001111100111",
+      "111001111001111",
+      "101101111001001",
+      "111100111001111",
+      "111100111101111",
+      "111001001001001",
+      "111101111101111",
+      "111101111001111",
+    ];
+    [...patterns[n % 10]].forEach((v, i) => {
+      if (v === "1") g.rect(x + (i % 3), y + Math.floor(i / 3), 1, 1).fill(color);
+    });
+  }
+  private context(kind: Glyph) {
+    let g = this.contexts.get(kind);
+    if (g) return g;
+    g = new GraphicsContext();
+    const border = (x: number, y: number, w: number, h: number, color: number) => g!.rect(x, y, w, h).fill(color).stroke({ color: ink, width: 2 });
+    if (kind === "target") {
+      border(8, 8, 16, 16, 0xffc340);
+      g.rect(13, 3, 6, 26).fill(cream).rect(3, 13, 26, 6).fill(cream).rect(11, 11, 10, 10).fill(0xe95d43).rect(14, 14, 4, 4).fill(cream);
+    }
+    if (kind === "switch") {
+      border(5, 7, 22, 20, 0x668c9a);
+      g.rect(10, 12, 12, 10).fill(ink).rect(13, 7, 6, 12).fill(cream).rect(7, 24, 18, 2).fill(0xbee4df);
+    }
+    if (kind === "terminal") {
+      border(5, 4, 22, 24, 0x668c9a);
+      g.rect(8, 7, 16, 12).fill(0xc6f26d).rect(12, 22, 8, 3).fill(cream);
+    }
+    if (kind === "charger") {
+      border(5, 5, 22, 24, 0x288b9e);
+      g.rect(11, 2, 10, 4).fill(ink).poly([17, 8, 10, 18, 15, 18, 13, 25, 23, 14, 17, 14]).fill(0xffe88c);
+    }
+    if (kind === "beacon") {
+      border(10, 7, 12, 19, 0xd1dfef);
+      g.rect(8, 25, 16, 4).fill(ink).rect(13, 4, 6, 8).fill(0xffcf5b).rect(4, 6, 4, 2).fill(cream).rect(24, 6, 4, 2).fill(cream);
+    }
+    if (kind === "supply") {
+      border(4, 10, 24, 17, 0xc99859);
+      g.rect(6, 12, 20, 3).fill(0xf7d994).rect(9, 6, 4, 20).fill(0x825d39).rect(19, 6, 4, 20).fill(0x825d39);
+    }
+    if (kind === "bridge") {
+      for (let y = 5; y < 29; y += 6) g.rect(3, y, 26, 4).fill({ color: 0xffd788, alpha: 0.7 });
+      g.rect(4, 3, 2, 26).fill(ink).rect(26, 3, 2, 26).fill(ink);
+    }
+    if (kind === "dock") {
+      g.rect(3, 3, 26, 26).fill(0x2d7f6d);
+      for (let y = 5; y < 27; y += 6) for (let x = 5; x < 27; x += 6) if ((x + y) % 12 === 10) g.rect(x, y, 5, 5).fill(0xd8f5cf);
+    }
+    if (kind === "box") {
+      border(3, 3, 26, 26, 0xd69a50);
+      g.rect(7, 6, 18, 3).fill(0xffd08a).rect(7, 23, 18, 3).fill(0x966332).poly([7, 10, 10, 7, 25, 22, 22, 25]).fill(0x996635).poly([7, 22, 22, 7, 25, 10, 10, 25]).fill(0xffce80);
+    }
+    this.contexts.set(kind, g);
+    return g;
+  }
+  private view(id: string, kind: Glyph, cell: number, tint: string | number = 0xffffff, alpha = 1) {
+    let g = this.objectViews.get(id);
+    if (!g) {
+      g = new Graphics(this.context(kind));
+      this.objects.addChild(g);
+      this.objectViews.set(id, g);
+    }
+    g.position.set((cell % this.level.board.width) * 32, Math.floor(cell / this.level.board.width) * 32);
+    g.visible = true;
+    g.tint = tint;
+    g.alpha = alpha;
+    return g;
+  }
+  private staticRoutes() {
+    const l = this.level;
+    this.routes.clear();
+    if (l.mode === "hunt")
+      l.hunt.targets.forEach((target, i) =>
+        target.route.forEach((p, j) => {
+          if (j % 2 === 0) this.routes.rect(p.x * 32 + 13, p.y * 32 + 13, 6, 6).fill({ color: [0xffd15f, 0x7be1eb, 0xdba3ee][i], alpha: 0.7 });
+        })
+      );
   }
   setPlayback(playing: boolean) {
     this.playing = playing;
   }
   setFocus(id: string) {
-    if (this.focusedApplied && id === this.focused) return;
-    this.focusedApplied = true;
+    if (id === this.focused) return;
     this.focused = id;
-    const actor = this.actors.get(id);
-    if (actor) this.world.setChildIndex(actor.container, this.world.children.length - 1);
-    this.drawOverlay();
-    this.drawMode();
+    this.signature = "";
+    this.setFrame(this.frame);
   }
   setFrame(frame: MatchFrame) {
-    const previous = this.frame;
     this.frame = frame;
     if (!this.initialized || this.disposed) return;
-    if (this.renderedFrame === frame) return;
-    this.renderedFrame = frame;
-    frame.terrain.forEach((name, i) => {
-      this.tiles[i].texture = this.terrain.textures[this.gateCells.has(i) ? "path" : name];
+    const focused = frame.bots.find((b) => b.id === this.focused) ?? frame.bots[0],
+      l = this.level,
+      width = l.board.width;
+    frame.terrain.forEach((terrain, c) => {
+      const known = l.mode === "fog" ? focused.known[c] : terrain;
+      this.tiles[c].texture = this.terrain.textures[known ?? "ground"];
+      this.tiles[c].alpha = l.mode === "fog" && !focused.visible.includes(c) ? 0.55 : 1;
     });
-    for (const [id, view] of this.actors)
-      if (!frame.bots.some((b) => b.id === id)) {
-        view.container.destroy({ children: true, context: true });
-        this.actors.delete(id);
-      }
-    frame.bots.forEach((bot, i) => {
-      let view = this.actors.get(bot.id);
-      const offset = [
-          [-4, -3],
-          [4, -3],
-          [-4, 4],
-          [4, 4],
-        ][i],
-        x = bot.x * 32 + offset[0],
-        y = bot.y * 32 + offset[1];
-      if (!view) {
-        const container = new Container({ x, y });
-        const ring = new Graphics().ellipse(16, 28, 10, 4).fill({ color: BOT_COLORS[i], alpha: 0.8 });
-        const sprite = new Sprite({ texture: this.character.textures["actor-down-idle-0"] });
-        const cargo = new Sprite({ texture: this.shared.textures.parcel, x: 21, y: 15, width: 12, height: 12, visible: false });
-        const badge = new Graphics().circle(25, 7, 6).fill(0xffffff).stroke({ color: BOT_COLORS[i], width: 2 });
-        const label = new Text({ text: String(i + 1), style: { fontFamily: "Geist, sans-serif", fontSize: 8, fontWeight: "900", fill: "#000000" }, x: 25, y: 7, resolution: 2 });
-        label.anchor.set(0.5);
-        container.addChild(ring, sprite, cargo, badge, label);
-        this.world.addChild(container);
-        view = { container, sprite, cargo, x, y };
-        this.actors.set(bot.id, view);
-      }
-      view.x = x;
-      view.y = y;
-      view.cargo.visible = bot.inventory > 0;
-      view.container.alpha = bot.eliminatedTick === null ? 1 : 0.35;
-      view.sprite.tint = bot.eliminatedTick === null ? 0xffffff : 0x8d8d8d;
-      if (!this.playing || this.reduced) view.container.position.set(x, y);
-    });
-    for (const g of frame.gems) {
-      const view = this.gems.get(g.id);
-      if (!view) continue;
-      const active = gemActive(g, frame.tick),
-        pending = gemPending(g, frame.tick);
-      view.gem.visible = active || pending;
-      view.gem.alpha = pending ? 0.5 : 1;
-      view.gem.texture = this.shared.textures[this.gemTexture(g)];
-      view.label.visible = active && (g.value ?? 1) > 1;
-      const bucket = active && g.expireTick != null ? Math.ceil((g.expireTick - frame.tick) / 20) : null;
-      if (bucket !== view.bucket) {
-        view.bucket = bucket;
-        view.life.clear();
-        if (bucket !== null) {
-          const fraction = (g.expireTick! - frame.tick) / (g.expireTick! - (g.spawnTick ?? 0));
-          view.life.rect(g.x * 32 + 4, g.y * 32 + 29, 24, 2).fill({ color: "#252b32", alpha: 0.6 });
-          view.life.rect(g.x * 32 + 4, g.y * 32 + 29, Math.max(1, Math.round(24 * fraction)), 2).fill(bucket < 3 ? "#df6650" : "#ffdc67");
-        }
-      }
-      if (g.taken && previous.gems.find((p) => p.id === g.id)?.taken === false && this.playing) view.until = this.clock + 300;
-      if (!g.taken || g.expired) {
-        view.until = 0;
-        view.pickup.visible = false;
-      }
+    for (const bot of frame.bots) {
+      const actor = this.actors.get(bot.id)!;
+      actor.x = bot.x * 32;
+      actor.y = bot.y * 32;
+      actor.container.alpha = bot.eliminatedTick !== null ? 0.35 : 1;
+      actor.container.visible = l.mode !== "fog" || bot.id === focused.id || focused.visible.includes(cellOf(bot, width));
+      actor.ring.alpha = bot.id === focused.id ? 1 : 0.5;
     }
-    this.drawOverlay();
-    this.drawMode();
-  }
-  private gemTexture(g: MatchFrame["gems"][number]) {
-    if (gemPending(g, this.frame.tick)) return "gem-dormant";
-    if ((g.value ?? 1) >= 5) return "gem-red";
-    if ((g.value ?? 1) >= 3) return "gem-blue";
-    if (feverMultiplier(this.level, this.frame.tick) === 2) return "gem-fever";
-    return `gem-${!this.reduced && this.playing ? Math.floor(this.clock / 600) % 2 : 0}`;
+    this.overlay.clear();
+    const known = (c: number) => l.mode !== "fog" || !!focused.known[c],
+      color = BOT_COLORS[frame.bots.findIndex((b) => b.id === focused.id)];
+    for (const c of focused.visited) if (known(c)) this.overlay.rect((c % width) * 32 + 2, Math.floor(c / width) * 32 + 2, 28, 28).fill({ color, alpha: 0.18 });
+    for (const c of focused.frontier) if (known(c)) this.overlay.rect((c % width) * 32 + 4, Math.floor(c / width) * 32 + 4, 24, 24).stroke({ color: 0xffdf69, width: 2 });
+    for (let i = 1; i < focused.route.length; i++) {
+      const a = focused.route[i - 1],
+        b = focused.route[i];
+      if (known(cellOf(a, width)) && known(cellOf(b, width)))
+        this.overlay
+          .moveTo(a.x * 32 + 16, a.y * 32 + 16)
+          .lineTo(b.x * 32 + 16, b.y * 32 + 16)
+          .stroke({ color, width: 3, alpha: 0.8 });
+    }
+    this.fog.clear();
+    if (l.mode === "fog")
+      focused.known.forEach((t, c) => {
+        if (t === null) {
+          this.fog.rect((c % width) * 32, Math.floor(c / width) * 32, 32, 32).fill(0x23343e);
+          if (c % 3 === 0) this.fog.rect((c % width) * 32 + 14, Math.floor(c / width) * 32 + 14, 3, 3).fill(0x41545d);
+        }
+      });
+    const signature = `${frame.tick}:${focused.id}`;
+    if (signature !== this.signature) {
+      this.signature = signature;
+      this.drawMode();
+    }
   }
   private drawMode() {
-    if (!this.initialized || this.disposed) return;
-    const { modeState: state, bots, tick } = this.frame,
-      width = this.level.board.width;
-    const observed = bots.find((b) => b.id === this.focused) ?? bots[0];
-    const nextWave = this.level.waves.find((w) => w.tick > tick)?.tick;
-    // Ownership and hazards change on rule events. Rebuilding their geometry
-    // for every playback frame costs much more than moving the sprites.
-    const signature = `${observed.id}:${observed.keys.join(",")}:${observed.checkpoints.join(",")}:${this.level.board.gates.map((g) => this.frame.terrain[g.y * width + g.x]).join(",")}:${nextWave ?? 0}:${state.territory.join(",")}:${state.parcels.map((p) => p.state).join(",")}:${state.posts.map((p) => `${p.owner}:${p.captureTicks}:${p.contested}`).join(",")}`;
-    if (signature === this.modeSignature) return;
-    this.modeSignature = signature;
-    this.ownership.clear();
-    this.level.board.checkpoints.forEach((_, i) => {
-      this.modeSprites.get(`checkpoint-${i}`)!.texture = this.shared.textures[observed.checkpoints.includes(i) ? "checkpoint-done" : "checkpoint-idle"];
-    });
-    this.level.board.gates.forEach((p, i) => {
-      this.modeSprites.get(`gate-${i}`)!.texture = this.shared.textures[isWalkable(this.frame.terrain[p.y * width + p.x]) ? "gate-open" : "gate-closed"];
-    });
-    state.territory.forEach((id, c) => {
-      const index = bots.findIndex((b) => b.id === id);
-      if (index < 0) return;
-      const x = (c % width) * 32,
-        y = Math.floor(c / width) * 32;
-      this.ownership
-        .rect(x + 1, y + 1, 30, 30)
-        .fill({ color: BOT_COLORS[index], alpha: 0.32 })
-        .stroke({ color: BOT_COLORS[index], width: 2 });
-      // Corner marks encode the owner number as well as the color.
-      for (let n = 0; n <= index; n++) this.ownership.rect(x + 4 + n * 4, y + 25, 2, 3).fill(0xffffff);
-    });
-    for (const parcel of state.parcels) this.modeSprites.get(parcel.id)!.visible = parcel.state === "available";
-    for (const key of this.level.board.keys) this.modeSprites.get(`key-${key.color}`)!.visible = !observed.keys.includes(key.color);
-    this.level.board.doors.forEach((door, i) => {
-      this.modeSprites.get(`door-${i}`)!.texture = this.shared.textures[observed.keys.includes(door.color) ? "door-open" : `door-${door.color}`];
-    });
-    for (const post of state.posts) {
-      const sprite = this.modeSprites.get(post.id)!,
-        owner = bots.findIndex((b) => b.id === post.owner);
-      sprite.tint = owner < 0 ? 0xffffff : BOT_COLORS[owner];
-      const x = post.x * 32,
-        y = post.y * 32;
-      this.ownership.rect(x + 2, y + 2, 28, 28).stroke({ color: post.contested ? "#f9b233" : owner < 0 ? "#ffffff" : BOT_COLORS[owner], width: 2 });
-      if (post.captureTicks) this.ownership.rect(x + 3, y + 28, (26 * post.captureTicks) / 8, 3).fill("#ffdd67");
+    for (const g of this.objectViews.values()) g.visible = false;
+    this.effects.clear();
+    const l = this.level,
+      s = this.frame.modeState,
+      w = l.board.width,
+      owner = (id: string | null) => {
+        const i = this.frame.bots.findIndex((b) => b.id === id);
+        return i < 0 ? 0xffffff : BOT_COLORS[i];
+      };
+    if (this.goalView) this.goalView.tint = s.mode === "bridge" && !s.owners.every(Boolean) ? 0x87949c : 0xffffff;
+    if (l.mode === "collapse" && s.mode === "collapse")
+      s.dangerAt.forEach((at, c) => {
+        const remaining = at - this.frame.tick;
+        if (remaining > 0 && remaining <= 80) {
+          const x = (c % w) * 32,
+            y = Math.floor(c / w) * 32;
+          this.effects
+            .moveTo(x + 8, y + 4)
+            .lineTo(x + 18, y + 13)
+            .lineTo(x + 12, y + 23)
+            .lineTo(x + 23, y + 28)
+            .stroke({ color: remaining <= 24 ? 0xea6946 : 0xffd45f, width: 3 });
+          this.effects.rect(x + 3, y + 29, Math.max(1, (26 * remaining) / 80), 2).fill(0xffd45f);
+        }
+      });
+    if (l.mode === "hunt" && s.mode === "hunt")
+      s.targets.forEach((t, i) => {
+        this.view(`target:${i}`, "target", t.cell, [0xffffff, 0x80d7e5, 0xd6a2ee][i], t.active ? 1 : 0.25);
+      });
+    if (l.mode === "circuit" && s.mode === "circuit") {
+      l.circuit.switches.forEach((p, i) => {
+        const c = cellOf(p, w);
+        this.view(`switch:${i}`, "switch", c, s.mask & (1 << i) ? 0x9ce4a0 : 0xffffff);
+        this.number(this.effects, i + 1, p.x * 32 + 25, p.y * 32 + 3, 0xffffff);
+        for (const gate of l.circuit.switches[i].gates) {
+          const x = gate.x * 32,
+            y = gate.y * 32;
+          this.effects.rect(x + 4, y + 4, 24, 24).stroke({ color: s.mask & (1 << i) ? 0x9fe176 : 0xed9f50, width: 3 });
+        }
+      });
+      const contract = l.circuit.contracts[s.contract];
+      if (contract) {
+        const cell = cellOf(contract, w),
+          powered = s.mask === contract.mask;
+        this.view("terminal", "terminal", cell, powered ? 0x9fef80 : 0x93a0a6);
+        l.circuit.switches.forEach((p, i) => {
+          const need = !!(contract.mask & (1 << i)),
+            on = !!(s.mask & (1 << i));
+          this.effects.rect(p.x * 32 + 7, p.y * 32 + 29, 18, 2).fill(need === on ? 0x9fe176 : 0xe77550);
+        });
+      }
     }
-    state.dangerAt.forEach((at, c) => {
-      if (!at) return;
-      const sprite = this.modeSprites.get(`hazard-${c}`)!;
-      const active = at <= tick;
-      sprite.visible = active || at === nextWave;
-      sprite.texture = this.shared.textures[active ? "hazard-active" : "hazard-warning"];
-      sprite.alpha = active ? 0.85 : 0.65;
-      if (active) this.ownership.rect((c % width) * 32, Math.floor(c / width) * 32, 32, 32).fill({ color: "#b64b23", alpha: 0.35 });
-    });
-  }
-  private drawOverlay() {
-    if (!this.initialized || this.disposed) return;
-    this.overlay.clear();
-    const bot = this.frame.bots.find((b) => b.id === this.focused);
-    if (!bot) return;
-    const color = BOT_COLORS[this.frame.bots.indexOf(bot)];
-    for (const c of bot.visited) this.overlay.rect((c % this.level.board.width) * 32 + 2, Math.floor(c / this.level.board.width) * 32 + 2, 28, 28).fill({ color, alpha: 0.2 });
-    for (const c of bot.frontier)
-      this.overlay.rect((c % this.level.board.width) * 32 + 3, Math.floor(c / this.level.board.width) * 32 + 3, 26, 26).stroke({ color: 0xffdf69, width: 2 });
-    if (bot.route.length > 1)
-      this.overlay
-        .poly(
-          bot.route.flatMap((p) => [p.x * 32 + 16, p.y * 32 + 16]),
-          false
-        )
-        .stroke({ color: "#ffffff", width: 5, alpha: 0.8 })
-        .stroke({ color, width: 3 });
+    if (l.mode === "energy" && s.mode === "energy") {
+      s.chargers.forEach((c, i) => {
+        this.view(`charger:${i}`, "charger", c.cell);
+        this.effects.rect((c.cell % w) * 32 + 5, Math.floor(c.cell / w) * 32 + 29, (22 * c.stock) / 40, 2).fill(0x8ce5ed);
+      });
+      l.energy.beacons.forEach((p, i) => this.view(`beacon:${i}`, "beacon", cellOf(p, w), owner(s.owners[i]), s.owners[i] ? 0.55 : 1));
+    }
+    if (l.mode === "bridge" && s.mode === "bridge") {
+      l.bridge.supplies.forEach((p, i) => this.view(`supply:${i}`, "supply", cellOf(p, w), 0xffffff, s.suppliesReady[i] > this.frame.tick ? 0.25 : 1));
+      l.bridge.spans.forEach((span, i) => {
+        if (!(s.builtMask & (1 << i)))
+          for (const p of span.cells) {
+            this.view(`span:${cellOf(p, w)}`, "bridge", cellOf(p, w), 0xffffff, 0.7);
+            this.number(this.effects, i + 1, p.x * 32 + 14, p.y * 32 + 13, ink);
+          }
+      });
+      l.bridge.markers.forEach((p, i) => this.view(`marker:${i}`, "beacon", cellOf(p, w), owner(s.owners[i]), s.owners[i] ? 0.5 : 1));
+    }
+    if (l.mode === "crates" && s.mode === "crates") {
+      l.crates.docks.forEach((p, i) => this.view(`dock:${i}`, "dock", cellOf(p, w)));
+      s.boxes.forEach((b) => this.view(`box:${b.id}`, "box", b.cell, owner(b.owner)));
+    }
   }
   destroy() {
+    if (this.disposed) return;
     this.disposed = true;
     this.observer?.disconnect();
     void this.promise
       .catch(() => {})
       .then(() => {
         if (this.initialized) {
+          for (const graphic of [this.overlay, this.effects, this.fog, this.routes]) graphic.destroy();
+          for (const actor of this.actors.values()) for (const child of [...actor.container.children]) if (child instanceof Graphics) child.destroy();
+          this.app.destroy({ removeView: true, releaseGlobalResources: true }, { children: true });
           this.initialized = false;
-          this.app.destroy({ removeView: true, releaseGlobalResources: true }, { children: true, context: true });
         }
+        for (const context of this.contexts.values()) context.destroy();
+        this.contexts.clear();
       });
   }
 }

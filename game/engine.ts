@@ -1,42 +1,55 @@
 import { algorithms, unavailableReason, type AlgorithmId, type MatchConfig } from "./algorithms";
-import { createSearch, SEARCH_OPERATIONS_PER_TICK, type Search } from "./search";
-import { isWalkable, terrainCost, type LevelDefinition, type Point, type Terrain } from "./schema";
-import { botTerrain, copyModeState, initialModeState, isRaceMode, objectives, resolveModeTick, ruleWinners, seededHash, type ModeState } from "./modes";
-import { MctsDecision, randomSource, RandomDecision, type DecisionState } from "./decisions";
-import { applyTerrainChanges, checkpointObjectives, gemActive, gemPending, gemsSettled, gemUtility, legacyHash, raceReady, resolveGemClaims, type CompetitiveGem } from "./classic";
-
+import { createDomainSearch, SEARCH_OPERATIONS_PER_TICK, type Search } from "./search";
+import { levelSchema, type LevelDefinition, type Point, type Terrain } from "./schema";
+import { ModeDomain } from "./planning";
+import { MctsDecision, RandomDecision, randomSource, type DecisionState } from "./decisions";
+import {
+  actionEqual,
+  advanceWorld,
+  botDetail,
+  cellOf,
+  cloneWorld,
+  copyModeState,
+  initialModeState,
+  legalActions,
+  observation,
+  reveal,
+  resolveActions,
+  ruleWinners,
+  seededHash,
+  syncCircuit,
+  terminal,
+  type Action,
+  type ActionKind,
+  type Intent,
+  type ModeState,
+  type RuleBot,
+  type RuleWorld,
+} from "./modes";
 export const TICK_MS = 50;
 export type BotStatus = "searching" | "moving" | "waiting" | "eliminated" | "finished" | "unreachable" | "timeout" | "stopped";
-export interface BotFrame extends Point {
-  id: string;
+export interface BotFrame extends RuleBot {
   algorithm: AlgorithmId;
   player: boolean;
   facing: "down" | "left" | "right" | "up";
   status: BotStatus;
-  score: number;
   expanded: number;
   memory: number;
   searchTicks: number;
   computeOps: number;
   moveTicks: number;
   cost: number;
-  finishTick: number | null;
   visited: number[];
   frontier: number[];
   route: Point[];
-  inventory: number;
-  keys: LevelDefinition["board"]["keys"][number]["color"][];
-  eliminatedTick: number | null;
-  checkpoints: number[];
-  checkpointTotal: number;
+  action: ActionKind | null;
+  detail: string;
 }
-export type Gem = CompetitiveGem;
 export interface MatchFrame {
   tick: number;
   phase: "running" | "finished";
   terrain: Terrain[];
   bots: BotFrame[];
-  gems: Gem[];
   winners: string[];
   note: string;
   modeState: ModeState;
@@ -47,435 +60,367 @@ export interface MatchResult {
   won: boolean;
   draw: boolean;
   finishTick: number | null;
-  gems: number;
-  metric?: { kind: "time" | "score" | "survival"; value: number };
-  rulesVersion?: number;
+  score: number;
+  metric: { kind: "time" | "score" | "survival"; value: number };
+  rulesVersion: number;
 }
 interface Bot extends BotFrame {
   search: Search | null;
-  targetId: string | null;
-  routeIndex: number;
+  domain: ModeDomain | null;
+  plan: Action[];
+  index: number;
   remaining: number;
+  retryAt: number;
+  visits: Map<number, number>;
   failed: Set<string>;
-  previous: Point | null;
   random: () => number;
+  failedRevision: number;
+  dirty: Set<number>;
 }
-export function previewFrame(level: LevelDefinition, config: MatchConfig): MatchFrame {
-  return {
-    tick: 0,
-    phase: "running",
-    terrain: [...level.board.terrain],
-    gems: level.board.gems.map((p, i) => ({
-      ...p,
-      value: p.value ?? 1,
-      spawnTick: p.spawnTick ?? 0,
-      expireTick: p.expireTick ?? null,
-      expired: false,
-      awardedPoints: 0,
-      id: `gem-${i}`,
-      taken: false,
-      claimedBy: null,
-      claimedTick: null,
-    })),
-    winners: [],
-    note: "Pilih peserta, lalu mulai pertandingan.",
-    modeState: initialModeState(level),
-    rulesVersion: level.rulesVersion,
-    bots: [config.player, ...config.opponents].map((algorithm, i) => ({
-      ...level.board.spawn,
-      id: `bot-${i}`,
-      algorithm,
-      player: i === 0,
-      facing: "down",
-      status: "searching",
-      score: 0,
-      expanded: 0,
-      memory: 0,
-      searchTicks: 0,
-      computeOps: 0,
-      moveTicks: 0,
-      cost: 0,
-      finishTick: null,
-      visited: [],
-      frontier: [],
-      route: [],
-      inventory: 0,
-      keys: [],
-      eliminatedTick: null,
-      checkpoints: [],
-      checkpointTotal: level.board.checkpoints.length,
-    })),
-  };
+function initialBots(l: LevelDefinition, c: MatchConfig): BotFrame[] {
+  return [c.player, ...c.opponents].map((algorithm, i) => ({
+    ...l.board.spawn,
+    id: `bot-${i}`,
+    algorithm,
+    player: i === 0,
+    score: 0,
+    inventory: 0,
+    energy: 24,
+    known: l.mode === "fog" ? Array(l.board.terrain.length).fill(null) : [],
+    visible: [],
+    finishTick: null,
+    eliminatedTick: null,
+    facing: "up",
+    status: "waiting",
+    expanded: 0,
+    memory: 0,
+    searchTicks: 0,
+    computeOps: 0,
+    moveTicks: 0,
+    cost: 0,
+    visited: [],
+    frontier: [],
+    route: [],
+    action: null,
+    detail: "",
+  }));
 }
-const hash = legacyHash;
-const getBotName = (id: AlgorithmId) => algorithms.find((a) => a.id === id)!.short;
-const same = (a: Point, b: Point) => a.x === b.x && a.y === b.y;
+export function previewFrame(l: LevelDefinition, c: MatchConfig): MatchFrame {
+  const bots = initialBots(l, c),
+    world: RuleWorld = { tick: 0, terrain: [...l.board.terrain], bots, modeState: initialModeState(l) };
+  syncCircuit(l, world);
+  for (const b of bots) {
+    reveal(l, world, b);
+    b.detail = botDetail(l.mode, b);
+  }
+  return { ...world, bots, phase: "running", winners: [], note: l.briefing, rulesVersion: l.rulesVersion };
+}
 export class MatchEngine {
-  private tickNumber = 0;
-  private finished = false;
-  private terrain: Terrain[];
+  private world: RuleWorld;
   private bots: Bot[];
-  private gems: Gem[];
-  private modeState: ModeState;
-  private applied = new Set<number>();
-  private note = "Pertandingan dimulai. Penjelajah sedang mencari jalan.";
+  private finished = false;
+  private note: string;
+  private changed = new Set<number>();
+  private decisionView: DecisionState | null = null;
+  readonly level: LevelDefinition;
   constructor(
-    readonly level: LevelDefinition,
+    level: LevelDefinition,
     readonly config: MatchConfig
   ) {
+    this.level = levelSchema.parse(level);
     const ids = [config.player, ...config.opponents];
-    if (ids.length < 2 || ids.length > 4 || new Set(ids).size !== ids.length || ids.some((id) => !algorithms.some((a) => a.id === id) || unavailableReason(id, level)))
-      throw new Error("Pilih 2–4 algoritma berbeda yang cocok dengan medan.");
-    const initial = previewFrame(level, config);
-    this.terrain = initial.terrain;
-    this.gems = initial.gems;
-    this.modeState = initial.modeState;
-    if (level.mode !== "race" && level.mode !== "gems") this.note = level.mission;
-    this.bots = initial.bots.map((b) => ({
+    if (ids.length < 2 || ids.length > 4 || new Set(ids).size !== ids.length || ids.some((id) => !algorithms.some((a) => a.id === id) || unavailableReason(id, this.level)))
+      throw new Error("Pilih 2–4 algoritma berbeda yang mendukung arena.");
+    const frame = previewFrame(this.level, config);
+    this.bots = frame.bots.map((b) => ({
       ...b,
       search: null,
-      targetId: null,
-      routeIndex: 0,
+      domain: null,
+      plan: [],
+      index: 0,
       remaining: 0,
-      failed: new Set<string>(),
-      previous: null,
+      retryAt: 0,
+      visits: new Map([[cellOf(b, level.board.width), 1]]),
+      failed: new Set(),
       random: randomSource(seededHash(b.algorithm, config.seed)),
+      failedRevision: 0,
+      dirty: new Set<number>(),
     }));
-    for (const bot of this.bots) this.plan(bot);
+    this.world = { tick: 0, terrain: frame.terrain, bots: this.bots, modeState: frame.modeState };
+    this.note = level.briefing;
+  }
+  private observed(bot: Bot): DecisionState {
+    const obs = observation(this.level, this.decisionView ?? this.world, bot);
+    const tasks: NonNullable<DecisionState["tasks"]> = {};
+    if (this.decisionView) {
+      for (const [id, task] of Object.entries(this.decisionView.tasks ?? {}))
+        if (obs.bots.some((b) => b.id === id) && (this.level.mode !== "fog" || id === bot.id || bot.visible.includes(task.action.to))) tasks[id] = structuredClone(task);
+    } else
+      for (const b of this.bots)
+        if (b.remaining > 0 && b.plan[b.index] && obs.bots.some((x) => x.id === b.id)) tasks[b.id] = { action: { ...b.plan[b.index] }, remaining: b.remaining };
+    return { ...obs, tasks };
+  }
+  private available(bot: Bot) {
+    const target = bot.domain?.target,
+      s = this.world.modeState;
+    if (!target) return true;
+    if (this.level.mode === "circuit" && s.mode === "circuit") return target.object === s.contract;
+    if (this.level.mode === "energy" && s.mode === "energy") return target.kind !== "claim" || !s.owners[target.object!] || s.owners[target.object!] === bot.id;
+    if (this.level.mode === "bridge" && s.mode === "bridge") {
+      if (target.kind === "collect") return s.suppliesReady[target.object!] <= this.world.tick;
+      if (target.kind === "build") return !(s.builtMask & (1 << target.object!));
+      if (target.kind === "claim" && target.object !== -1) return !s.owners[target.object!];
+    }
+    if (this.level.mode === "hunt" && s.mode === "hunt") return s.targets[target.object ?? 0]?.active || this.world.tick < (target.tick ?? 0);
+    return true;
   }
   private plan(bot: Bot) {
-    bot.route = [];
-    bot.routeIndex = 0;
+    bot.plan = [];
+    bot.index = 0;
     bot.remaining = 0;
-    bot.visited = [];
-    bot.frontier = [];
-    let target: Point | undefined;
-    if (this.level.mode === "race") {
-      const candidates = checkpointObjectives(this.level, bot)
-        .filter((p) => !bot.failed.has(p.id))
-        .sort(
-          (a, b) =>
-            Math.abs(a.x - bot.x) + Math.abs(a.y - bot.y) - Math.abs(b.x - bot.x) - Math.abs(b.y - bot.y) ||
-            hash(a.id + bot.algorithm, this.config.seed) - hash(b.id + bot.algorithm, this.config.seed)
-        );
-      target = candidates[0];
-      bot.targetId = candidates[0]?.id === "goal" ? null : (candidates[0]?.id ?? null);
-    } else if (this.level.mode === "gems") {
-      const available = this.gems
-        .filter((g) => gemActive(g, this.tickNumber) && !bot.failed.has(g.id) && (this.level.rulesVersion < 2 || gemUtility(this.level, g, bot, this.tickNumber) > 0))
-        .sort((a, b) => {
-          const distance = (p: Point) => Math.abs(p.x - bot.x) + Math.abs(p.y - bot.y);
-          return (
-            (this.level.rulesVersion >= 2 ? gemUtility(this.level, b, bot, this.tickNumber) - gemUtility(this.level, a, bot, this.tickNumber) : distance(a) - distance(b)) ||
-            hash(a.id + bot.algorithm, this.config.seed) - hash(b.id + bot.algorithm, this.config.seed)
-          );
-        });
-      target = available[0];
-      bot.targetId = available[0]?.id ?? null;
-      if (!target && this.level.rulesVersion >= 2) {
-        const upcoming = this.gems
-          .filter((g) => gemPending(g, this.tickNumber) && !bot.failed.has(g.id))
-          .sort(
-            (a, b) =>
-              (a.spawnTick ?? 0) - (b.spawnTick ?? 0) ||
-              Math.abs(a.x - bot.x) + Math.abs(a.y - bot.y) - Math.abs(b.x - bot.x) - Math.abs(b.y - bot.y) ||
-              hash(a.id + bot.algorithm, this.config.seed) - hash(b.id + bot.algorithm, this.config.seed)
-          );
-        target = upcoming[0];
-        bot.targetId = upcoming[0]?.id ?? null;
-        if (target && same(bot, target)) {
-          bot.status = "waiting";
-          return;
-        }
-      }
-    } else {
-      let candidates = objectives(this.level, this.modeState, bot, this.tickNumber);
-      if (this.level.mode === "outposts") {
-        const uncontested = candidates.filter((p) => !this.bots.some((other) => other.id !== bot.id && same(other, p)));
-        if (uncontested.length) candidates = uncontested;
-      }
-      const available = candidates
-        .filter((p) => !bot.failed.has(p.id))
-        .sort(
-          (a, b) =>
-            Math.abs(a.x - bot.x) + Math.abs(a.y - bot.y) - Math.abs(b.x - bot.x) - Math.abs(b.y - bot.y) ||
-            seededHash(a.id + bot.algorithm, this.config.seed) - seededHash(b.id + bot.algorithm, this.config.seed)
-        );
-      target = available[0];
-      bot.targetId = available[0]?.id ?? null;
-      if (!target && this.level.mode === "cargo" && bot.inventory && this.level.board.depot) {
-        target = this.level.board.depot;
-        bot.targetId = "depot";
-      }
+    bot.route = [];
+    bot.action = null;
+    if (bot.failedRevision !== this.world.modeState.revision) {
+      bot.failed.clear();
+      bot.failedRevision = this.world.modeState.revision;
     }
-    const direct = bot.algorithm === "random" || bot.algorithm === "mcts";
-    if (!target) {
-      if (direct && this.level.mode !== "gems") target = { x: bot.x, y: bot.y };
-      else {
-        if (bot.algorithm !== "dstar-lite") bot.search = null;
-        bot.status =
-          this.level.mode === "race" || this.level.mode === "keys"
-            ? "unreachable"
-            : this.level.mode === "gems"
-              ? gemsSettled(this.gems)
-                ? "finished"
-                : this.gems.some((g) => gemPending(g, this.tickNumber) || (this.level.rulesVersion >= 2 && !g.taken && !g.expired && g.expireTick != null))
-                  ? "waiting"
-                  : "unreachable"
-              : "waiting";
-        return;
-      }
+    const observed = this.observed(bot),
+      actor = observed.bots.find((b) => b.id === bot.id)!;
+    const domain = new ModeDomain(this.level, observed, actor, bot.visits, bot.failed);
+    bot.domain = domain;
+    if (domain.target.id === "idle") {
+      bot.status = "waiting";
+      bot.retryAt = this.world.tick + 8;
+      bot.failed.clear();
+      return;
     }
     bot.status = "searching";
-    const terrain = botTerrain(this.level, this.modeState, this.terrain, bot, this.tickNumber);
-    if (bot.algorithm === "random") bot.search = new RandomDecision(this.level.board.width, this.level.board.height, terrain, bot, bot.previous, bot.random);
-    else if (bot.algorithm === "mcts") bot.search = new MctsDecision(this.level, this.bots.indexOf(bot), this.decisionState(), this.config.seed, bot.random);
-    else if (bot.algorithm === "dstar-lite" && bot.search?.update) bot.search.update(bot, target, terrain);
-    else bot.search = createSearch(this.level.board.width, this.level.board.height, terrain, bot, target, bot.algorithm);
+    if (bot.algorithm === "random") bot.search = new RandomDecision(this.level, observed, actor, domain, bot.visits, bot.random);
+    else if (bot.algorithm === "mcts")
+      bot.search = new MctsDecision(
+        this.level,
+        observed.bots.findIndex((b) => b.id === bot.id),
+        observed,
+        this.config.seed,
+        bot.random,
+        bot.visits
+      );
+    else if (bot.algorithm === "dstar-lite" && bot.search?.updateDomain) bot.search.updateDomain(domain, bot.dirty);
+    else bot.search = createDomainSearch(domain, bot.algorithm, this.level.board.width);
+    bot.dirty.clear();
   }
-  private decisionState(): DecisionState {
-    return {
-      tick: this.tickNumber,
-      terrain: [...this.terrain],
-      modeState: copyModeState(this.modeState),
-      gems: this.gems.map((g) => ({ ...g })),
-      appliedChanges: [...this.applied],
-      bots: this.bots.map((b) => ({
-        id: b.id,
-        algorithm: b.algorithm,
-        x: b.x,
-        y: b.y,
-        score: b.score,
-        inventory: b.inventory,
-        keys: [...b.keys],
-        checkpoints: [...b.checkpoints],
-        eliminatedTick: b.eliminatedTick,
-        finishTick: b.finishTick,
-        remaining: b.remaining,
-        intention: b.route[b.routeIndex] ? { ...b.route[b.routeIndex] } : null,
-      })),
-    };
-  }
-  private arrive(bot: Bot) {
-    if (this.level.mode === "race" && this.level.board.goal && same(bot, this.level.board.goal) && raceReady(this.level, bot)) {
-      bot.status = "finished";
-      bot.finishTick = this.tickNumber;
-    }
-    if (
-      bot.status === "moving" &&
-      bot.routeIndex >= bot.route.length &&
-      ((this.level.mode !== "gems" && this.level.mode !== "race") || bot.algorithm === "random" || bot.algorithm === "mcts" || this.level.board.checkpoints.length > 0)
-    )
+  private readyAction(bot: Bot) {
+    const action = bot.plan[bot.index];
+    if (!action) {
+      const target = bot.domain?.target;
+      if (this.level.mode === "hunt" && target?.tick !== undefined && cellOf(bot, this.level.board.width) === target.cell && this.world.tick <= target.tick + 16) {
+        const duration = Math.max(1, Math.min(16, target.tick + 1 - this.world.tick));
+        bot.plan = [{ kind: "wait", from: target.cell, to: target.cell, duration }];
+        bot.index = 0;
+        bot.remaining = duration;
+        bot.status = "moving";
+        bot.action = "wait";
+        return;
+      }
       bot.status = "waiting";
+      bot.action = null;
+      bot.retryAt = this.world.tick;
+      return;
+    }
+    if (!legalActions(this.level, this.world, bot).some((a) => actionEqual(a, action))) {
+      bot.status = "waiting";
+      bot.retryAt = this.world.tick;
+      bot.plan = [];
+      bot.route = [];
+      bot.action = null;
+      return;
+    }
+    bot.status = "moving";
+    bot.remaining = action.duration;
+    bot.action = action.kind;
   }
   step(): MatchFrame {
     if (this.finished) return this.snapshot();
-    this.tickNumber++;
-    const changed = applyTerrainChanges(this.level, this.terrain, this.bots, this.tickNumber, this.applied);
-    if (changed.size) {
-      this.note = this.level.board.gates.length ? "Gerbang beralih. Perhatikan jalan yang terbuka." : "Medan berubah. Penjelajah menyesuaikan rute.";
-      for (const bot of this.bots)
-        if (bot.status !== "finished" && bot.status !== "eliminated") {
-          bot.failed.clear();
-          // Snapshot searches finish their current computation. The live move
-          // check rejects blocked steps; distant shutters must not starve them.
-          if (bot.status === "searching" && bot.algorithm !== "dstar-lite") continue;
-          if (bot.status !== "moving" || bot.route.slice(bot.routeIndex).some((p) => changed.has(p.y * this.level.board.width + p.x))) this.plan(bot);
-        }
-    }
-    if (this.level.mode === "survival")
-      for (const bot of this.bots) {
-        const at = this.modeState.dangerAt[bot.y * this.level.board.width + bot.x];
-        if (bot.eliminatedTick === null && at && at <= this.tickNumber) {
-          bot.eliminatedTick = this.tickNumber;
-          bot.status = "eliminated";
-          bot.route = [];
-          bot.remaining = 0;
-        }
-      }
-    const arrivals = new Set<string>();
+    const oldTerrain = [...this.world.terrain];
+    const chargerRates = this.world.modeState.mode === "energy" ? this.world.modeState.chargers.map((c) => ({ cell: c.cell, rate: Math.min(4, c.stock) })) : [];
+    advanceWorld(this.level, this.world, this.world.tick + 1);
+    this.changed = new Set(oldTerrain.flatMap((t, c) => (t !== this.world.terrain[c] ? [c] : [])));
+    if (this.world.modeState.mode === "energy")
+      for (const [i, c] of this.world.modeState.chargers.entries()) if (Math.min(4, c.stock) !== chargerRates[i].rate) this.changed.add(c.cell);
+    for (const b of this.bots) for (const c of this.changed) b.dirty.add(c);
+    this.decisionView = null;
+    this.decisionView = {
+      ...cloneWorld(this.world),
+      tasks: Object.fromEntries(this.bots.filter((b) => b.remaining > 0 && b.plan[b.index]).map((b) => [b.id, { action: { ...b.plan[b.index] }, remaining: b.remaining }])),
+    };
+    const intents: Intent[] = [];
     for (const bot of this.bots) {
-      if (bot.status === "waiting" && (this.level.mode === "race" || this.level.mode === "gems")) this.plan(bot);
+      if (bot.eliminatedTick !== null) {
+        bot.status = "eliminated";
+        bot.plan = [];
+        bot.route = [];
+        bot.remaining = 0;
+        continue;
+      }
+      if (bot.finishTick !== null) continue;
+      if (!this.available(bot)) {
+        bot.status = "waiting";
+        bot.plan = [];
+        bot.remaining = 0;
+        bot.retryAt = this.world.tick;
+      }
+      if ((bot.status === "waiting" && this.world.tick >= bot.retryAt) || (bot.algorithm === "dstar-lite" && bot.status === "searching" && bot.dirty.size > 0)) this.plan(bot);
       if (bot.status === "searching" && bot.search) {
-        const previous = bot.search.expanded;
+        const expanded = bot.search.expanded;
         bot.computeOps += bot.search.advance(SEARCH_OPERATIONS_PER_TICK);
         bot.searchTicks++;
-        bot.expanded += bot.search.expanded - previous;
+        bot.expanded += bot.search.expanded - expanded;
         bot.memory = Math.max(bot.memory, bot.search.memory);
         bot.visited = [...bot.search.visited];
         bot.frontier = bot.search.frontier();
         if (bot.search.done) {
-          if (!bot.search.path) {
-            if (bot.targetId) {
-              bot.failed.add(bot.targetId);
-              this.plan(bot);
-            } else bot.status = "unreachable";
+          if (!bot.search.actions) {
+            if (bot.domain) bot.failed.add(bot.domain.target.id);
+            bot.status = "waiting";
+            bot.retryAt = this.world.tick + 1;
           } else {
-            bot.route = bot.search.path;
-            bot.routeIndex = 1;
-            bot.status = "moving";
-            if (bot.route.length <= 1) {
-              this.arrive(bot);
-              if (bot.status === "moving") bot.status = "waiting";
-            } else bot.remaining = terrainCost(this.terrain[bot.route[1].y * this.level.board.width + bot.route[1].x]) * 4;
+            bot.plan = bot.search.actions.map((a) => ({ ...a }));
+            bot.index = 0;
+            bot.route = bot.search.path?.map((p) => ({ ...p })) ?? [];
+            if (!bot.plan.length) {
+              bot.status = "waiting";
+              bot.retryAt = this.world.tick + 1;
+            } else this.readyAction(bot);
           }
         }
-      } else if (bot.status === "moving") {
-        const next = bot.route[bot.routeIndex];
-        if (!next) {
-          if (this.level.mode === "gems" || bot.algorithm === "random" || bot.algorithm === "mcts") this.plan(bot);
-          continue;
-        }
-        const terrain = botTerrain(this.level, this.modeState, this.terrain, bot, this.tickNumber)[next.y * this.level.board.width + next.x];
-        if (!isWalkable(terrain)) {
-          this.plan(bot);
-          continue;
-        }
+      } else if (bot.status === "moving" && bot.remaining > 0) {
         bot.moveTicks++;
-        bot.remaining--;
-        if (bot.remaining <= 0) {
-          bot.facing = next.x > bot.x ? "right" : next.x < bot.x ? "left" : next.y > bot.y ? "down" : "up";
-          bot.previous = { x: bot.x, y: bot.y };
-          bot.x = next.x;
-          bot.y = next.y;
-          arrivals.add(bot.id);
-          bot.cost += terrainCost(terrain);
-          bot.routeIndex++;
-          this.arrive(bot);
-          const after = bot.route[bot.routeIndex];
-          if (after) bot.remaining = terrainCost(this.terrain[after.y * this.level.board.width + after.x]) * 4;
+        if (--bot.remaining === 0) intents.push({ botId: bot.id, action: bot.plan[bot.index] });
+      }
+    }
+    const accepted = resolveActions(this.level, this.world, intents, this.config.seed);
+    for (const { botId, action } of intents) {
+      const bot = this.bots.find((b) => b.id === botId)!;
+      if (accepted.has(botId)) {
+        bot.cost += action.duration;
+        if (action.to !== action.from) {
+          bot.facing =
+            action.to % this.level.board.width > action.from % this.level.board.width
+              ? "right"
+              : action.to % this.level.board.width < action.from % this.level.board.width
+                ? "left"
+                : action.to > action.from
+                  ? "down"
+                  : "up";
+          bot.visits.set(action.to, (bot.visits.get(action.to) ?? 0) + 1);
         }
-      }
-    }
-    if (this.level.mode === "gems") {
-      const taken = resolveGemClaims(this.gems, this.bots, this.tickNumber, this.config.seed, this.level);
-      const claimed = this.gems.filter((g) => taken.has(g.id) && g.claimedTick === this.tickNumber);
-      if (claimed.length) {
-        const gem = claimed.at(-1)!,
-          owner = this.bots.find((b) => b.id === gem.claimedBy)!;
-        this.note = `${getBotName(owner.algorithm)} merebut ${gem.value === 5 ? "rubi" : gem.value === 3 ? "safir" : "emas"}: +${gem.awardedPoints} poin.`;
-      } else if (taken.size) this.note = "Gem bertimer telah lenyap. Incar kesempatan berikutnya.";
-      else if (this.gems.some((g) => g.spawnTick === this.tickNumber)) this.note = "Gelombang gem baru muncul. Para pemburu bersiap merebutnya.";
-      for (const bot of this.bots) if (bot.targetId && taken.has(bot.targetId)) this.plan(bot);
-      if (gemsSettled(this.gems)) {
-        this.finished = true;
-        for (const b of this.bots) b.status = "finished";
-      }
-    }
-    if (this.level.mode === "race") {
-      const before = this.bots.map((b) => b.checkpoints.length);
-      resolveModeTick(this.level, this.modeState, this.bots, this.tickNumber, arrivals, this.config.seed);
-      for (const [i, bot] of this.bots.entries()) {
-        if (bot.finishTick !== null) {
-          bot.status = "finished";
-          continue;
-        }
-        if (bot.checkpoints.length !== before[i]) {
-          bot.failed.clear();
-          this.note = `Pos lintasan diaktifkan. ${getBotName(bot.algorithm)}: ${bot.checkpoints.length}/${this.level.board.checkpoints.length} pos.`;
-          this.plan(bot);
-        } else if (bot.status === "waiting") this.plan(bot);
-      }
-    }
-    if (this.level.mode !== "race" && this.level.mode !== "gems") {
-      const previousKeys = this.bots.map((b) => b.keys.length),
-        previousInventory = this.bots.map((b) => b.inventory);
-      resolveModeTick(this.level, this.modeState, this.bots, this.tickNumber, arrivals, this.config.seed);
-      for (const [i, bot] of this.bots.entries()) {
-        if (bot.eliminatedTick !== null) {
-          bot.status = "eliminated";
+        bot.index++;
+        if (action.energyAfter !== undefined && bot.energy !== action.energyAfter) {
+          bot.plan = [];
           bot.route = [];
-          continue;
-        }
-        if (bot.finishTick !== null) {
-          bot.status = "finished";
-          continue;
-        }
-        const keyChanged = bot.keys.length !== previousKeys[i],
-          inventoryChanged = bot.inventory !== previousInventory[i];
-        let retarget = keyChanged || inventoryChanged;
-        if (keyChanged) bot.failed.clear();
-        if (this.level.mode === "cargo" && bot.targetId?.startsWith("parcel-")) retarget ||= this.modeState.parcels.find((p) => p.id === bot.targetId)?.state !== "available";
-        if (bot.status === "waiting") {
-          if (this.level.mode === "outposts") {
-            const post = this.modeState.posts.find((p) => same(p, bot));
-            retarget ||= !post || post.owner === bot.id || (post.contested && this.modeState.posts.some((p) => p.owner !== bot.id && !this.bots.some((b) => same(b, p))));
-          } else retarget = true;
-        }
-        if (this.level.mode === "survival") {
-          const at = bot.targetId?.startsWith("safe-") ? this.modeState.dangerAt[Number(bot.targetId.slice(5))] : 0;
-          retarget ||= !!at && at <= this.tickNumber;
-        }
-        if (retarget) this.plan(bot);
+          bot.status = "waiting";
+          bot.retryAt = this.world.tick + 1;
+          bot.action = null;
+        } else this.readyAction(bot);
+      } else {
+        bot.status = "waiting";
+        bot.retryAt = this.world.tick + 1;
+        bot.plan = [];
+        bot.route = [];
+        bot.action = null;
       }
-      if (this.level.mode === "cargo" && this.modeState.parcels.every((p) => p.state === "delivered")) this.finished = true;
-      if (this.level.mode === "survival" && this.bots.filter((b) => b.eliminatedTick === null).length <= 1) this.finished = true;
     }
-    // Resolve the whole tick before stopping: finishers on the same tick tie.
-    if (isRaceMode(this.level.mode) && this.bots.some((b) => b.finishTick !== null)) {
-      this.finished = true;
-      for (const bot of this.bots) if (bot.status !== "finished" && bot.status !== "unreachable") bot.status = "stopped";
-      this.note = "Garis finis tercapai. Pertandingan selesai.";
+    // A target can walk onto a stationary participant in the same complete tick.
+
+    for (let c = 0; c < oldTerrain.length; c++) if (oldTerrain[c] !== this.world.terrain[c]) for (const b of this.bots) b.dirty.add(c);
+    if (this.world.modeState.mode === "energy")
+      for (const [i, c] of this.world.modeState.chargers.entries()) if (Math.min(4, c.stock) !== chargerRates[i].rate) for (const b of this.bots) b.dirty.add(c.cell);
+    for (const e of this.world.modeState.events) if (e.kind === "reveal" && e.graphChanged && e.cell !== undefined) this.bots.find((b) => b.id === e.botId)?.dirty.add(e.cell);
+    this.finished = terminal(this.level, this.world);
+    const event = [...this.world.modeState.events].reverse().find((e) => !["step", "reveal", "charge"].includes(e.kind));
+    if (event) {
+      const names: Partial<Record<typeof event.kind, string>> = {
+        crack: "Jejak mulai retak. Cari pijakan berikutnya.",
+        collapse: "Sebagian lantai runtuh!",
+        catch: "Target tertangkap. Perhatikan kemunculan berikutnya.",
+        toggle: "Sambungan listrik dan akses berubah.",
+        claim: "Objektif diklaim. Perebutan berlanjut.",
+        collect: "Bahan diambil. Stok kembali empat detik lagi.",
+        build: "Jembatan baru bisa dipakai semua peserta.",
+        push: "Posisi peti berubah. Rencana lawan ikut terpengaruh.",
+        dock: "Peti terkunci di tujuan. Satu poin untuk pendorongnya.",
+        eliminated: "Satu penjelajah tereliminasi.",
+      };
+      this.note = names[event.kind] ?? this.note;
     }
-    if (!this.finished && this.tickNumber >= this.level.timeLimit) {
-      this.finished = true;
-      for (const bot of this.bots) if (bot.status !== "finished" && bot.status !== "unreachable" && bot.status !== "eliminated") bot.status = "timeout";
-      this.note = "Waktu pertandingan habis.";
+    for (const bot of this.bots) {
+      bot.detail = botDetail(this.level.mode, bot);
+      if (bot.eliminatedTick !== null) {
+        bot.status = "eliminated";
+        bot.route = [];
+      } else if (bot.finishTick !== null) bot.status = "finished";
+      else if (this.finished) {
+        bot.status = this.level.mode === "fog" ? "stopped" : "finished";
+        bot.action = null;
+      }
     }
-    if (
-      this.bots.every((b) => b.status === "finished" || b.status === "unreachable") &&
-      this.level.mode !== "survival" &&
-      this.level.mode !== "territory" &&
-      this.level.mode !== "outposts"
-    ) {
-      // A scheduled opening can make an unreachable target accessible again.
-      if (
-        !this.level.changes.some((c, i) => !this.applied.has(i) && isWalkable(c.terrain)) &&
-        !(this.level.mode === "gems" && this.gems.some((g) => gemPending(g, this.tickNumber)))
-      )
-        this.finished = true;
-    }
-    if (this.finished && !isRaceMode(this.level.mode) && this.level.mode !== "gems")
-      for (const bot of this.bots) if (bot.status !== "eliminated" && bot.status !== "unreachable") bot.status = "finished";
+    if (this.finished) this.note = this.world.tick >= this.level.timeLimit ? "Waktu habis. Hasil seluruh peserta telah dihitung." : "Pertandingan selesai. Lihat hasil peserta.";
     return this.snapshot();
   }
   snapshot(): MatchFrame {
-    const winners = this.finished ? ruleWinners(this.level.mode, this.bots, this.tickNumber) : [];
     return {
-      tick: this.tickNumber,
+      tick: this.world.tick,
       phase: this.finished ? "finished" : "running",
-      terrain: [...this.terrain],
-      gems: this.gems.map((g) => ({ ...g })),
-      winners,
+      terrain: [...this.world.terrain],
+      bots: this.bots.map((b) => ({
+        id: b.id,
+        algorithm: b.algorithm,
+        player: b.player,
+        x: b.x,
+        y: b.y,
+        score: b.score,
+        inventory: b.inventory,
+        energy: b.energy,
+        known: [...b.known],
+        visible: [...b.visible],
+        finishTick: b.finishTick,
+        eliminatedTick: b.eliminatedTick,
+        facing: b.facing,
+        status: b.status,
+        expanded: b.expanded,
+        memory: b.memory,
+        searchTicks: b.searchTicks,
+        computeOps: b.computeOps,
+        moveTicks: b.moveTicks,
+        cost: b.cost,
+        visited: [...b.visited],
+        frontier: [...b.frontier],
+        route: b.route.map((p) => ({ ...p })),
+        action: b.action,
+        detail: b.detail,
+      })),
+      modeState: copyModeState(this.world.modeState),
+      winners: this.finished ? ruleWinners(this.level.mode, this.bots, this.world.tick) : [],
       note: this.note,
-      modeState: copyModeState(this.modeState),
       rulesVersion: this.level.rulesVersion,
-      bots: this.bots.map(
-        ({ search: _search, targetId: _targetId, routeIndex: _routeIndex, remaining: _remaining, failed: _failed, previous: _previous, random: _random, ...b }) => ({
-          ...b,
-          keys: [...b.keys],
-          checkpoints: [...b.checkpoints],
-          visited: [...b.visited],
-          frontier: [...b.frontier],
-          route: b.route.map((p) => ({ ...p })),
-        })
-      ),
     };
   }
 }
 export function matchResult(frame: MatchFrame): MatchResult {
-  const player = frame.bots.find((b) => b.player)!;
+  const player = frame.bots.find((b) => b.player)!,
+    mode = frame.modeState.mode;
   return {
     player: player.algorithm,
     won: frame.winners.includes(player.id),
     draw: frame.winners.length > 1,
     finishTick: player.finishTick,
-    gems: frame.modeState.mode === "gems" ? player.score : 0,
+    score: player.score,
     rulesVersion: frame.rulesVersion,
-    metric: isRaceMode(frame.modeState.mode)
-      ? { kind: "time", value: player.finishTick ?? 0 }
-      : frame.modeState.mode === "survival"
-        ? { kind: "survival", value: player.eliminatedTick ?? frame.tick }
-        : { kind: "score", value: player.score },
+    metric:
+      mode === "fog"
+        ? { kind: "time", value: player.finishTick ?? 0 }
+        : mode === "collapse"
+          ? { kind: "survival", value: player.eliminatedTick ?? frame.tick }
+          : { kind: "score", value: player.score },
   };
 }

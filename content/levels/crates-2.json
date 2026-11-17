@@ -1,0 +1,125 @@
+{
+  "schemaVersion": 4,
+  "rulesVersion": 4,
+  "id": "crates-2",
+  "sectionId": "crates",
+  "order": 2,
+  "title": "Putar sebelum dorong",
+  "mission": "Dorong peti bersama ke tujuannya.",
+  "briefing": "Peti yang masuk tujuan terkunci dan memberi poin kepada pendorong. Sisakan tempat berdiri di belakang peti; satu dorongan bisa mengubah rencana seluruh peserta.",
+  "theme": "desert",
+  "seed": 47002,
+  "timeLimit": 1200,
+  "board": {
+    "width": 11,
+    "height": 7,
+    "terrain": [
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "wall",
+      "wall",
+      "ground",
+      "ground",
+      "wall",
+      "wall",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "wall",
+      "wall",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "wall",
+      "wall",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "wall",
+      "wall",
+      "path",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall"
+    ],
+    "spawn": {
+      "x": 1,
+      "y": 5
+    },
+    "decorations": [
+      {
+        "x": 0,
+        "y": 0
+      },
+      {
+        "x": 10,
+        "y": 6
+      }
+    ]
+  },
+  "mode": "crates",
+  "crates": {
+    "boxes": [
+      {
+        "x": 3,
+        "y": 3
+      }
+    ],
+    "docks": [
+      {
+        "x": 6,
+        "y": 1
+      }
+    ]
+  }
+}

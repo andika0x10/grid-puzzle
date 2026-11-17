@@ -1,0 +1,111 @@
+{
+  "schemaVersion": 4,
+  "rulesVersion": 4,
+  "id": "crates-1",
+  "sectionId": "crates",
+  "order": 1,
+  "title": "Dorong ke tanda",
+  "mission": "Dorong peti bersama ke tujuannya.",
+  "briefing": "Peti yang masuk tujuan terkunci dan memberi poin kepada pendorong. Sisakan tempat berdiri di belakang peti; satu dorongan bisa mengubah rencana seluruh peserta.",
+  "theme": "farm",
+  "seed": 47001,
+  "timeLimit": 1200,
+  "board": {
+    "width": 9,
+    "height": 7,
+    "terrain": [
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "wall",
+      "wall",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "wall",
+      "wall",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "wall",
+      "wall",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "wall",
+      "wall",
+      "ground",
+      "ground",
+      "ground",
+      "path",
+      "ground",
+      "ground",
+      "ground",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall"
+    ],
+    "spawn": {
+      "x": 4,
+      "y": 5
+    },
+    "decorations": [
+      {
+        "x": 0,
+        "y": 0
+      },
+      {
+        "x": 8,
+        "y": 6
+      }
+    ]
+  },
+  "mode": "crates",
+  "crates": {
+    "boxes": [
+      {
+        "x": 4,
+        "y": 3
+      }
+    ],
+    "docks": [
+      {
+        "x": 4,
+        "y": 1
+      }
+    ]
+  }
+}

@@ -39,7 +39,7 @@ export default function ResultDialog({
   const ordered = [...frame.bots].sort((a, b) =>
     isRaceMode(mode)
       ? (a.finishTick ?? Infinity) - (b.finishTick ?? Infinity)
-      : mode === "survival"
+      : mode === "collapse"
         ? (b.eliminatedTick ?? frame.tick) - (a.eliminatedTick ?? frame.tick)
         : b.score - a.score
   );
@@ -47,9 +47,7 @@ export default function ResultDialog({
     winners.length === 0
       ? isRaceMode(mode)
         ? "Tidak ada bot yang mencapai finis."
-        : mode === "gems"
-          ? "Belum ada gem yang berhasil direbut."
-          : `Belum ada ${modeInfo[mode].unit} yang diperoleh.`
+        : `Belum ada ${modeInfo[mode].unit} yang diperoleh.`
       : winners.length > 1
         ? `${winnerNames} berbagi kemenangan.${playerWon ? " Bot kamu ikut menang." : ""}`
         : playerWon

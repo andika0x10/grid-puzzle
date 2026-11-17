@@ -1,0 +1,487 @@
+{
+  "schemaVersion": 4,
+  "rulesVersion": 4,
+  "id": "bridge-7",
+  "sectionId": "bridge",
+  "order": 7,
+  "title": "Lima sambungan",
+  "mission": "Bangun jalan, rebut pulau, capai keluar.",
+  "briefing": "Pembuat jembatan mendapat poin, penjelajah lain mendapat akses. Bandingkan keuntungan membangun, merebut penanda pulau, dan mengejar bonus keluar.",
+  "theme": "space",
+  "seed": 46007,
+  "timeLimit": 1200,
+  "board": {
+    "width": 21,
+    "height": 15,
+    "terrain": [
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "water",
+      "water",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "water",
+      "slow",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "wall",
+      "wall",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "water",
+      "water",
+      "slow",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "water",
+      "ground",
+      "wall",
+      "wall",
+      "wall",
+      "ground",
+      "ground",
+      "wall",
+      "wall",
+      "ground",
+      "slow",
+      "ground",
+      "ground",
+      "ground",
+      "water",
+      "water",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "water",
+      "ground",
+      "slow",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "wall",
+      "wall",
+      "ground",
+      "wall",
+      "wall",
+      "wall",
+      "ground",
+      "water",
+      "water",
+      "ground",
+      "slow",
+      "ground",
+      "ground",
+      "ground",
+      "water",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "wall",
+      "wall",
+      "ground",
+      "ground",
+      "slow",
+      "ground",
+      "ground",
+      "water",
+      "water",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "water",
+      "ground",
+      "wall",
+      "wall",
+      "wall",
+      "ground",
+      "ground",
+      "wall",
+      "wall",
+      "ground",
+      "wall",
+      "ground",
+      "ground",
+      "ground",
+      "water",
+      "water",
+      "ground",
+      "ground",
+      "slow",
+      "ground",
+      "ground",
+      "water",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "wall",
+      "wall",
+      "ground",
+      "ground",
+      "ground",
+      "slow",
+      "ground",
+      "water",
+      "water",
+      "water",
+      "water",
+      "water",
+      "water",
+      "water",
+      "water",
+      "water",
+      "water",
+      "water",
+      "water",
+      "water",
+      "water",
+      "wall",
+      "wall",
+      "ground",
+      "ground",
+      "wall",
+      "ground",
+      "ground",
+      "water",
+      "water",
+      "ground",
+      "ground",
+      "ground",
+      "slow",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "water",
+      "water",
+      "ground",
+      "ground",
+      "wall",
+      "wall",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "slow",
+      "water",
+      "water",
+      "ground",
+      "ground",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "ground",
+      "water",
+      "water",
+      "slow",
+      "ground",
+      "wall",
+      "wall",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "water",
+      "water",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "slow",
+      "ground",
+      "ground",
+      "ground",
+      "water",
+      "water",
+      "ground",
+      "ground",
+      "wall",
+      "wall",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "water",
+      "water",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "water",
+      "water",
+      "ground",
+      "slow",
+      "wall",
+      "wall",
+      "ground",
+      "wall",
+      "ground",
+      "ground",
+      "ground",
+      "water",
+      "water",
+      "ground",
+      "wall",
+      "wall",
+      "wall",
+      "ground",
+      "slow",
+      "ground",
+      "ground",
+      "water",
+      "water",
+      "ground",
+      "ground",
+      "wall",
+      "wall",
+      "path",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "water",
+      "water",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "water",
+      "water",
+      "ground",
+      "ground",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall"
+    ],
+    "spawn": {
+      "x": 1,
+      "y": 13
+    },
+    "goal": {
+      "x": 19,
+      "y": 1
+    },
+    "decorations": [
+      {
+        "x": 0,
+        "y": 0
+      },
+      {
+        "x": 20,
+        "y": 14
+      }
+    ]
+  },
+  "mode": "bridge",
+  "bridge": {
+    "spans": [
+      {
+        "banks": [
+          {
+            "x": 5,
+            "y": 3
+          },
+          {
+            "x": 8,
+            "y": 3
+          }
+        ],
+        "cells": [
+          {
+            "x": 6,
+            "y": 3
+          },
+          {
+            "x": 7,
+            "y": 3
+          }
+        ]
+      },
+      {
+        "banks": [
+          {
+            "x": 12,
+            "y": 4
+          },
+          {
+            "x": 14,
+            "y": 4
+          }
+        ],
+        "cells": [
+          {
+            "x": 13,
+            "y": 4
+          }
+        ]
+      },
+      {
+        "banks": [
+          {
+            "x": 10,
+            "y": 6
+          },
+          {
+            "x": 10,
+            "y": 8
+          }
+        ],
+        "cells": [
+          {
+            "x": 10,
+            "y": 7
+          }
+        ]
+      },
+      {
+        "banks": [
+          {
+            "x": 15,
+            "y": 11
+          },
+          {
+            "x": 18,
+            "y": 11
+          }
+        ],
+        "cells": [
+          {
+            "x": 16,
+            "y": 11
+          },
+          {
+            "x": 17,
+            "y": 11
+          }
+        ]
+      },
+      {
+        "banks": [
+          {
+            "x": 5,
+            "y": 11
+          },
+          {
+            "x": 8,
+            "y": 11
+          }
+        ],
+        "cells": [
+          {
+            "x": 6,
+            "y": 11
+          },
+          {
+            "x": 7,
+            "y": 11
+          }
+        ]
+      }
+    ],
+    "supplies": [
+      {
+        "x": 1,
+        "y": 1
+      },
+      {
+        "x": 10,
+        "y": 5
+      },
+      {
+        "x": 3,
+        "y": 10
+      }
+    ],
+    "markers": [
+      {
+        "x": 3,
+        "y": 2
+      },
+      {
+        "x": 11,
+        "y": 2
+      },
+      {
+        "x": 19,
+        "y": 12
+      }
+    ]
+  }
+}

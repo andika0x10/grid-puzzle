@@ -49,13 +49,9 @@ describe("participant preferences", () => {
     expect(saveParticipants(preferences, null).persisted).toBe(false);
     expect(readParticipants(null)).toEqual(preferences);
   });
-  it.each([false, true])("replaces unsupported participants for slow terrain (scheduled: %s)", (scheduled) => {
+  it.each([false, true])("replaces unsupported participants for terrain and action domains (%s)", (actions) => {
     const base = fixture();
-    const level = fixture(
-      scheduled
-        ? { changes: [{ tick: 5, x: 2, y: 1, terrain: "slow" }] }
-        : { board: { ...base.board, terrain: base.board.terrain.map((terrain, i) => (i === 7 ? "slow" : terrain)) } }
-    );
+    const level = fixture(actions ? { mode: "crates" } : { board: { ...base.board, terrain: base.board.terrain.map((terrain, i) => (i === 7 ? "slow" : terrain)) } });
     for (const preferences of [
       { player: "bidirectional", opponents: ["astar", "greedy", "dfs"] },
       { player: "greedy", opponents: ["bidirectional"] },

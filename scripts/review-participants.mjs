@@ -6,12 +6,12 @@ import { assertParticipantLayout } from "./participant-layout.mjs";
 const root = process.argv[2] ?? "http://127.0.0.1:5173",
   output = "artifacts/participant-review";
 const catalog = JSON.parse(await fs.readFile("content/catalog.json", "utf8"));
-const progress = { version: 4, levels: Object.fromEntries(catalog.levels.map((l) => [l.id, { completed: true, matches: 1, wins: 0, bestTicks: null, bestGems: 0 }])) };
+const progress = { version: 5, levels: Object.fromEntries(catalog.levels.map((l) => [l.id, { completed: true, matches: 1, wins: 0, bestMetric: null, rulesVersion: 4 }])) };
 const browser = await chromium.launch({ headless: true, args: ["--enable-unsafe-swiftshader"] });
 const errors = [],
   checks = [];
 await fs.mkdir(output, { recursive: true });
-const modes = ["navigation-1", "gems-1", "cargo-7", "territory-1", "survival-1", "keys-1", "outposts-1"];
+const modes = ["fog-1", "collapse-1", "hunt-1", "circuit-1", "energy-1", "bridge-7", "crates-1"];
 const sizes = [
   [320, 568],
   [390, 844],
@@ -39,7 +39,7 @@ async function run(page, id, label, count = 4) {
   for (const name of ["Weighted A*", "A*", "Random Walk"].slice(0, count - 1)) await roster.getByRole("checkbox", { name: `Lawan ${name}`, exact: true }).check();
   await roster.getByRole("button", { name: "Save", exact: true }).click();
   await check(page, `${label}-ready`);
-  await page.getByRole("combobox", { name: "Kecepatan simulasi" }).selectOption("4");
+  await page.getByRole("combobox", { name: "Kecepatan simulasi" }).selectOption("1");
   await page.getByRole("button", { name: "Mulai pertandingan", exact: true }).click();
   await page.waitForFunction(() => parseFloat(document.querySelector(".arena-meta b").textContent) >= 0.2);
   await page.getByRole("button", { name: "Jeda pertandingan", exact: true }).click();
@@ -47,13 +47,7 @@ async function run(page, id, label, count = 4) {
   // Explicit synthetic stress values exercise text wrapping; these frames are
   // separate from screenshots of actual gameplay above.
   await page.locator(".participant-value").evaluateAll((values, id) => {
-    const value = id.startsWith("cargo")
-      ? "999 barang"
-      : id.startsWith("survival")
-        ? "60.00 dtk bertahan"
-        : id.startsWith("navigation") || id.startsWith("keys")
-          ? "Belum finis"
-          : "999 poin";
+    const value = id.startsWith("crates") ? "999 peti" : id.startsWith("collapse") ? "60.00 dtk bertahan" : id.startsWith("fog") ? "Belum finis" : "999 poin";
     for (const el of values) el.textContent = value;
   }, id);
   await check(page, `${label}-stress`, true);
@@ -63,7 +57,7 @@ try {
     const context = await browser.newContext({ viewport: { width, height }, reducedMotion: "reduce" });
     await context.addInitScript(
       ({ progress }) => {
-        localStorage.setItem("grid-puzzle.progress.v4", JSON.stringify(progress));
+        localStorage.setItem("grid-puzzle.progress.v5", JSON.stringify(progress));
         localStorage.setItem("grid-puzzle.participants.v1", JSON.stringify({ version: 1, player: "greedy", opponents: ["weighted-astar", "astar", "random"] }));
       },
       { progress }
@@ -71,9 +65,9 @@ try {
     const page = await context.newPage();
     page.on("pageerror", (e) => errors.push(e.message));
     for (const id of modes) await run(page, id, `${id}-${width}`);
-    for (const count of [2, 3]) await run(page, "cargo-7", `cargo-${count}-participants-${width}`, count);
+    for (const count of [2, 3]) await run(page, "bridge-7", `bridge-${count}-participants-${width}`, count);
     // Dijkstra is the widest catalog abbreviation; use actual roster controls.
-    await page.goto(`${root}/play/cargo-7`, { waitUntil: "networkidle" });
+    await page.goto(`${root}/play/bridge-7`, { waitUntil: "networkidle" });
     const roster = page.getByRole("dialog", { name: "Pilih peserta" });
     await roster.waitFor();
     for (const checkbox of await roster.getByRole("checkbox").all()) if (await checkbox.isChecked()) await checkbox.uncheck();
@@ -85,7 +79,7 @@ try {
     await context.close();
   }
   assert.deepEqual(errors, []);
-  console.log(`Passed ${checks.length} participant layout checks: 7 modes, 6 viewports, 2–4 bots, cargo inventory, long names and stress values.`);
+  console.log(`Passed ${checks.length} participant layout checks: 7 modes, 6 viewports, 2–4 bots, energy and building materials, long names and stress values.`);
 } finally {
   await fs.writeFile(`${output}/findings.json`, JSON.stringify({ errors, checks }, null, 2));
   await browser.close();

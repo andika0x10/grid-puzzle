@@ -1,107 +1,107 @@
 [
   {
-    "id": "navigation",
+    "id": "fog",
     "order": 1,
-    "title": "Balap rute",
-    "subtitle": "Pilih urutan pos dan taklukkan gerbang berjadwal.",
+    "title": "Labirin Kabut",
+    "subtitle": "Ungkap labirin dan capai keluar.",
     "levelIds": [
-      "navigation-1",
-      "navigation-2",
-      "navigation-3",
-      "navigation-4",
-      "navigation-5",
-      "navigation-6",
-      "navigation-7"
+      "fog-1",
+      "fog-2",
+      "fog-3",
+      "fog-4",
+      "fog-5",
+      "fog-6",
+      "fog-7"
     ]
   },
   {
-    "id": "gems",
+    "id": "collapse",
     "order": 2,
-    "title": "Perebutan gem",
-    "subtitle": "Buru gem berharga, baca gelombang, rebut bonus ganda.",
+    "title": "Lantai Runtuh",
+    "subtitle": "Cari pijakan dan bertahan paling lama.",
     "levelIds": [
-      "gems-1",
-      "gems-2",
-      "gems-3",
-      "gems-4",
-      "gems-5",
-      "gems-6",
-      "gems-7"
+      "collapse-1",
+      "collapse-2",
+      "collapse-3",
+      "collapse-4",
+      "collapse-5",
+      "collapse-6",
+      "collapse-7"
     ]
   },
   {
-    "id": "cargo",
+    "id": "hunt",
     "order": 3,
-    "title": "Kurir kargo",
-    "subtitle": "Antar barang sebanyak mungkin ke depot.",
+    "title": "Perburuan Bergerak",
+    "subtitle": "Cegat target, rebut poin terbanyak.",
     "levelIds": [
-      "cargo-1",
-      "cargo-2",
-      "cargo-3",
-      "cargo-4",
-      "cargo-5",
-      "cargo-6",
-      "cargo-7"
+      "hunt-1",
+      "hunt-2",
+      "hunt-3",
+      "hunt-4",
+      "hunt-5",
+      "hunt-6",
+      "hunt-7"
     ]
   },
   {
-    "id": "territory",
+    "id": "circuit",
     "order": 4,
-    "title": "Rebut wilayah",
-    "subtitle": "Kuasai petak terbanyak sebelum waktu habis.",
+    "title": "Sambung Sirkuit",
+    "subtitle": "Sambung listrik, klaim terminal.",
     "levelIds": [
-      "territory-1",
-      "territory-2",
-      "territory-3",
-      "territory-4",
-      "territory-5",
-      "territory-6",
-      "territory-7"
+      "circuit-1",
+      "circuit-2",
+      "circuit-3",
+      "circuit-4",
+      "circuit-5",
+      "circuit-6",
+      "circuit-7"
     ]
   },
   {
-    "id": "survival",
+    "id": "energy",
     "order": 5,
-    "title": "Zona selamat",
-    "subtitle": "Hindari bahaya dan bertahan paling lama.",
+    "title": "Ekspedisi Energi",
+    "subtitle": "Isi energi dan aktifkan suar.",
     "levelIds": [
-      "survival-1",
-      "survival-2",
-      "survival-3",
-      "survival-4",
-      "survival-5",
-      "survival-6",
-      "survival-7"
+      "energy-1",
+      "energy-2",
+      "energy-3",
+      "energy-4",
+      "energy-5",
+      "energy-6",
+      "energy-7"
     ]
   },
   {
-    "id": "keys",
+    "id": "bridge",
     "order": 6,
-    "title": "Kunci dan pintu",
-    "subtitle": "Kumpulkan semua kunci, lalu capai pintu keluar.",
+    "title": "Jembatan Rakitan",
+    "subtitle": "Bangun jalan, rebut pulau, capai keluar.",
     "levelIds": [
-      "keys-1",
-      "keys-2",
-      "keys-3",
-      "keys-4",
-      "keys-5",
-      "keys-6",
-      "keys-7"
+      "bridge-1",
+      "bridge-2",
+      "bridge-3",
+      "bridge-4",
+      "bridge-5",
+      "bridge-6",
+      "bridge-7"
     ]
   },
   {
-    "id": "outposts",
+    "id": "crates",
     "order": 7,
-    "title": "Rebut pos",
-    "subtitle": "Kuasai pos dan kumpulkan poin terbanyak.",
+    "title": "Dorong Peti",
+    "subtitle": "Dorong peti bersama ke tujuannya.",
     "levelIds": [
-      "outposts-1",
-      "outposts-2",
-      "outposts-3",
-      "outposts-4",
-      "outposts-5",
-      "outposts-6",
-      "outposts-7"
+      "crates-1",
+      "crates-2",
+      "crates-3",
+      "crates-4",
+      "crates-5",
+      "crates-6",
+      "crates-7"
     ]
   }
 ]

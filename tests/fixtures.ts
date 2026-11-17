@@ -1,23 +1,23 @@
 import { MatchEngine } from "../game/engine";
 import type { WorkerPort } from "../game/simulation";
 import type { WorkerRequest, WorkerResponse } from "../game/simulation.worker";
+import { getLevel } from "../game/provider";
 import { levelSchema, type LevelDefinition } from "../game/schema";
 export function fixture(overrides: Partial<LevelDefinition> = {}): LevelDefinition {
-  return levelSchema.parse({
-    schemaVersion: 2,
-    id: "test",
-    sectionId: "navigation",
-    order: 1,
-    title: "Test",
-    mission: "Capai finis.",
-    theme: "farm",
-    mode: "race",
-    seed: 42,
-    timeLimit: 1200,
-    board: { width: 5, height: 3, terrain: Array(15).fill("ground"), spawn: { x: 0, y: 1 }, goal: { x: 4, y: 1 }, gems: [], decorations: [] },
-    changes: [],
-    ...overrides,
-  });
+  const base = structuredClone(getLevel(`${overrides.mode ?? "fog"}-1`)!);
+  if (!overrides.mode) {
+    base.id = "test";
+    base.title = "Test";
+    base.board = {
+      width: 7,
+      height: 5,
+      terrain: Array.from({ length: 35 }, (_, c) => (c % 7 === 0 || c % 7 === 6 || c < 7 || c >= 28 ? "wall" : "ground")),
+      spawn: { x: 1, y: 2 },
+      goal: { x: 5, y: 2 },
+      decorations: [],
+    };
+  }
+  return levelSchema.parse({ ...base, ...overrides });
 }
 export class LocalWorker implements WorkerPort {
   onmessage: ((event: MessageEvent<WorkerResponse>) => void) | null = null;
