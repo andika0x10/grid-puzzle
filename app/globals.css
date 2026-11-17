@@ -471,16 +471,17 @@ progress::-moz-progress-bar {
 .match-main {
   flex: 1;
   min-height: 0;
-  width: min(900px, calc(100% - 48px));
+  width: calc(100% - 48px);
   margin: auto;
   padding: 16px 0 20px;
+  overflow-y: auto;
 }
 .arena-column {
   display: flex;
   flex-direction: column;
   min-width: 0;
-  min-height: 0;
-  height: 100%;
+  min-height: 100%;
+  height: auto;
 }
 .mission-row {
   display: flex;
@@ -675,14 +676,13 @@ progress::-moz-progress-bar {
   color: #000;
 }
 .arena-stage {
-  flex: 1;
+  flex: none;
   min-height: 0;
   min-width: 0;
   width: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
-  container-type: size;
 }
 .board-wrap {
   position: relative;
@@ -699,7 +699,7 @@ progress::-moz-progress-bar {
   background: #fff;
 }
 .board-group {
-  width: min(100cqw, calc((100cqh - 28px) * var(--board-ratio)), var(--board-max-width));
+  width: 100%;
   max-width: 100%;
   flex: none;
 }
@@ -1500,18 +1500,9 @@ progress::-moz-progress-bar {
   .match-main {
     width: calc(100% - 40px);
     padding: 0 0 6px;
-    max-width: 1100px;
-  }
-  .arena-column {
-    display: grid;
-    grid-template-columns: 190px minmax(0, 1fr);
-    grid-template-rows: auto auto minmax(0, 1fr);
-    gap: 6px 24px;
   }
   .mission-row {
-    grid-column: 1;
-    grid-row: 1;
-    margin: 0;
+    margin-bottom: 6px;
     gap: 6px;
     align-items: flex-start;
   }
@@ -1530,12 +1521,8 @@ progress::-moz-progress-bar {
     display: none;
   }
   .participant-strip {
-    grid-column: 1;
-    grid-row: 3;
-    grid-template-columns: 1fr 1fr;
     gap: 4px 12px;
-    margin: 0;
-    align-self: start;
+    margin-bottom: 6px;
     width: 100%;
   }
   .participant {
@@ -1554,20 +1541,12 @@ progress::-moz-progress-bar {
     font-size: 10px;
   }
   .arena-meta {
-    grid-column: 1;
-    grid-row: 2;
     font-size: 10px;
-    margin: 0;
+    margin-bottom: 6px;
     gap: 8px;
   }
   .arena-meta b {
     margin-left: 4px;
-  }
-  .arena-stage {
-    grid-column: 2;
-    grid-row: 1/4;
-    align-self: stretch;
-    height: 100%;
   }
   .arena-caption {
     display: none;

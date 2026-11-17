@@ -290,12 +290,7 @@ function GameSession({ levelId }: { levelId: string }) {
               )}
             </span>
           </div>
-          <div
-            className="arena-stage"
-            style={
-              { "--board-ratio": (level.board.width * 32 + 16) / (level.board.height * 32 + 16), "--board-max-width": `${level.board.width * 32 * 3 + 16}px` } as CSSProperties
-            }
-          >
+          <div className="arena-stage" style={{ "--board-ratio": (level.board.width * 32 + 16) / (level.board.height * 32 + 16) } as CSSProperties}>
             <div className="board-group">
               <BoardCanvas level={level} frame={state.frame} playing={state.phase === "playing"} focused={focused} onReady={setBoardReady} />
               <div className="arena-caption">

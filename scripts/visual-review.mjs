@@ -18,8 +18,19 @@ async function layout(page, name) {
   assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true, `${name}: horizontal overflow`);
   await assertParticipantLayout(page, name);
   const board = await page.locator(".board-wrap").boundingBox(),
+    stage = await page.locator(".arena-stage").boundingBox(),
     dock = await page.locator(".match-dock").boundingBox();
-  assert.ok(board && board.height >= 100 && board.y + board.height <= dock.y + 1, `${name}: board hidden`);
+  assert.ok(board && board.height >= 100, `${name}: board hidden`);
+  assert.ok(stage && Math.abs(board.width - stage.width) <= 1, `${name}: board does not fill arena width`);
+  assert.ok(dock && dock.y >= 0 && dock.y + dock.height <= page.viewportSize().height + 1, `${name}: controls hidden`);
+  await page.locator(".match-main").evaluate((main) => {
+    main.scrollTop = main.scrollHeight;
+  });
+  const scrolledBoard = await page.locator(".board-wrap").boundingBox();
+  assert.ok(scrolledBoard.y + scrolledBoard.height <= dock.y + 1, `${name}: board bottom cannot be reached`);
+  await page.locator(".match-main").evaluate((main) => {
+    main.scrollTop = 0;
+  });
   const buffer = await page.locator(".board-wrap").screenshot();
   const stats = await sharp(buffer).stats();
   assert.ok(
