@@ -21,14 +21,19 @@ async function layout(page, name) {
     stage = await page.locator(".arena-stage").boundingBox(),
     dock = await page.locator(".match-dock").boundingBox();
   assert.ok(board && board.height >= 100, `${name}: board hidden`);
-  assert.ok(stage && Math.abs(board.width - stage.width) <= 1, `${name}: board does not fill arena width`);
+  const ratio = await page.locator(".board-wrap").evaluate((board) => Number(getComputedStyle(board).getPropertyValue("--board-ratio"))),
+    maxHeight = Math.min(480, page.viewportSize().height * 0.6);
+  assert.ok(board.height <= maxHeight + 1, `${name}: board exceeds maximum viewing height`);
+  assert.ok(Math.abs(board.width / board.height - ratio) < 0.01, `${name}: board aspect ratio changed`);
+  assert.ok(stage && Math.abs(board.x + board.width / 2 - (stage.x + stage.width / 2)) <= 1, `${name}: board is not centered`);
   const container = await page.locator(".match-main").evaluate((main) => ({
     width: main.getBoundingClientRect().width,
     contentWidth: main.clientWidth,
     limit: matchMedia("(max-height: 500px) and (orientation: landscape)").matches ? 1100 : 900,
   }));
   assert.ok(container.width <= container.limit + 1, `${name}: game exceeds container width limit`);
-  assert.ok(Math.abs(board.width - container.contentWidth) <= 1, `${name}: board does not fill game container`);
+  const expectedWidth = Math.min(container.contentWidth, maxHeight * ratio);
+  assert.ok(Math.abs(board.width - expectedWidth) <= 1, `${name}: board does not fit height and container limits`);
   assert.ok(dock && dock.y >= 0 && dock.y + dock.height <= page.viewportSize().height + 1, `${name}: controls hidden`);
   await page.locator(".match-main").evaluate((main) => {
     main.scrollTop = main.scrollHeight;

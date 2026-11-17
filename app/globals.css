@@ -676,6 +676,7 @@ progress::-moz-progress-bar {
   color: #000;
 }
 .arena-stage {
+  --board-max-height: min(480px, 60dvh);
   flex: none;
   min-height: 0;
   min-width: 0;
@@ -699,7 +700,7 @@ progress::-moz-progress-bar {
   background: #fff;
 }
 .board-group {
-  width: 100%;
+  width: min(100%, calc(var(--board-max-height) * var(--board-ratio)));
   max-width: 100%;
   flex: none;
 }
