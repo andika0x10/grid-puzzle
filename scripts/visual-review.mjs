@@ -22,6 +22,13 @@ async function layout(page, name) {
     dock = await page.locator(".match-dock").boundingBox();
   assert.ok(board && board.height >= 100, `${name}: board hidden`);
   assert.ok(stage && Math.abs(board.width - stage.width) <= 1, `${name}: board does not fill arena width`);
+  const container = await page.locator(".match-main").evaluate((main) => ({
+    width: main.getBoundingClientRect().width,
+    contentWidth: main.clientWidth,
+    limit: matchMedia("(max-height: 500px) and (orientation: landscape)").matches ? 1100 : 900,
+  }));
+  assert.ok(container.width <= container.limit + 1, `${name}: game exceeds container width limit`);
+  assert.ok(Math.abs(board.width - container.contentWidth) <= 1, `${name}: board does not fill game container`);
   assert.ok(dock && dock.y >= 0 && dock.y + dock.height <= page.viewportSize().height + 1, `${name}: controls hidden`);
   await page.locator(".match-main").evaluate((main) => {
     main.scrollTop = main.scrollHeight;
