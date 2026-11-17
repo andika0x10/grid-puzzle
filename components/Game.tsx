@@ -7,6 +7,9 @@ import Modal from "./Modal";
 import ResultDialog, { resultHeadline } from "./ResultDialog";
 import BoardCanvas from "./BoardCanvas";
 import RuleRibbon from "./RuleRibbon";
+import SoundButton from "./SoundButton";
+import { useSound } from "./SoundProvider";
+import { connectGameAudio } from "../game/game-audio";
 import { getLevel, levels, sections } from "../game/provider";
 import { algorithms, BOT_COLORS, getAlgorithm, unavailableReason, type AlgorithmId, type MatchConfig } from "../game/algorithms";
 import { emptyProgress, isLevelUnlocked, readProgress, recordMatch, subscribeProgress } from "../game/progress";
@@ -35,6 +38,7 @@ function GameSession({ levelId }: { levelId: string }) {
     theme = themes[level.theme],
     section = sections.find((s) => s.id === level.sectionId)!;
   const controller = useMemo(() => new SimulationController(level), [level]);
+  const { audio } = useSound();
   const state = useSyncExternalStore(controller.subscribe, controller.getSnapshot, controller.getSnapshot);
   const [progress, setProgress] = useState(emptyProgress),
     [loaded, setLoaded] = useState(false),
@@ -67,6 +71,9 @@ function GameSession({ levelId }: { levelId: string }) {
     setLoaded(true);
     return subscribeProgress(() => setProgress(readProgress()));
   }, [controller, level]);
+  useEffect(() => {
+    if (audio) return connectGameAudio(controller, level, audio);
+  }, [controller, level, audio]);
   useEffect(() => {
     let raf = 0,
       last = performance.now();
@@ -212,6 +219,7 @@ function GameSession({ levelId }: { levelId: string }) {
           <span className="level-count">
             {level.order} / {section.levelIds.length}
           </span>
+          <SoundButton />
           <button
             className="icon-button"
             onClick={() => {

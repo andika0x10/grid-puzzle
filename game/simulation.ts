@@ -20,9 +20,15 @@ export interface SimulationState {
   result: MatchResult | null;
   run: number;
 }
+export interface PlaybackBatch {
+  run: number;
+  previous: MatchFrame;
+  frames: readonly MatchFrame[];
+}
 export class SimulationController {
   private state: SimulationState;
   private listeners = new Set<() => void>();
+  private playbackListeners = new Set<(batch: PlaybackBatch) => void>();
   private worker: WorkerPort | null = null;
   private history: MatchFrame[] = [];
   private elapsed = 0;
@@ -40,6 +46,13 @@ export class SimulationController {
     this.listeners.add(listener);
     return () => {
       this.listeners.delete(listener);
+    };
+  };
+  /** Only newly displayed live ticks; seeking and manual steps stay silent. */
+  subscribePlayback = (listener: (batch: PlaybackBatch) => void) => {
+    this.playbackListeners.add(listener);
+    return () => {
+      this.playbackListeners.delete(listener);
     };
   };
   private update(next: Partial<SimulationState>) {
@@ -73,6 +86,8 @@ export class SimulationController {
           return;
         }
         const wasAtHead = this.state.cursor === this.state.head;
+        const livePlayback = this.state.phase === "playing" && wasAtHead && !this.stepping;
+        const previous = this.state.frame;
         this.history.push(...data.frames);
         const head = this.history.length - 1,
           last = this.history[head];
@@ -85,6 +100,10 @@ export class SimulationController {
           this.update({ frame: last, cursor: head, head, phase: last.phase === "finished" ? "finished" : this.stepping ? "paused" : "playing", result });
         } else this.update({ head, result });
         this.stepping = false;
+        if (livePlayback) {
+          const batch = { run: this.state.run, previous, frames: data.frames };
+          this.playbackListeners.forEach((listener) => listener(batch));
+        }
       };
       worker.postMessage({ kind: "start", level: this.level, config });
     } catch {

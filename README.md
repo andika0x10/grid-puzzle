@@ -49,6 +49,8 @@ Browser menyimpan ringkasan progres dan rekor melalui `grid-puzzle.progress.v4`;
 
 ## Kontrol
 
+- Musik chiptune diputar saat pertandingan berjalan, dengan efek arcade untuk interaksi, langkah bot pemain, objektif, bahaya, dan hasil pertandingan. Tombol speaker di beranda dan arena mematikan/menyalakan semua suara; pilihannya disimpan di `grid-puzzle.audio.v1`.
+- Audio aktif setelah interaksi pertama. Musik berhenti saat jeda, tab tersembunyi, atau meninggalkan arena. Langkah manual dan pemutaran riwayat tidak mengulang efek aksi atau nada hasil. Musik dan efek dibuat langsung dengan Web Audio API, tanpa unduhan audio tambahan.
 - Play/jeda, langkah sebelumnya/berikutnya, mulai ulang, dan kecepatan 0,5×–4×.
 - Statistik membuka metrik dan timeline riwayat yang sudah dihitung.
 - Sentuh peserta untuk mengamati frontier, petak diperiksa, dan rutenya.

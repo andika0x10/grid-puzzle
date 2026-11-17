@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import SoundProvider from "../components/SoundProvider";
 
 export const metadata: Metadata = {
   title: "Grid Puzzle — Arena petualang",
@@ -10,7 +11,9 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="id">
-      <body>{children}</body>
+      <body>
+        <SoundProvider>{children}</SoundProvider>
+      </body>
     </html>
   );
 }

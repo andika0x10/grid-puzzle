@@ -203,6 +203,15 @@ progress::-moz-progress-bar {
   font-size: 13px;
   color: var(--muted);
 }
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+.sound-button {
+  color: var(--muted);
+}
 .header-progress strong {
   color: #000;
 }
@@ -1411,6 +1420,15 @@ progress::-moz-progress-bar {
   }
 }
 @media (max-width: 359px) {
+  .header-inner {
+    gap: 8px;
+  }
+  .header-actions {
+    gap: 4px;
+  }
+  .match-header-inner {
+    gap: 8px;
+  }
   .shell,
   .header-inner,
   .home.shell {
