@@ -10,7 +10,8 @@ export function matchSoundCues(_level: LevelDefinition, previous: MatchFrame, fr
       if (event.kind === "dock") cues.add("deposit");
       if (["claim", "catch", "build"].includes(event.kind)) cues.add("claim");
       if (event.kind === "toggle") cues.add("checkpoint");
-      if (event.kind === "collapse") cues.add("danger");
+      if (["collapse", "bomb", "explosion"].includes(event.kind)) cues.add("danger");
+      if (["barrier", "teleport", "distract"].includes(event.kind)) cues.add("checkpoint");
       if (event.kind === "eliminated") cues.add("eliminated");
     }
     if (frame.phase === "finished" && previous.phase !== "finished") {

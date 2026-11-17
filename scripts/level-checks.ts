@@ -1,5 +1,6 @@
 import { adjacent, cellOf } from "../game/modes";
 import { isWalkable, terrainCost, type LevelDefinition, type Point } from "../game/schema";
+import { extraTokens } from "../game/extra-modes";
 export function layoutFingerprint(l: LevelDefinition) {
   let rows = Array.from({ length: l.board.height }, (_, y) => l.board.terrain.slice(y * l.board.width, (y + 1) * l.board.width).map((t) => (isWalkable(t) ? "." : "#")));
   while (rows.length && rows[0].every((c) => c === "#")) rows.shift();
@@ -13,10 +14,38 @@ export function layoutFingerprint(l: LevelDefinition) {
   }
   return versions.sort()[0];
 }
+export function layoutSimilarity(a: LevelDefinition, b: LevelDefinition) {
+  const raster = (l: LevelDefinition) => {
+    const t = allOpenTerrain(l),
+      size = 24;
+    return Array.from({ length: size }, (_, y) =>
+      Array.from({ length: size }, (_, x) =>
+        Number(
+          isWalkable(
+            t[
+              (1 + Math.min(l.board.height - 3, Math.floor((y / size) * (l.board.height - 2)))) * l.board.width +
+                1 +
+                Math.min(l.board.width - 3, Math.floor((x / size) * (l.board.width - 2)))
+            ]
+          )
+        )
+      )
+    );
+  };
+  const r = raster(a).flat();
+  let rows = raster(b),
+    best = 0;
+  for (let turn = 0; turn < 4; turn++) {
+    for (const candidate of [rows.flat(), rows.map((v) => [...v].reverse()).flat()]) best = Math.max(best, candidate.reduce((n, c, i) => n + Number(c === r[i]), 0) / r.length);
+    rows = rows[0].map((_, x) => rows.map((v) => v[x]).reverse());
+  }
+  return best;
+}
 export function allOpenTerrain(l: LevelDefinition) {
   const t = [...l.board.terrain];
   if (l.mode === "bridge") for (const span of l.bridge.spans) for (const p of span.cells) t[cellOf(p, l.board.width)] = "path";
   if (l.mode === "circuit") for (const s of l.circuit.switches) for (const p of s.gates) t[cellOf(p, l.board.width)] = "path";
+  if (l.mode === "bomb") for (const p of l.bomb.destructible) t[cellOf(p, l.board.width)] = "path";
   return t;
 }
 export function reachableCells(l: LevelDefinition) {
@@ -33,7 +62,7 @@ export function reachableCells(l: LevelDefinition) {
   return seen;
 }
 export function objectivePoints(l: LevelDefinition): Point[] {
-  const points = [...(l.board.goal ? [l.board.goal] : [])];
+  const points = [...(l.board.goal ? [l.board.goal] : []), ...(l.board.spawns ?? []), ...extraTokens(l)];
   switch (l.mode) {
     case "hunt":
       points.push(...l.hunt.targets.flatMap((t) => t.route));

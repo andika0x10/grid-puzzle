@@ -1,0 +1,868 @@
+{
+  "schemaVersion": 5,
+  "rulesVersion": 5,
+  "id": "bomb-7",
+  "sectionId": "bomb",
+  "order": 7,
+  "title": "Perebutan reruntuhan",
+  "mission": "Pasang bom dengan sumbu 1,8 detik dan ledakan tiga petak tiap arah.",
+  "briefing": "Cincin bersimpang. Pasang bom dengan sumbu 1,8 detik dan ledakan tiga petak tiap arah. Tembok kayu hancur memberi satu poin, permata dua, menjatuhkan lawan tiga. Ledakan dapat berantai dan mengenai pemasangnya. Rebut permata sambil menyisakan jalur aman.",
+  "theme": "space",
+  "seed": 1603810,
+  "timeLimit": 1200,
+  "board": {
+    "width": 21,
+    "height": 25,
+    "terrain": [
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "ground",
+      "wall",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "wall",
+      "ground",
+      "ground",
+      "path",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "wall",
+      "wall",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "wall",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "wall",
+      "wall",
+      "ground",
+      "ground",
+      "wall",
+      "ground",
+      "wall",
+      "wall",
+      "ground",
+      "ground",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "ground",
+      "wall",
+      "wall",
+      "ground",
+      "ground",
+      "wall",
+      "wall",
+      "ground",
+      "ground",
+      "wall",
+      "ground",
+      "ground",
+      "wall",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "wall",
+      "ground",
+      "wall",
+      "wall",
+      "ground",
+      "ground",
+      "wall",
+      "wall",
+      "ground",
+      "wall",
+      "wall",
+      "wall",
+      "ground",
+      "wall",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "wall",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "wall",
+      "wall",
+      "ground",
+      "ground",
+      "wall",
+      "wall",
+      "wall",
+      "ground",
+      "wall",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "wall",
+      "ground",
+      "ground",
+      "wall",
+      "ground",
+      "ground",
+      "wall",
+      "wall",
+      "ground",
+      "ground",
+      "wall",
+      "wall",
+      "ground",
+      "ground",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "ground",
+      "wall",
+      "ground",
+      "wall",
+      "ground",
+      "wall",
+      "ground",
+      "ground",
+      "wall",
+      "wall",
+      "ground",
+      "ground",
+      "wall",
+      "ground",
+      "wall",
+      "ground",
+      "wall",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "wall",
+      "wall",
+      "ground",
+      "ground",
+      "ground",
+      "wall",
+      "ground",
+      "wall",
+      "wall",
+      "wall",
+      "ground",
+      "wall",
+      "wall",
+      "ground",
+      "ground",
+      "ground",
+      "wall",
+      "ground",
+      "ground",
+      "ground",
+      "wall",
+      "ground",
+      "wall",
+      "ground",
+      "ground",
+      "wall",
+      "wall",
+      "ground",
+      "ground",
+      "wall",
+      "wall",
+      "ground",
+      "ground",
+      "wall",
+      "ground",
+      "ground",
+      "wall",
+      "wall",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "wall",
+      "ground",
+      "ground",
+      "ground",
+      "wall",
+      "ground",
+      "ground",
+      "wall",
+      "wall",
+      "wall",
+      "ground",
+      "wall",
+      "ground",
+      "ground",
+      "ground",
+      "wall",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "wall",
+      "ground",
+      "ground",
+      "ground",
+      "wall",
+      "ground",
+      "ground",
+      "wall",
+      "wall",
+      "ground",
+      "ground",
+      "wall",
+      "ground",
+      "ground",
+      "ground",
+      "wall",
+      "ground",
+      "ground",
+      "path",
+      "wall",
+      "wall",
+      "wall",
+      "ground",
+      "wall",
+      "ground",
+      "wall",
+      "ground",
+      "path",
+      "wall",
+      "wall",
+      "ground",
+      "ground",
+      "wall",
+      "wall",
+      "wall",
+      "ground",
+      "wall",
+      "ground",
+      "ground",
+      "wall",
+      "ground",
+      "ground",
+      "wall",
+      "wall",
+      "ground",
+      "ground",
+      "wall",
+      "ground",
+      "ground",
+      "wall",
+      "wall",
+      "ground",
+      "wall",
+      "wall",
+      "ground",
+      "ground",
+      "ground",
+      "wall",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "wall",
+      "ground",
+      "ground",
+      "ground",
+      "wall",
+      "ground",
+      "ground",
+      "wall",
+      "wall",
+      "ground",
+      "wall",
+      "wall",
+      "wall",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "wall",
+      "ground",
+      "wall",
+      "ground",
+      "wall",
+      "ground",
+      "ground",
+      "ground",
+      "wall",
+      "ground",
+      "ground",
+      "wall",
+      "wall",
+      "ground",
+      "wall",
+      "wall",
+      "ground",
+      "wall",
+      "ground",
+      "wall",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "wall",
+      "slow",
+      "ground",
+      "ground",
+      "ground",
+      "wall",
+      "ground",
+      "wall",
+      "wall",
+      "wall",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "ground",
+      "ground",
+      "ground",
+      "wall",
+      "ground",
+      "ground",
+      "wall",
+      "wall",
+      "ground",
+      "ground",
+      "wall",
+      "ground",
+      "ground",
+      "wall",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "wall",
+      "ground",
+      "ground",
+      "ground",
+      "wall",
+      "wall",
+      "ground",
+      "wall",
+      "wall",
+      "ground",
+      "ground",
+      "wall",
+      "ground",
+      "wall",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "wall",
+      "wall",
+      "wall",
+      "ground",
+      "ground",
+      "wall",
+      "ground",
+      "ground",
+      "wall",
+      "wall",
+      "ground",
+      "ground",
+      "wall",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "wall",
+      "ground",
+      "wall",
+      "wall",
+      "ground",
+      "ground",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "ground",
+      "ground",
+      "wall",
+      "wall",
+      "ground",
+      "ground",
+      "wall",
+      "ground",
+      "wall",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "wall",
+      "wall",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "wall",
+      "wall",
+      "ground",
+      "ground",
+      "wall",
+      "wall",
+      "ground",
+      "ground",
+      "wall",
+      "wall",
+      "ground",
+      "wall",
+      "wall",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "wall",
+      "path",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall"
+    ],
+    "spawn": {
+      "x": 19,
+      "y": 12
+    },
+    "spawns": [
+      {
+        "x": 19,
+        "y": 12
+      },
+      {
+        "x": 10,
+        "y": 12
+      },
+      {
+        "x": 10,
+        "y": 1
+      },
+      {
+        "x": 19,
+        "y": 23
+      }
+    ],
+    "decorations": [
+      {
+        "x": 0,
+        "y": 0
+      },
+      {
+        "x": 20,
+        "y": 24
+      }
+    ]
+  },
+  "mode": "bomb",
+  "bomb": {
+    "destructible": [
+      {
+        "x": 2,
+        "y": 1
+      },
+      {
+        "x": 7,
+        "y": 1
+      },
+      {
+        "x": 9,
+        "y": 2
+      },
+      {
+        "x": 14,
+        "y": 2
+      },
+      {
+        "x": 15,
+        "y": 2
+      },
+      {
+        "x": 18,
+        "y": 2
+      },
+      {
+        "x": 6,
+        "y": 4
+      },
+      {
+        "x": 11,
+        "y": 4
+      },
+      {
+        "x": 13,
+        "y": 4
+      },
+      {
+        "x": 14,
+        "y": 4
+      },
+      {
+        "x": 18,
+        "y": 4
+      },
+      {
+        "x": 1,
+        "y": 5
+      },
+      {
+        "x": 11,
+        "y": 5
+      },
+      {
+        "x": 16,
+        "y": 5
+      },
+      {
+        "x": 1,
+        "y": 6
+      },
+      {
+        "x": 14,
+        "y": 6
+      },
+      {
+        "x": 4,
+        "y": 7
+      },
+      {
+        "x": 15,
+        "y": 7
+      },
+      {
+        "x": 5,
+        "y": 8
+      },
+      {
+        "x": 12,
+        "y": 8
+      },
+      {
+        "x": 19,
+        "y": 8
+      },
+      {
+        "x": 2,
+        "y": 9
+      },
+      {
+        "x": 11,
+        "y": 9
+      },
+      {
+        "x": 16,
+        "y": 9
+      },
+      {
+        "x": 6,
+        "y": 10
+      },
+      {
+        "x": 1,
+        "y": 11
+      },
+      {
+        "x": 11,
+        "y": 12
+      },
+      {
+        "x": 12,
+        "y": 12
+      },
+      {
+        "x": 15,
+        "y": 12
+      },
+      {
+        "x": 4,
+        "y": 13
+      },
+      {
+        "x": 5,
+        "y": 13
+      },
+      {
+        "x": 10,
+        "y": 13
+      },
+      {
+        "x": 14,
+        "y": 13
+      },
+      {
+        "x": 2,
+        "y": 14
+      },
+      {
+        "x": 2,
+        "y": 15
+      },
+      {
+        "x": 4,
+        "y": 15
+      },
+      {
+        "x": 9,
+        "y": 15
+      },
+      {
+        "x": 11,
+        "y": 15
+      },
+      {
+        "x": 2,
+        "y": 16
+      },
+      {
+        "x": 5,
+        "y": 16
+      },
+      {
+        "x": 12,
+        "y": 16
+      },
+      {
+        "x": 19,
+        "y": 16
+      },
+      {
+        "x": 6,
+        "y": 18
+      },
+      {
+        "x": 13,
+        "y": 18
+      },
+      {
+        "x": 18,
+        "y": 18
+      },
+      {
+        "x": 5,
+        "y": 19
+      },
+      {
+        "x": 12,
+        "y": 19
+      },
+      {
+        "x": 13,
+        "y": 19
+      },
+      {
+        "x": 14,
+        "y": 19
+      },
+      {
+        "x": 18,
+        "y": 20
+      },
+      {
+        "x": 3,
+        "y": 22
+      },
+      {
+        "x": 5,
+        "y": 22
+      },
+      {
+        "x": 12,
+        "y": 22
+      },
+      {
+        "x": 13,
+        "y": 22
+      },
+      {
+        "x": 3,
+        "y": 23
+      },
+      {
+        "x": 4,
+        "y": 23
+      },
+      {
+        "x": 7,
+        "y": 23
+      },
+      {
+        "x": 8,
+        "y": 23
+      },
+      {
+        "x": 10,
+        "y": 23
+      },
+      {
+        "x": 11,
+        "y": 23
+      },
+      {
+        "x": 18,
+        "y": 23
+      }
+    ],
+    "gems": [
+      {
+        "x": 9,
+        "y": 19
+      },
+      {
+        "x": 15,
+        "y": 15
+      },
+      {
+        "x": 4,
+        "y": 18
+      },
+      {
+        "x": 5,
+        "y": 6
+      },
+      {
+        "x": 6,
+        "y": 14
+      },
+      {
+        "x": 1,
+        "y": 3
+      },
+      {
+        "x": 13,
+        "y": 6
+      },
+      {
+        "x": 17,
+        "y": 2
+      },
+      {
+        "x": 2,
+        "y": 12
+      },
+      {
+        "x": 18,
+        "y": 7
+      }
+    ],
+    "fuseTicks": 36
+  }
+}

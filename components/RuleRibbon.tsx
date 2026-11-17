@@ -47,6 +47,32 @@ export default function RuleRibbon({ level, frame, focused }: { level: LevelDefi
     progress = s.boxes.filter((b) => b.owner).length;
     max = s.boxes.length;
   }
+  if (s.mode === "bomb") {
+    primary = `${s.bombs.length} bom · sumbu ${((level.mode === "bomb" ? level.bomb.fuseTicks : 36) / 20).toFixed(1)} dtk`;
+    secondary = "Bot terakhir menang · selain itu: skor tertinggi";
+  }
+  if (s.mode === "snake") {
+    primary = `Panjang ekor ${(s.tails[bot.id]?.length ?? 0) + 1}`;
+    secondary = "Bot terakhir menang · waktu habis: buah terbanyak";
+  }
+  if (s.mode === "flow") {
+    primary = `${s.owners.filter(Boolean).length}/${s.owners.length} token direbut`;
+    secondary = "Panah memaksa gerak · es meluncur · token +2";
+  }
+  if (s.mode === "portal") {
+    primary = `Jaringan portal ${s.phase + 1}`;
+    secondary = "Nomor kecil: identitas · nomor tengah: tujuan · jaringan bergeser tiap pemakaian";
+  }
+  if (s.mode === "tactical") {
+    primary = `${s.walls.filter((p) => p.owner === bot.id).length}/3 pagar terpasang`;
+    secondary = "Pagar bertahan 5 dtk · seluruh objektif harus tetap terhubung";
+  }
+  if (s.mode === "stealth") {
+    primary = `Terdeteksi ${((s.alert[bot.id] ?? 0) / 20).toFixed(1)}/1 dtk`;
+    secondary = "Semak menyembunyikan · pengalih perhatian menghentikan patroli";
+    progress = s.alert[bot.id] ?? 0;
+    max = 20;
+  }
   return (
     <div className={`rule-ribbon mode-${level.mode}`} aria-label="Aturan dan status arena">
       <span>

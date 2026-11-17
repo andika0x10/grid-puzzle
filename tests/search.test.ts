@@ -43,7 +43,7 @@ describe("search correctness and scheduling", () => {
   it("budgets change batching without changing the result or operation count", () => {
     const terrain: Terrain[] = Array(63).fill("ground");
     terrain[12] = "slow";
-    for (const id of ["astar", "weighted-astar", "greedy", "dfs", "bfs", "dijkstra", "dstar-lite"] as const) {
+    for (const id of ["astar", "weighted-astar", "greedy", "dfs", "bfs", "dijkstra", "dstar-lite", "beam", "rtaa", "ara"] as const) {
       const runs = [1, 7, 64, 256].map((budget) => {
         const s = createSearch(9, 7, terrain, { x: 0, y: 0 }, { x: 8, y: 6 }, id);
         expect(s.advance(0)).toBe(0);
@@ -57,6 +57,48 @@ describe("search correctness and scheduling", () => {
       });
       for (const r of runs) expect(r).toEqual(runs[0]);
     }
+  });
+  it("ARA* returns a legal bounded-cost route on independent weighted fixtures", () => {
+    const random = randomSource(982);
+    for (let sample = 0; sample < 30; sample++) {
+      const terrain: Terrain[] = Array.from({ length: 99 }, () => (random() < 0.2 ? "wall" : random() < 0.35 ? "slow" : "ground"));
+      terrain[0] = terrain[98] = "ground";
+      const optimal = oracle(11, 9, terrain, 0, 98),
+        s = createSearch(11, 9, terrain, { x: 0, y: 0 }, { x: 10, y: 8 }, "ara"),
+        cost = finish(s);
+      if (optimal === null) expect(cost).toBeNull();
+      else {
+        expect(cost).not.toBeNull();
+        expect(cost!).toBeGreaterThanOrEqual(optimal);
+        expect(cost!).toBeLessThanOrEqual(optimal * 2.5);
+        let from = 0;
+        for (const a of s.actions!) {
+          expect(a.from).toBe(from);
+          expect(adjacent(from, 11, 9)).toContain(a.to);
+          expect(isWalkable(terrain[a.to])).toBe(true);
+          expect(a.duration).toBe(terrainCost(terrain[a.to]) * 4);
+          from = a.to;
+        }
+        expect(from).toBe(98);
+      }
+    }
+  });
+  it("RTAA* learns across bounded searches and reaches a distant goal", () => {
+    const l = getLevel("fog-6")!,
+      w = previewFrame(l, defaultConfig(1)),
+      bot = w.bots[0];
+    let domain = new ModeDomain(l, w, bot);
+    const s = createDomainSearch(domain, "rtaa", l.board.width);
+    for (let episode = 0; episode < 150 && !domain.isGoal(domain.start); episode++) {
+      const previous = s.expanded;
+      finish(s);
+      expect(s.expanded - previous).toBeLessThanOrEqual(24);
+      expect(s.actions?.length).toBeGreaterThan(0);
+      for (const a of s.actions!) Object.assign(bot, pointOf(a.to, l.board.width));
+      domain = new ModeDomain(l, w, bot);
+      s.updateDomain!(domain);
+    }
+    expect(domain.isGoal(domain.start)).toBe(true);
   });
   it("bidirectional BFS agrees with BFS on uniform graphs", () => {
     const random = randomSource(91);

@@ -1,18 +1,18 @@
 {
-  "schemaVersion": 4,
-  "rulesVersion": 4,
+  "schemaVersion": 5,
+  "rulesVersion": 5,
   "id": "bridge-2",
   "sectionId": "bridge",
   "order": 2,
-  "title": "Pilih penyeberangan",
-  "mission": "Bangun jalan, rebut pulau, capai keluar.",
-  "briefing": "Pembuat jembatan mendapat poin, penjelajah lain mendapat akses. Bandingkan keuntungan membangun, merebut penanda pulau, dan mengejar bonus keluar.",
+  "title": "Selat dua petak",
+  "mission": "Ambil bahan, lalu bangun bentang bertanda untuk dua poin.",
+  "briefing": "Gua berongga. Ambil bahan, lalu bangun bentang bertanda untuk dua poin. Semua bot dapat memakai jembatan jadi. Penanda pulau memberi tiga poin. Setelah semua penanda diklaim, keluar memberi lima dan mengakhiri pertandingan. Bahan maksimal tiga, muncul kembali setiap empat detik.",
   "theme": "desert",
-  "seed": 46002,
+  "seed": 1064327,
   "timeLimit": 1200,
   "board": {
     "width": 13,
-    "height": 10,
+    "height": 17,
     "terrain": [
       "wall",
       "wall",
@@ -38,88 +38,179 @@
       "ground",
       "ground",
       "ground",
-      "ground",
-      "wall",
-      "wall",
-      "ground",
-      "wall",
-      "ground",
-      "ground",
-      "wall",
-      "wall",
-      "wall",
-      "ground",
-      "ground",
-      "wall",
-      "ground",
-      "wall",
-      "wall",
-      "ground",
-      "ground",
-      "ground",
-      "ground",
-      "ground",
-      "ground",
-      "ground",
-      "ground",
-      "ground",
-      "ground",
-      "ground",
-      "wall",
-      "wall",
-      "water",
-      "water",
-      "water",
-      "water",
-      "water",
-      "water",
-      "water",
-      "water",
-      "water",
-      "water",
-      "water",
-      "wall",
-      "wall",
-      "water",
-      "water",
-      "water",
-      "water",
-      "water",
-      "water",
-      "water",
-      "water",
-      "water",
-      "water",
-      "water",
-      "wall",
-      "wall",
-      "ground",
-      "ground",
-      "ground",
-      "ground",
-      "ground",
-      "ground",
-      "ground",
-      "ground",
-      "ground",
-      "ground",
-      "ground",
-      "wall",
-      "wall",
-      "ground",
-      "wall",
-      "ground",
-      "ground",
-      "ground",
-      "wall",
-      "ground",
-      "ground",
-      "ground",
-      "wall",
-      "ground",
+      "path",
       "wall",
       "wall",
       "path",
+      "wall",
+      "wall",
+      "wall",
+      "ground",
+      "wall",
+      "wall",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "wall",
+      "wall",
+      "ground",
+      "wall",
+      "wall",
+      "wall",
+      "ground",
+      "wall",
+      "wall",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "wall",
+      "wall",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "wall",
+      "wall",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "wall",
+      "wall",
+      "ground",
+      "ground",
+      "wall",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "wall",
+      "wall",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "wall",
+      "wall",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "path",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "path",
+      "wall",
+      "wall",
+      "water",
+      "water",
+      "water",
+      "water",
+      "water",
+      "water",
+      "water",
+      "water",
+      "water",
+      "water",
+      "water",
+      "wall",
+      "wall",
+      "water",
+      "water",
+      "water",
+      "water",
+      "water",
+      "water",
+      "water",
+      "water",
+      "water",
+      "water",
+      "water",
+      "wall",
+      "wall",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "wall",
+      "wall",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "wall",
+      "wall",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "wall",
+      "wall",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "wall",
+      "wall",
+      "wall",
+      "ground",
+      "wall",
+      "wall",
+      "ground",
+      "ground",
+      "wall",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "wall",
+      "wall",
+      "wall",
+      "ground",
+      "wall",
+      "wall",
+      "ground",
       "ground",
       "ground",
       "ground",
@@ -146,12 +237,30 @@
       "wall"
     ],
     "spawn": {
-      "x": 1,
-      "y": 8
+      "x": 6,
+      "y": 7
     },
+    "spawns": [
+      {
+        "x": 6,
+        "y": 7
+      },
+      {
+        "x": 11,
+        "y": 1
+      },
+      {
+        "x": 1,
+        "y": 2
+      },
+      {
+        "x": 11,
+        "y": 7
+      }
+    ],
     "goal": {
-      "x": 8,
-      "y": 1
+      "x": 11,
+      "y": 15
     },
     "decorations": [
       {
@@ -160,7 +269,7 @@
       },
       {
         "x": 12,
-        "y": 9
+        "y": 16
       }
     ]
   },
@@ -171,21 +280,21 @@
         "banks": [
           {
             "x": 3,
-            "y": 3
+            "y": 7
           },
           {
             "x": 3,
-            "y": 6
+            "y": 10
           }
         ],
         "cells": [
           {
             "x": 3,
-            "y": 4
+            "y": 8
           },
           {
             "x": 3,
-            "y": 5
+            "y": 9
           }
         ]
       },
@@ -193,43 +302,39 @@
         "banks": [
           {
             "x": 9,
-            "y": 3
+            "y": 7
           },
           {
             "x": 9,
-            "y": 6
+            "y": 10
           }
         ],
         "cells": [
           {
             "x": 9,
-            "y": 4
+            "y": 8
           },
           {
             "x": 9,
-            "y": 5
+            "y": 9
           }
         ]
       }
     ],
     "supplies": [
       {
-        "x": 4,
-        "y": 3
+        "x": 6,
+        "y": 7
       },
       {
-        "x": 3,
-        "y": 6
-      },
-      {
-        "x": 9,
-        "y": 6
+        "x": 2,
+        "y": 14
       }
     ],
     "markers": [
       {
-        "x": 3,
-        "y": 1
+        "x": 7,
+        "y": 13
       }
     ]
   }

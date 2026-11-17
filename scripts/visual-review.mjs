@@ -7,6 +7,9 @@ const root = process.argv[2] ?? "http://127.0.0.1:5173",
   output = "artifacts/arena-review";
 const filter = process.argv.find((a) => a.startsWith("--level="))?.split("=")[1],
   viewport = Number(process.argv.find((a) => a.startsWith("--viewport="))?.split("=")[1]);
+const selectedPlayer = process.argv.find((a) => a.startsWith("--player="))?.split("=")[1];
+const newNames = { beam: "Beam Search", rtaa: "Real-Time Adaptive A*", ara: "Anytime Repairing A*", maxn: "Maxⁿ Search", paranoid: "Paranoid Search", utility: "Utility AI + A*" };
+if (selectedPlayer && !newNames[selectedPlayer]) throw Error("Use a new AI ID with --player");
 const catalog = JSON.parse(await fs.readFile("content/catalog.json", "utf8"));
 const progress = { version: 5, levels: Object.fromEntries(catalog.levels.map((l) => [l.id, { completed: true, matches: 1, wins: 0, bestMetric: null, rulesVersion: 4 }])) };
 await fs.mkdir(output, { recursive: true });
@@ -60,10 +63,16 @@ try {
     [1440, 900],
   ].filter(([w]) => !viewport || w === viewport)) {
     const context = await browser.newContext({ viewport: { width, height }, reducedMotion: "reduce" });
-    await context.addInitScript((p) => {
-      localStorage.setItem("grid-puzzle.progress.v5", JSON.stringify(p));
-      localStorage.setItem("grid-puzzle.participants.v1", JSON.stringify({ version: 1, player: "dijkstra", opponents: ["dstar-lite", "mcts", "random"] }));
-    }, progress);
+    await context.addInitScript(
+      ({ progress, selectedPlayer }) => {
+        localStorage.setItem("grid-puzzle.progress.v5", JSON.stringify(progress));
+        localStorage.setItem(
+          "grid-puzzle.participants.v1",
+          JSON.stringify({ version: 1, player: selectedPlayer ?? "dijkstra", opponents: selectedPlayer ? ["astar", "greedy", "random"] : ["dstar-lite", "mcts", "random"] })
+        );
+      },
+      { progress, selectedPlayer }
+    );
     const page = await context.newPage();
     page.on("pageerror", (e) => errors.push(e.message));
     const selected = catalog.levels.filter((l) => (!filter || l.id === filter) && ([390, 1440].includes(width) || l.order === 1));
@@ -73,8 +82,9 @@ try {
       await page.getByText("Menyiapkan arena…", { exact: true }).waitFor({ state: "hidden" });
       const roster = page.getByRole("dialog", { name: "Pilih peserta" });
       await roster.waitFor();
-      assert.equal(await roster.locator(".algorithm-entry").count(), 10);
+      assert.equal(await roster.locator(".algorithm-entry").count(), 16);
       await roster.getByRole("button", { name: "Save", exact: true }).click();
+      if (selectedPlayer) await page.getByRole("button", { name: `Amati ${newNames[selectedPlayer]}, karakter saya`, exact: true }).waitFor();
       await layout(page, `${level.id}-${width}`);
       if (level.order === 1) {
         await page.getByRole("combobox", { name: "Kecepatan simulasi" }).selectOption("1");
@@ -104,8 +114,8 @@ try {
     await context.close();
   }
   assert.deepEqual(errors, [], "Runtime browser errors");
-  console.log(`Passed ${checks.length} board and worker checks across seven new modes.`);
+  console.log(`Passed ${checks.length} board and worker checks across 13 modes.`);
 } finally {
-  await fs.writeFile(`${output}/findings.json`, JSON.stringify({ errors, checks }, null, 2));
+  await fs.writeFile(`${output}/findings-${[viewport || "all", filter, selectedPlayer].filter(Boolean).join("-")}.json`, JSON.stringify({ errors, checks }, null, 2));
   await browser.close();
 }

@@ -1,0 +1,326 @@
+{
+  "schemaVersion": 5,
+  "rulesVersion": 5,
+  "id": "flow-2",
+  "sectionId": "flow",
+  "order": 2,
+  "title": "Angin dari barat",
+  "mission": "Panah mendorong satu sampai tiga petak.",
+  "briefing": "Pelataran bercabang. Panah mendorong satu sampai tiga petak. Es meluncurkan bot sampai keluar es atau terhalang. Satu masukan bisa memindahkan beberapa petak dan waktu gerak tetap dihitung. Rebut semua token yang tersebar, dua poin per token.",
+  "theme": "desert",
+  "seed": 1096003,
+  "timeLimit": 1200,
+  "board": {
+    "width": 17,
+    "height": 11,
+    "terrain": [
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "path",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "path",
+      "wall",
+      "wall",
+      "ground",
+      "ground",
+      "wall",
+      "wall",
+      "ground",
+      "ground",
+      "wall",
+      "wall",
+      "wall",
+      "ground",
+      "ground",
+      "wall",
+      "wall",
+      "ground",
+      "ground",
+      "wall",
+      "wall",
+      "ground",
+      "wall",
+      "wall",
+      "wall",
+      "ground",
+      "ground",
+      "wall",
+      "wall",
+      "wall",
+      "ground",
+      "ground",
+      "wall",
+      "wall",
+      "ground",
+      "ground",
+      "wall",
+      "wall",
+      "ground",
+      "wall",
+      "wall",
+      "wall",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "wall",
+      "wall",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "path",
+      "wall",
+      "wall",
+      "ground",
+      "wall",
+      "wall",
+      "ground",
+      "ground",
+      "ground",
+      "wall",
+      "wall",
+      "ground",
+      "ground",
+      "ground",
+      "wall",
+      "wall",
+      "ground",
+      "ground",
+      "wall",
+      "wall",
+      "ground",
+      "wall",
+      "wall",
+      "ground",
+      "ground",
+      "ground",
+      "wall",
+      "wall",
+      "ground",
+      "ground",
+      "ground",
+      "wall",
+      "wall",
+      "ground",
+      "ground",
+      "wall",
+      "wall",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "wall",
+      "wall",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "wall",
+      "wall",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "path",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall"
+    ],
+    "spawn": {
+      "x": 15,
+      "y": 9
+    },
+    "spawns": [
+      {
+        "x": 15,
+        "y": 9
+      },
+      {
+        "x": 15,
+        "y": 1
+      },
+      {
+        "x": 15,
+        "y": 5
+      },
+      {
+        "x": 1,
+        "y": 1
+      }
+    ],
+    "decorations": [
+      {
+        "x": 0,
+        "y": 0
+      },
+      {
+        "x": 16,
+        "y": 10
+      }
+    ]
+  },
+  "mode": "flow",
+  "flow": {
+    "currents": [
+      {
+        "x": 5,
+        "y": 8,
+        "dx": 0,
+        "dy": 1,
+        "distance": 1
+      },
+      {
+        "x": 9,
+        "y": 1,
+        "dx": -1,
+        "dy": 0,
+        "distance": 2
+      },
+      {
+        "x": 10,
+        "y": 7,
+        "dx": 0,
+        "dy": -1,
+        "distance": 3
+      },
+      {
+        "x": 5,
+        "y": 3,
+        "dx": 1,
+        "dy": 0,
+        "distance": 1
+      },
+      {
+        "x": 8,
+        "y": 9,
+        "dx": 0,
+        "dy": 1,
+        "distance": 2
+      }
+    ],
+    "ice": [
+      {
+        "x": 1,
+        "y": 6
+      },
+      {
+        "x": 4,
+        "y": 6
+      },
+      {
+        "x": 8,
+        "y": 4
+      },
+      {
+        "x": 9,
+        "y": 4
+      },
+      {
+        "x": 10,
+        "y": 4
+      },
+      {
+        "x": 11,
+        "y": 4
+      }
+    ],
+    "tokens": [
+      {
+        "x": 12,
+        "y": 4
+      },
+      {
+        "x": 12,
+        "y": 9
+      },
+      {
+        "x": 6,
+        "y": 5
+      },
+      {
+        "x": 14,
+        "y": 7
+      },
+      {
+        "x": 2,
+        "y": 9
+      }
+    ]
+  }
+}

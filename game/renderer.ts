@@ -3,7 +3,8 @@ import { BOT_COLORS } from "./algorithms";
 import type { MatchFrame } from "./engine";
 import type { LevelDefinition } from "./schema";
 import { cellOf } from "./modes";
-type Glyph = "target" | "switch" | "terminal" | "charger" | "beacon" | "supply" | "bridge" | "dock" | "box";
+import { extraTokens, guardCells } from "./extra-modes";
+type Glyph = "target" | "switch" | "terminal" | "charger" | "beacon" | "supply" | "bridge" | "dock" | "box" | "bomb" | "fruit" | "portal" | "guard" | "bush" | "intel";
 const ink = 0x26343b,
   cream = 0xfff2ca;
 export class BoardRenderer {
@@ -73,8 +74,8 @@ export class BoardRenderer {
     });
     this.world.addChild(this.routes, this.overlay, this.objects, this.effects, this.actorsLayer, this.fog);
     for (const p of this.level.board.decorations) this.world.addChild(new Sprite({ texture: this.terrain.textures.decor, x: p.x * 32, y: p.y * 32 }));
-    const spawn = this.level.board.spawn;
-    this.objects.addChild(new Sprite({ texture: this.shared.textures.start, x: spawn.x * 32, y: spawn.y * 32 }));
+    for (const spawn of this.level.board.spawns ?? [this.level.board.spawn])
+      this.objects.addChild(new Sprite({ texture: this.shared.textures.start, x: spawn.x * 32, y: spawn.y * 32 }));
     if (this.level.board.goal) {
       const p = this.level.board.goal;
       this.goalView = new Sprite({ texture: this.shared.textures.finish, x: p.x * 32, y: p.y * 32 });
@@ -181,6 +182,14 @@ export class BoardRenderer {
       border(3, 3, 26, 26, 0xd69a50);
       g.rect(7, 6, 18, 3).fill(0xffd08a).rect(7, 23, 18, 3).fill(0x966332).poly([7, 10, 10, 7, 25, 22, 22, 25]).fill(0x996635).poly([7, 22, 22, 7, 25, 10, 10, 25]).fill(0xffce80);
     }
+    if (kind === "bomb") g.circle(16, 19, 10).fill(ink).rect(13, 5, 6, 7).fill(0x9d7347).poly([17, 6, 23, 2, 25, 7, 20, 10]).fill(0xffb52d).circle(12, 15, 2).fill(cream);
+    if (kind === "fruit") g.circle(12, 19, 8).fill(0xf26a45).circle(20, 19, 8).fill(0xee7842).rect(15, 5, 3, 9).fill(ink).ellipse(22, 7, 7, 3).fill(0x67b84c);
+    if (kind === "portal") g.ellipse(16, 16, 12, 14).fill(ink).ellipse(16, 16, 9, 11).fill(0x9e82e7).ellipse(16, 16, 5, 8).fill(0x383a78).rect(4, 28, 24, 3).fill(0xc9b8f1);
+    if (kind === "guard")
+      g.circle(16, 9, 7).fill(0xe1ad7d).rect(6, 4, 20, 5).fill(0x5c65a1).rect(8, 15, 16, 13).fill(0x5668a2).rect(10, 27, 5, 4).fill(ink).rect(19, 27, 5, 4).fill(ink);
+    if (kind === "bush") g.circle(9, 21, 8).fill(0x347d4b).circle(21, 20, 9).fill(0x40864c).circle(15, 12, 9).fill(0x5caa58).rect(4, 26, 24, 4).fill(0x347d4b);
+    if (kind === "intel")
+      g.rect(6, 4, 20, 24).fill(cream).stroke({ color: ink, width: 2 }).rect(10, 9, 12, 3).fill(0xd36a52).rect(10, 16, 12, 2).fill(ink).rect(10, 21, 8, 2).fill(ink);
     this.contexts.set(kind, g);
     return g;
   }
@@ -337,6 +346,65 @@ export class BoardRenderer {
     if (l.mode === "crates" && s.mode === "crates") {
       l.crates.docks.forEach((p, i) => this.view(`dock:${i}`, "dock", cellOf(p, w)));
       s.boxes.forEach((b) => this.view(`box:${b.id}`, "box", b.cell, owner(b.owner)));
+    }
+    extraTokens(l).forEach((p, i) => {
+      const id = "owners" in s ? s.owners[i] : null;
+      const ready = s.mode !== "snake" || s.ready[i] <= this.frame.tick;
+      this.view(`token:${i}`, l.mode === "snake" ? "fruit" : l.mode === "stealth" ? "intel" : "target", cellOf(p, w), owner(id), id || !ready ? 0.28 : 1);
+    });
+    if (s.mode === "bomb") {
+      for (const c of s.wood) this.view(`wood:${c}`, "box", c);
+      for (const bomb of s.bombs) {
+        this.view(`bomb:${bomb.cell}`, "bomb", bomb.cell, owner(bomb.owner));
+        const x = (bomb.cell % w) * 32,
+          y = Math.floor(bomb.cell / w) * 32;
+        this.effects.rect(x + 3, y + 29, Math.max(1, (26 * (bomb.at - this.frame.tick)) / 36), 2).fill(0xffcf58);
+      }
+      for (const f of s.flames) this.effects.rect((f.cell % w) * 32 + 2, Math.floor(f.cell / w) * 32 + 2, 28, 28).fill({ color: 0xff9c35, alpha: 0.9 });
+    }
+    if (s.mode === "snake")
+      for (const [id, tail] of Object.entries(s.tails))
+        for (const [i, c] of tail.entries())
+          this.effects.roundRect((c % w) * 32 + 5, Math.floor(c / w) * 32 + 5, 22, 22, 5).fill({ color: owner(id), alpha: Math.max(0.35, 0.9 - i * 0.05) });
+    if (l.mode === "flow") {
+      for (const p of l.flow.ice)
+        this.effects
+          .rect(p.x * 32 + 2, p.y * 32 + 2, 28, 28)
+          .fill({ color: 0xa5edf4, alpha: 0.65 })
+          .moveTo(p.x * 32 + 6, p.y * 32 + 24)
+          .lineTo(p.x * 32 + 23, p.y * 32 + 7)
+          .stroke({ color: 0xffffff, width: 2 });
+      for (const p of l.flow.currents) {
+        const x = p.x * 32 + 16,
+          y = p.y * 32 + 16,
+          dx = p.dx * 9,
+          dy = p.dy * 9;
+        this.effects
+          .moveTo(x - dx, y - dy)
+          .lineTo(x + dx, y + dy)
+          .stroke({ color: 0x16839b, width: 4 })
+          .poly([x + dx, y + dy, x + dy * 0.7, y - dx * 0.7, x - dy * 0.7, y + dx * 0.7])
+          .fill(0x16839b);
+        this.number(this.effects, p.distance, p.x * 32 + 25, p.y * 32 + 2, ink);
+      }
+    }
+    if (l.mode === "portal" && s.mode === "portal")
+      l.portal.pads.forEach((p, i) => {
+        this.view(`portal:${i}`, "portal", cellOf(p, w));
+        this.number(this.effects, i + 1, p.x * 32 + 3, p.y * 32 + 2, cream);
+        this.number(this.effects, ((i + 1 + (s.phase % (l.portal.pads.length - 1))) % l.portal.pads.length) + 1, p.x * 32 + 14, p.y * 32 + 13, 0xffffff);
+      });
+    if (s.mode === "tactical")
+      for (const wall of s.walls)
+        this.effects
+          .rect((wall.cell % w) * 32 + 3, Math.floor(wall.cell / w) * 32 + 3, 26, 26)
+          .fill(owner(wall.owner))
+          .stroke({ color: ink, width: 2 });
+    if (l.mode === "stealth" && s.mode === "stealth") {
+      for (const c of guardCells(l, this.frame)) this.effects.rect((c % w) * 32 + 1, Math.floor(c / w) * 32 + 1, 30, 30).fill({ color: 0xf2aa4c, alpha: 0.35 });
+      l.stealth.bushes.forEach((p, i) => this.view(`bush:${i}`, "bush", cellOf(p, w)));
+      l.stealth.guards.forEach((g, i) => this.view(`guard:${i}`, "guard", cellOf(g.route[s.guards[i].index], w), 0xffffff, s.guards[i].stunnedUntil > this.frame.tick ? 0.4 : 1));
+      for (const b of this.frame.bots) if (s.alert[b.id]) this.effects.rect(b.x * 32 + 3, b.y * 32, 26 * Math.min(1, s.alert[b.id] / 20), 3).fill(0xef7651);
     }
   }
   destroy() {

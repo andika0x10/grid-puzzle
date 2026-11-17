@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { authorLevels } from "../scripts/author-arenas";
-import { layoutFingerprint, objectivePoints, reachableCells, circuitReachable, weightedDistances } from "../scripts/level-checks";
+import { layoutFingerprint, layoutSimilarity, objectivePoints, reachableCells, circuitReachable, weightedDistances } from "../scripts/level-checks";
 import { levels } from "../game/provider";
 import { advanceWorld, cellOf, resolveActions } from "../game/modes";
 import { previewFrame } from "../game/engine";
@@ -10,7 +10,18 @@ import { createDomainSearch } from "../game/search";
 describe("authored arenas", () => {
   it("reproduces the catalog and has no duplicate, rotated or mirrored floor plans", () => {
     expect(authorLevels()).toEqual(levels);
-    expect(new Set(levels.map(layoutFingerprint)).size).toBe(49);
+    expect(new Set(levels.map(layoutFingerprint)).size).toBe(91);
+  });
+  it("rejects resized lookalikes within a category and varies the starting regions", () => {
+    for (const mode of new Set(levels.map((l) => l.mode))) {
+      const maps = levels.filter((l) => l.mode === mode);
+      for (const [i, a] of maps.entries()) for (const b of maps.slice(i + 1)) expect(layoutSimilarity(a, b), `${a.id}/${b.id}`).toBeLessThan(0.9);
+      const starts = new Set(
+        maps.map((l) => `${Math.min(2, Math.floor((l.board.spawn.x / l.board.width) * 3))}:${Math.min(2, Math.floor((l.board.spawn.y / l.board.height) * 3))}`)
+      );
+      expect(starts.size, mode).toBeGreaterThanOrEqual(3);
+      expect(maps.every((l) => l.board.spawns?.length === 4)).toBe(true);
+    }
   });
   for (const l of levels)
     it(`${l.id} has reachable objectives and valid dependencies`, () => {

@@ -1,0 +1,233 @@
+{
+  "schemaVersion": 5,
+  "rulesVersion": 5,
+  "id": "portal-1",
+  "sectionId": "portal",
+  "order": 1,
+  "title": "Empat pintu asing",
+  "mission": "Injak portal untuk berpindah.",
+  "briefing": "Gua berongga. Injak portal untuk berpindah. Setiap penggunaan menggeser pasangan seluruh portal, termasuk milik lawan. Nomor pada portal menunjukkan tujuan saat ini. Rebut token dua poin sambil menyesuaikan rute dengan jaringan yang berubah.",
+  "theme": "farm",
+  "seed": 999193,
+  "timeLimit": 1200,
+  "board": {
+    "width": 11,
+    "height": 13,
+    "terrain": [
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "path",
+      "ground",
+      "ground",
+      "path",
+      "ground",
+      "ground",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "ground",
+      "ground",
+      "ground",
+      "path",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "wall",
+      "wall",
+      "wall",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "wall",
+      "wall",
+      "wall",
+      "path",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "ground",
+      "ground",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall"
+    ],
+    "spawn": {
+      "x": 2,
+      "y": 2
+    },
+    "spawns": [
+      {
+        "x": 2,
+        "y": 2
+      },
+      {
+        "x": 2,
+        "y": 10
+      },
+      {
+        "x": 5,
+        "y": 6
+      },
+      {
+        "x": 5,
+        "y": 2
+      }
+    ],
+    "decorations": [
+      {
+        "x": 0,
+        "y": 0
+      },
+      {
+        "x": 10,
+        "y": 12
+      }
+    ]
+  },
+  "mode": "portal",
+  "portal": {
+    "pads": [
+      {
+        "x": 9,
+        "y": 8
+      },
+      {
+        "x": 8,
+        "y": 4
+      },
+      {
+        "x": 3,
+        "y": 8
+      },
+      {
+        "x": 2,
+        "y": 6
+      }
+    ],
+    "tokens": [
+      {
+        "x": 8,
+        "y": 10
+      },
+      {
+        "x": 4,
+        "y": 11
+      },
+      {
+        "x": 6,
+        "y": 8
+      },
+      {
+        "x": 3,
+        "y": 4
+      }
+    ]
+  }
+}

@@ -1,0 +1,273 @@
+{
+  "schemaVersion": 5,
+  "rulesVersion": 5,
+  "id": "stealth-1",
+  "sectionId": "stealth",
+  "order": 1,
+  "title": "Patroli kebun",
+  "mission": "Rebut dokumen tiga poin di antara patroli penjaga.",
+  "briefing": "Lorong berjalin. Rebut dokumen tiga poin di antara patroli penjaga. Kerucut pandangan ditampilkan, semak menyembunyikan bot. Terlihat terus selama satu detik menyebabkan tertangkap. Pengalih perhatian menghentikan penjaga terdekat selama 1,8 detik, pulih lima detik.",
+  "theme": "farm",
+  "seed": 1015031,
+  "timeLimit": 1200,
+  "board": {
+    "width": 13,
+    "height": 11,
+    "terrain": [
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "ground",
+      "wall",
+      "ground",
+      "ground",
+      "ground",
+      "path",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "wall",
+      "wall",
+      "ground",
+      "ground",
+      "ground",
+      "wall",
+      "wall",
+      "wall",
+      "ground",
+      "ground",
+      "ground",
+      "wall",
+      "ground",
+      "wall",
+      "wall",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "wall",
+      "ground",
+      "ground",
+      "ground",
+      "wall",
+      "wall",
+      "wall",
+      "ground",
+      "wall",
+      "wall",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "path",
+      "ground",
+      "ground",
+      "ground",
+      "wall",
+      "path",
+      "wall",
+      "wall",
+      "ground",
+      "wall",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "wall",
+      "ground",
+      "ground",
+      "ground",
+      "wall",
+      "wall",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "wall",
+      "wall",
+      "ground",
+      "wall",
+      "wall",
+      "wall",
+      "ground",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "ground",
+      "wall",
+      "wall",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "wall",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "path",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall"
+    ],
+    "spawn": {
+      "x": 11,
+      "y": 5
+    },
+    "spawns": [
+      {
+        "x": 11,
+        "y": 5
+      },
+      {
+        "x": 6,
+        "y": 5
+      },
+      {
+        "x": 6,
+        "y": 1
+      },
+      {
+        "x": 11,
+        "y": 9
+      }
+    ],
+    "decorations": [
+      {
+        "x": 0,
+        "y": 0
+      },
+      {
+        "x": 12,
+        "y": 10
+      }
+    ]
+  },
+  "mode": "stealth",
+  "stealth": {
+    "guards": [
+      {
+        "route": [
+          {
+            "x": 7,
+            "y": 2
+          },
+          {
+            "x": 8,
+            "y": 2
+          },
+          {
+            "x": 9,
+            "y": 2
+          },
+          {
+            "x": 9,
+            "y": 3
+          },
+          {
+            "x": 9,
+            "y": 4
+          },
+          {
+            "x": 8,
+            "y": 4
+          },
+          {
+            "x": 7,
+            "y": 4
+          },
+          {
+            "x": 7,
+            "y": 3
+          }
+        ],
+        "stepTicks": 12,
+        "range": 3
+      }
+    ],
+    "bushes": [
+      {
+        "x": 2,
+        "y": 3
+      },
+      {
+        "x": 3,
+        "y": 9
+      },
+      {
+        "x": 9,
+        "y": 7
+      },
+      {
+        "x": 10,
+        "y": 1
+      },
+      {
+        "x": 1,
+        "y": 6
+      }
+    ],
+    "intel": [
+      {
+        "x": 7,
+        "y": 3
+      },
+      {
+        "x": 3,
+        "y": 1
+      },
+      {
+        "x": 4,
+        "y": 6
+      }
+    ]
+  }
+}

@@ -1,6 +1,6 @@
 # Grid Puzzle
 
-Tujuh permainan taktik berbahasa Indonesia, **49 arena terkurasi**, dan sepuluh algoritma. Seluruh peserta bermain pada arena bersama: perubahan peti, jembatan, saklar, stok, dan lantai ikut memengaruhi lawan.
+13 permainan taktik berbahasa Indonesia, **91 arena** dan **16 pilihan AI**. Semua peserta berinteraksi dengan dunia yang sama. Setiap kategori tersedia mulai level pertama, tanpa menyelesaikan kategori lain; progres level di dalam kategori tetap berurutan.
 
 ## Jalankan
 
@@ -9,54 +9,72 @@ npm install
 npm run dev
 ```
 
-Buka alamat Vite. Setiap kategori langsung bisa dimainkan mulai level pertama, tanpa menyelesaikan kategori lain. Pilih algoritma dan satu sampai tiga lawan, simpan dengan **Save**, lalu **Mulai pertandingan**. Menang, seri, atau kalah tetap membuka level berikutnya dalam kategori tersebut. Tidak ada pertandingan yang dihitung sebelum Play.
+Pilih algoritma dan satu sampai tiga lawan, simpan dengan **Save**, lalu **Mulai pertandingan**. Tidak ada pertandingan yang dihitung sebelum Play. Menang, seri, maupun kalah membuka level berikutnya dalam kategori tersebut.
 
-## Tujuh permainan
+## Permainan
 
-| Permainan          | Cara bermain dan hasil                                                                                                                                                                                                                                                                                 |
-| ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Labirin Kabut      | Pemindai radius dua petak membuka pengetahuan pribadi tiap bot. Posisi keluar diketahui; bentuk jalan harus ditemukan. Pertama mencapai keluar menang.                                                                                                                                                 |
-| Lantai Runtuh      | Petak runtuh 24 tick setelah ditinggalkan; gelombang keruntuhan menyapu arena. Spawn terlindungi 160 tick. Bot tanpa pijakan berikutnya tereliminasi. Bertahan paling lama menang.                                                                                                                     |
-| Perburuan Bergerak | Cegat target pada lintasan bergerak untuk satu poin. Target muncul kembali 20 tick kemudian di titik berikutnya. Skor terbanyak menang.                                                                                                                                                                |
-| Sambung Sirkuit    | Cocokkan saklar dengan pola kontrak. Saklar juga mengubah gerbang bersama. Datangi dan klaim terminal yang tersambung untuk tiga poin, lalu kerjakan kontrak berikutnya.                                                                                                                               |
-| Ekspedisi Energi   | Energi maksimal 24; langkah biasa memakai satu, medan lambat empat. Aktivasi suar memakai lima energi dan memberi tiga poin. Pengisian bersama memberi maksimal empat per tick, stok 40, pulih satu per tick. Bot kehabisan energi di luar stasiun mogok.                                              |
-| Jembatan Rakitan   | Ambil bahan, maksimal tiga. Bentang membutuhkan satu sampai tiga bahan dan memberi dua poin kepada pembangun. Jembatan jadi dapat dipakai semua bot. Penanda pulau memberi tiga poin; setelah seluruh penanda diklaim, keluar memberi lima dan mengakhiri pertandingan. Bahan kembali setelah 80 tick. |
-| Dorong Peti        | Peti dan ruang manuver dipakai bersama. Peti yang masuk tujuan terkunci dan memberi satu poin kepada pendorongnya. Sudut mati statis ditolak. Skor terbanyak menang.                                                                                                                                   |
+| Kategori           | Mekanisme                                                                                                                                                                      |
+| ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Labirin Kabut      | Pengetahuan pribadi, pemindai radius dua, pertama mencapai keluar menang.                                                                                                      |
+| Lantai Runtuh      | Jejak runtuh setelah 24 tick dan gelombang menyapu arena. Bot terakhir bertahan menang; eliminasi serentak dapat seri.                                                         |
+| Perburuan Bergerak | Cegat target di lintasan bersiku, bercabang ulang, dan berputar. Tangkapan +1; respawn 20 tick.                                                                                |
+| Sambung Sirkuit    | Ubah saklar dan gerbang bersama, cocokkan pola, klaim kontrak +3.                                                                                                              |
+| Ekspedisi Energi   | Baterai 24; gerak memakai energi, aktivasi suar memakai lima untuk +3. Charger berbagi stok 40, pulih satu dan mengisi maksimal empat per tick.                                |
+| Jembatan Rakitan   | Kumpulkan maksimal tiga bahan, bangun bentang +2, rebut pulau +3. Setelah seluruh penanda diklaim, keluar +5 mengakhiri pertandingan.                                          |
+| Dorong Peti        | Kotak dan ruang dorong bersama; peti di tujuan terkunci dan memberi pendorong +1. Dorongan ke sudut mati ditolak.                                                              |
+| Zona Bom           | Sumbu 36 tick, jangkauan tiga, tembok kayu hancur +1, permata +2, eliminasi lawan +3. Ledakan berantai dan mengenai pemasang.                                                  |
+| Ular Arena         | Ekor menghalangi semua bot, bertambah saat makan buah +1. Buah kembali setelah 100 tick. Bot tanpa langkah aman tereliminasi.                                                  |
+| Arus Paksa         | Panah mendorong satu sampai tiga petak; es meluncurkan bot sampai keluar es atau terhalang. Token +2.                                                                          |
+| Portal Berantai    | Pemakaian portal menggeser tujuan seluruh jaringan. Nomor kecil menunjukkan identitas, nomor tengah tujuan. Token +2.                                                          |
+| Pagar Taktis       | Maksimal tiga pagar per bot, bertahan 100 tick; semua bot harus tetap bisa menjangkau setiap objektif. Token +2.                                                               |
+| Operasi Senyap     | Patroli, kerucut pandangan, semak, dokumen +3. Terlihat terus 20 tick menyebabkan tertangkap. Pengalih perhatian menghentikan penjaga dekat selama 36 tick, cooldown 100 tick. |
 
-Setiap kategori mengikuti tema kebun, gurun, hutan, salju, vulkanik, pabrik, dan luar angkasa. Level awal memperkenalkan aturan; level lanjut menambah cabang, risiko, ketergantungan tindakan, dan interaksi. Papan terbesar berisi 21 × 15 petak; puzzle peti lebih kecil agar susunannya tetap terbaca.
+Zona Bom dan Ular memberi kemenangan kepada satu-satunya bot yang bertahan; pada akhir lainnya skor menentukan pemenang. Mode skor lain memakai skor tertinggi. Satu tick = 50 ms; perburuan dan ular dibatasi 900 tick, lainnya 1.200 tick.
 
-Bot dapat saling melewati. Perebutan serentak dihitung sesudah semua tindakan pada tick yang sama dikumpulkan. Prioritas memakai hash seed, tick, objek, dan algoritma. Urutan peserta maupun status sebagai pemain tidak memberi hak atas objek. Dua bot yang membangun bentang sama hanya menghasilkan satu pembangunan dan satu pembayaran bahan. Finis kabut serentak dan skor tertinggi sama ditampilkan sebagai seri.
+Setiap kategori mempunyai tujuh tema: kebun, gurun, hutan, salju, vulkanik, pabrik dan luar angkasa. Papan memiliki ukuran serta rasio yang berbeda. Empat posisi awal tersedia; benchmark memutar posisi agar keunggulan tempat tidak disalahartikan sebagai keunggulan algoritma. Bot dapat saling melewati; ekor dan peti tetap menghalangi.
 
-## Algoritma dan simulasi
+Perebutan serentak diputuskan sesudah semua intent terkumpul, memakai hash seed, tick, objek dan algoritma. Status pemain dan urutan intent tidak memberi prioritas. Pembangunan bersama hanya membayar satu bahan; satu objektif hanya memiliki satu pemilik.
 
-Satu tick adalah 50 ms. Semua algoritma mendapat **64 operasi per tick**. Perbandingan antrean, pemeriksaan aksi, perluasan state, evaluasi, dan pemulihan rencana menggunakan anggaran. Waktu pertandingan mencakup menghitung dan bertindak. Ini model pekerjaan algoritma, bukan waktu CPU perangkat.
+## Algoritma
 
-Tindakan mempunyai durasi: langkah biasa empat tick, medan lambat enam belas, mendorong minimal delapan, membangun dua belas, saklar/klaim/pengambilan bahan empat, dan pengisian satu. Batas pertandingan 1.200 tick.
+Semua bot mendapat **64 operasi pencarian per tick** dan waktu berpikir tetap masuk waktu pertandingan. Operasi merupakan model pekerjaan pencarian, bukan waktu CPU identik: pemrosesan objek, cloning dan kebijakan objektif juga mempunyai biaya perangkat yang berbeda.
 
-- **A\*** menggunakan perkiraan yang sesuai tindakan dan biaya; **Weighted A\*** memakai bobot 1,5; **Greedy** mengutamakan perkiraan; **DFS** menelusuri cabang; **BFS** meminimalkan jumlah tindakan.
-- **Dijkstra** memakai antrean bucket untuk biaya integer dan meminimalkan biaya rencana pada domain yang diberikan.
-- **D\* Lite** menyimpan `g`, `rhs`, serta antrean berindeks. Perubahan petak dan pengisian stasiun memperbaiki bagian graph yang terdampak. Pergantian tujuan menginisialisasi pencarian baru. Pembaruan yang datang saat operasi tertunda tidak menerbitkan rencana lama.
-- **Random Walk** memakai pilihan acak berbobot, memori kunjungan, bias tujuan dan keselamatan, dengan peluang eksplorasi 15%.
-- **MCTS** memakai UCT, bias tujuan, serta rollout terarah. Batasnya 32 rollout, delapan tindakan per rollout, dan 1.024 operasi per keputusan. Pilihan awal dievaluasi dengan simulasi pendek terlebih dahulu; keputusan yang sudah jelas dapat selesai lebih cepat. Hanya rollout selesai yang memperbarui statistik.
-- **Bidirectional BFS** tersedia pada navigasi kabut dan perburuan dengan biaya seragam. Domain tindakan lain dan medan lambat menampilkan alasan ketidaktersediaannya.
+| AI                   | Implementasi dan batas                                                                                                                                |
+| -------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
+| A*                   | Biaya tindakan dan heuristic sesuai domain; gerbang, energi dan peti masuk state.                                                                     |
+| Weighted A*          | Heuristic berbobot 1,5.                                                                                                                               |
+| Greedy Best-First    | Mengutamakan heuristic.                                                                                                                               |
+| Depth-First Search   | Menjelajahi satu cabang; kualitas rute tidak dijamin.                                                                                                 |
+| Breadth-First Search | Meminimalkan jumlah tindakan, termasuk saat biaya tindakan berbeda.                                                                                   |
+| Bidirectional BFS    | Khusus Kabut dan Perburuan dengan biaya seragam; alasan ketidaktersediaan tampil di pemilih peserta.                                                  |
+| Dijkstra             | Antrean bucket biaya integer; minimum biaya pada graph perencanaan saat itu.                                                                          |
+| D* Lite              | g/rhs, indexed queue, pemakaian ulang dan perbaikan graph. Tujuan atau jaringan global berubah menyebabkan reset.                                     |
+| Random Walk          | Acak berbobot tujuan, keselamatan dan memori kunjungan, eksplorasi seragam 15%.                                                                       |
+| MCTS                 | UCT dan transisi aturan sebenarnya; maksimal 32 rollout, kedalaman delapan, 1.024 operasi per keputusan. Hanya rollout selesai memperbarui statistik. |
+| Beam Search          | Delapan kandidat per kedalaman, maksimal 192 lapisan; pemangkasan bisa membuang solusi.                                                               |
+| RTAA*                | Maksimal 24 state lokal per pencarian; heuristic dipelajari antar pencarian dengan tujuan dan graph yang sama.                                        |
+| ARA*                 | Mulai bobot 2,5, turunkan menuju satu, gunakan ulang g/OPEN/INCONS; maksimal 512 operasi tambahan setelah solusi pertama.                             |
+| Maxⁿ                 | Pencarian komitmen aksi serentak: empat kandidat sendiri, dua per lawan, vector utility setiap pemain, maksimal 2.048 operasi.                        |
+| Paranoid             | Graph keputusan yang sama, dengan respons lawan yang meminimalkan utility pemain.                                                                     |
+| Utility AI + A*      | Pemilihan objektif memakai hadiah, waktu tiba, persaingan, energi dan risiko; navigasi memakai A*.                                                    |
 
-`PlanningDomain` menghasilkan rencana tindakan eksplisit, termasuk prasyarat sumber daya, saklar, dan posisi peti. Kebijakan objektif dipakai bersama oleh bot rute. Bot energi menyisakan sembilan energi setelah aktivasi; validator memastikan setiap suar mempunyai rute kembali ke stasiun dalam anggaran itu. Bot memilih pengisian ketika perlu. Jembatan direncanakan sebagai tahap pengambilan bahan, pembangunan, dan klaim; puzzle peti memakai subtujuan dorongan yang bisa diuji lalu direncanakan ulang setelah perubahan lawan.
+Maxⁿ dan Paranoid memakai horizon terbatas pada komitmen aksi berikutnya, bukan solusi sempurna game serentak. MCTS memakai model lawan sederhana; ketiganya tetap memvalidasi aksi terhadap dunia langsung. Kabut hanya memberikan observasi yang diketahui, termasuk kepada simulasi.
 
-Aturan transisi langsung dan rollout MCTS berada di fungsi yang sama. Model lawan dalam rollout memakai tindakan legal dengan kebijakan sederhana dan seed; hasilnya merupakan perkiraan. Solver kabut hanya menerima observasi yang sudah diketahui, termasuk dalam rollout. Tidak ada akses peta tersembunyi melalui state internal bot lain.
+Transisi arus, es, portal, bom, pagar, ekor dan patroli dipakai bersama oleh engine dan simulasi. Rencana yang menjadi tidak legal karena aksi lawan dibuang. Energi menyisakan cadangan sembilan setelah aktivasi. Puzzle peti direncanakan melalui subtujuan dorongan dan diverifikasi dengan tindakan langsung.
 
-Web Worker menghitung batch maksimal delapan tick mengikuti waktu playback. Jeda menghentikan permintaan baru; langkah manual menghitung satu tick. Riwayat hanya berisi tick yang sudah dihitung. Kecepatan 0,5×–4× tidak mengubah hasil seed yang sama. Pergantian tab menjeda permainan; restart dan pergantian level membuang worker sebelumnya.
+[Evaluasi setiap AI](docs/algorithm-evaluation.md) memuat hasil dan keterbatasan; [audit perubahan map](docs/map-review.md) memuat perbandingan terhadap commit sebelumnya.
 
-## Kontrol dan progres
+## Kontrol dan penyimpanan
 
-Pilih peserta yang diamati untuk melihat pengetahuan kabut, kandidat state, dan rencananya. Statistik memisahkan operasi, ekspansi, memori, biaya tindakan, dan waktu cari/gerak. HUD menampilkan objektif serta sumber daya mode aktif.
+Web Worker menghitung maksimal delapan tick per batch playback. Jeda menghentikan permintaan, langkah manual menghitung satu tick, riwayat memuat hasil yang sudah dihitung. Kecepatan playback tidak mengubah hasil seed yang sama. Restart dan pergantian level membuang worker lama.
 
-Spasi mengatur Play/jeda; panah kiri/kanan menelusuri riwayat ketika fokus berada di luar kontrol formulir. Escape menutup dialog. Popup hasil muncul sekali per pertandingan dan dapat dibuka kembali lewat **Lihat hasil**. Suara chiptune mengikuti playback langsung; langkah manual dan pemutaran riwayat tidak mengulang efek aksi.
+Spasi: Play/jeda. Panah kiri/kanan: riwayat saat fokus di luar formulir. Escape: tutup dialog. Statistik menampilkan operasi, ekspansi, memori, biaya tindakan dan waktu cari/gerak. Fokus peserta mengubah tampilan pengetahuan kabut dan rute.
 
-Perjalanan baru memakai `grid-puzzle.progress.v5`. **Progres kategori lama dihapus**, termasuk key v1–v4 dan key demo lama. Seluruh kategori baru dimulai dari awal. Pilihan algoritma (`grid-puzzle.participants.v1`) dan suara (`grid-puzzle.audio.v1`) tetap disimpan. Storage yang diblokir memakai memori tab. Web Locks serta sinkronisasi antar-tab melindungi progres versi baru.
+Progres tetap memakai `grid-puzzle.progress.v5`, pilihan peserta `grid-puzzle.participants.v1`, suara `grid-puzzle.audio.v1`. Aturan kampanye baru memakai rulesVersion 5 sehingga metrik hasil lama dibedakan saat hasil baru disimpan. Storage yang diblokir memakai memori tab; sinkronisasi antar-tab dan Web Locks tetap tersedia.
 
-## Konten dan pemeriksaan
+## Konten dan verifikasi
 
-Grid dalam `scripts/arena-layouts.ts` ditulis per arena. `scripts/author-arenas.ts` menambahkan konfigurasi mode; JSON hanya menyimpan kondisi awal. Tidak ada jawaban, rute, hasil solver, atau rekaman pertandingan dalam katalog.
+`scripts/campaign-design.ts` membangun konten deterministik pada waktu build dari tujuh jenis arsitektur, konfigurasi kategori dan seed tetap. `scripts/author-arenas.ts` menyusun bagian. JSON berisi kondisi awal, tanpa jawaban atau rekaman pertandingan. Map tidak dibuat acak saat Play.
 
 ```sh
 npm run content:generate
@@ -65,19 +83,15 @@ npm run validate:levels
 npm test
 npm run typecheck
 npm run build
-```
-
-`content:generate` mengganti seluruh 49 level bawaan. Validator menolak bentuk jalur identik, termasuk rotasi dan pencerminan, lalu memeriksa objektif, konfigurasi sirkuit, cadangan energi, katalog, aset, dan hasil pertandingan langsung. Tes juga memverifikasi solusi peti melalui tindakan legal.
-
-Pemeriksaan tambahan:
-
-```sh
+npx tsx scripts/audit-arenas.ts
 npx tsx scripts/review-maps.ts
-npx tsx scripts/benchmark-solvers.ts --seeds=5
+npx tsx scripts/benchmark-solvers.ts --seeds=4
 npm run test:visual -- http://127.0.0.1:5173
 npm run test:participants -- http://127.0.0.1:5173
 ```
 
-Pratinjau semua map dan screenshot browser berada di `artifacts/arena-review`; pemeriksaan peserta di `artifacts/participant-review`; benchmark 980 pertandingan empat solver melawan A* dan Greedy di `artifacts/solver-review`. Angka kemenangan mencerminkan interaksi mode dan roster, bukan jaminan satu algoritma selalu lebih kuat.
+Validator memeriksa duplikat termasuk rotasi/refleksi, kemiripan setelah resize, objektif terhubung, pola sirkuit, cadangan energi, katalog, aset dan hasil simulasi. Tes memeriksa solusi peti, batas komputasi, replay deterministik, aturan bersama, dan transisi khusus setiap kategori baru.
 
-Renderer memakai PixiJS v8, atlas tema dan karakter yang tersedia, serta simbol mekanik dari GraphicsContext yang dipakai bersama. Bentuk simbol memakai grid pixel dan tidak memerlukan unduhan gambar baru. Aplikasi tetap memakai vinext, React, dan konfigurasi Cloudflare Workers proyek ini.
+Artefak lokal: `artifacts/arena-review` untuk screenshot, `artifacts/campaign-review` untuk audit, `artifacts/algorithm-audit` untuk seluruh pertandingan dan ringkasan per kategori. Persentase kemenangan tergantung roster, mode, posisi dan seed; algoritma yang lebih rumit tidak otomatis lebih kuat.
+
+Renderer memakai PixiJS v8 dengan atlas pixel art yang tersedia dan glyph GraphicsContext. Aplikasi tetap memakai React, vinext dan konfigurasi Cloudflare Workers proyek ini.

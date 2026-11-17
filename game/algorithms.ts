@@ -10,6 +10,12 @@ export const algorithms = [
   { id: "dstar-lite", name: "D* Lite", short: "D* Lite", description: "Gunakan kembali pencarian dan perbaiki state yang terdampak perubahan." },
   { id: "random", name: "Random Walk", short: "Random", description: "Langkah acak berbobot dengan memori eksplorasi, tujuan, dan keselamatan." },
   { id: "mcts", name: "Monte Carlo Tree Search", short: "MCTS", description: "Nilai tindakan melalui UCT dan simulasi aturan arena dengan rollout terarah." },
+  { id: "beam", name: "Beam Search", short: "Beam", description: "Pertahankan delapan rencana terbaik pada setiap kedalaman tindakan." },
+  { id: "rtaa", name: "Real-Time Adaptive A*", short: "RTAA*", description: "Cari maksimal 24 state, bergerak, lalu pelajari perkiraan biaya untuk pencarian berikutnya." },
+  { id: "ara", name: "Anytime Repairing A*", short: "ARA*", description: "Temukan rute berbobot, lalu perbaiki dengan memakai ulang hasil pencarian selama anggaran tersedia." },
+  { id: "maxn", name: "Maxⁿ Search", short: "Maxⁿ", description: "Simulasikan pilihan beberapa pemain dengan kepentingan skor masing-masing." },
+  { id: "paranoid", name: "Paranoid Search", short: "Paranoid", description: "Pilih tindakan yang tetap baik saat lawan berusaha memperburuk hasilmu." },
+  { id: "utility", name: "Utility AI + A*", short: "Utility", description: "Nilai hadiah, risiko, sumber daya dan persaingan objektif, lalu cari rute dengan A*." },
 ] as const;
 export type AlgorithmId = (typeof algorithms)[number]["id"];
 export const getAlgorithm = (id: AlgorithmId) => algorithms.find((a) => a.id === id)!;
@@ -23,5 +29,6 @@ export interface MatchConfig {
   player: AlgorithmId;
   opponents: AlgorithmId[];
   seed: number;
+  seatOffset?: number;
 }
 export const defaultConfig = (seed: number): MatchConfig => ({ player: "astar", opponents: ["weighted-astar", "greedy"], seed });

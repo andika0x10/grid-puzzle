@@ -1,4 +1,5 @@
 import { isWalkable, terrainCost, type GameMode, type LevelDefinition, type Point, type Terrain } from "./schema";
+import { advanceExtra, extraActions, extraBlocked, extraTerminal, forcedMove, initialExtra, resolveExtra, safeBarrier, type ExtraState } from "./extra-modes";
 export const modeInfo: Record<GameMode, { title: string; unit: string; help: string }> = {
   fog: {
     title: "Labirin Kabut",
@@ -35,6 +36,36 @@ export const modeInfo: Record<GameMode, { title: string; unit: string; help: str
     unit: "peti",
     help: "Dorong peti ke tujuan bercorak. Satu peti memberi satu poin kepada pendorongnya dan terkunci. Peti bersama bisa membantu atau mengganggu rencana lawan. Dorongan ke sudut mati ditolak.",
   },
+  bomb: {
+    title: "Zona Bom",
+    unit: "poin",
+    help: "Pasang bom dengan sumbu 1,8 detik dan ledakan tiga petak tiap arah. Tembok kayu hancur memberi satu poin, permata dua, menjatuhkan lawan tiga. Ledakan dapat berantai dan mengenai pemasangnya. Rebut permata sambil menyisakan jalur aman.",
+  },
+  snake: {
+    title: "Ular Arena",
+    unit: "buah",
+    help: "Setiap langkah meninggalkan ekor. Panjang awal tiga, bertambah setiap buah dimakan. Buah muncul kembali lima detik kemudian. Ekor semua bot menghalangi jalan; bot tanpa langkah aman tereliminasi. Kumpulkan buah dan potong jalur lawan.",
+  },
+  flow: {
+    title: "Arus Paksa",
+    unit: "poin",
+    help: "Panah mendorong satu sampai tiga petak. Es meluncurkan bot sampai keluar es atau terhalang. Satu masukan bisa memindahkan beberapa petak dan waktu gerak tetap dihitung. Rebut semua token yang tersebar, dua poin per token.",
+  },
+  portal: {
+    title: "Portal Berantai",
+    unit: "poin",
+    help: "Injak portal untuk berpindah. Setiap penggunaan menggeser pasangan seluruh portal, termasuk milik lawan. Nomor pada portal menunjukkan tujuan saat ini. Rebut token dua poin sambil menyesuaikan rute dengan jaringan yang berubah.",
+  },
+  tactical: {
+    title: "Pagar Taktis",
+    unit: "poin",
+    help: "Rebut token dua poin sambil memasang maksimal tiga pagar per bot. Pagar bertahan lima detik. Penempatan yang memutus akses bot mana pun ke objektif ditolak. Perlambat lawan dengan memaksanya mengambil jalan memutar.",
+  },
+  stealth: {
+    title: "Operasi Senyap",
+    unit: "poin",
+    help: "Rebut dokumen tiga poin di antara patroli penjaga. Kerucut pandangan ditampilkan, semak menyembunyikan bot. Terlihat terus selama satu detik menyebabkan tertangkap. Pengalih perhatian menghentikan penjaga terdekat selama 1,8 detik, pulih lima detik.",
+  },
 };
 export const isRaceMode = (m: GameMode) => m === "fog";
 export const samePoint = (a: Point, b: Point) => a.x === b.x && a.y === b.y;
@@ -61,7 +92,7 @@ export interface RuleBot extends Point {
   finishTick: number | null;
   eliminatedTick: number | null;
 }
-export type ActionKind = "move" | "wait" | "toggle" | "claim" | "charge" | "collect" | "build" | "push";
+export type ActionKind = "move" | "wait" | "toggle" | "claim" | "charge" | "collect" | "build" | "push" | "bomb" | "barrier" | "distract";
 export interface Action {
   kind: ActionKind;
   from: number;
@@ -72,7 +103,25 @@ export interface Action {
   energyAfter?: number;
 }
 export interface RuleEvent {
-  kind: "step" | "reveal" | "crack" | "collapse" | "catch" | "toggle" | "claim" | "charge" | "collect" | "build" | "push" | "dock" | "eliminated";
+  kind:
+    | "step"
+    | "reveal"
+    | "crack"
+    | "collapse"
+    | "catch"
+    | "toggle"
+    | "claim"
+    | "charge"
+    | "collect"
+    | "build"
+    | "push"
+    | "dock"
+    | "eliminated"
+    | "bomb"
+    | "explosion"
+    | "barrier"
+    | "teleport"
+    | "distract";
   botId?: string;
   cell?: number;
   object?: number;
@@ -83,6 +132,7 @@ interface BaseState {
   events: RuleEvent[];
 }
 export type ModeState =
+  | ExtraState
   | (BaseState & { mode: "fog" })
   | (BaseState & { mode: "collapse"; dangerAt: number[]; nextCollapse: number })
   | (BaseState & { mode: "hunt"; targets: { cell: number; routeIndex: number; nextMove: number; respawnAt: number; active: boolean }[] })
@@ -128,6 +178,8 @@ export function deadSquares(level: LevelDefinition) {
 }
 export function initialModeState(l: LevelDefinition): ModeState {
   const base = { revision: 0, events: [] };
+  const extra = initialExtra(l);
+  if (extra) return extra;
   switch (l.mode) {
     case "fog":
       return { ...base, mode: "fog" };
@@ -161,6 +213,8 @@ export function initialModeState(l: LevelDefinition): ModeState {
       };
     case "crates":
       return { ...base, mode: "crates", boxes: l.crates.boxes.map((p, id) => ({ id, cell: cellOf(p, l.board.width), owner: null })), deadCells: deadSquares(l) };
+    default:
+      throw Error(`Unknown mode: ${l.mode}`);
   }
 }
 export const copyModeState = (s: ModeState): ModeState => structuredClone(s);
@@ -234,6 +288,7 @@ export function advanceWorld(l: LevelDefinition, w: RuleWorld, tick: number) {
   w.tick = tick;
   const s = w.modeState;
   s.events = [];
+  advanceExtra(l, w);
   if (s.mode === "collapse" && tick >= s.nextCollapse) {
     s.nextCollapse = Infinity;
     for (let c = 0; c < s.dangerAt.length; c++) {
@@ -280,6 +335,11 @@ export function legalActions(l: LevelDefinition, w: RuleWorld, b: RuleBot): Acti
   const walk = (c: number) => isWalkable(w.terrain[c]);
   for (const to of adjacent(from, width, height)) {
     if (!walk(to)) continue;
+    if (extraBlocked(l, w, to)) continue;
+    if (l.mode === "flow" || l.mode === "portal") {
+      actions.push(forcedMove(l, w, from, to));
+      continue;
+    }
     const box = s.mode === "crates" ? s.boxes.findIndex((p) => p.cell === to) : -1;
     let kind: ActionKind = "move",
       duration = terrainCost(w.terrain[to]) * 4,
@@ -296,6 +356,7 @@ export function legalActions(l: LevelDefinition, w: RuleWorld, b: RuleBot): Acti
     if (s.mode === "collapse" && [from, to].some((c) => s.dangerAt[c] > 0 && s.dangerAt[c] <= w.tick + duration)) continue;
     actions.push({ kind, from, to, duration, ...(object === undefined ? {} : { object }) });
   }
+  actions.push(...extraActions(l, w, b));
   if (l.mode === "circuit" && s.mode === "circuit") {
     l.circuit.switches.forEach((p, i) => {
       if (cellOf(p, width) === from) actions.push({ kind: "toggle", from, to: from, duration: 4, object: i, expected: s.mask & (1 << i) ? 0 : 1 });
@@ -323,7 +384,7 @@ export function legalActions(l: LevelDefinition, w: RuleWorld, b: RuleBot): Acti
     });
     if (l.board.goal && from === cellOf(l.board.goal, width) && s.owners.every(Boolean)) actions.push({ kind: "claim", from, to: from, duration: 4, object: -1 });
   }
-  if (l.mode !== "collapse") actions.push({ kind: "wait", from, to: from, duration: 1 });
+  if (l.mode !== "collapse" && l.mode !== "snake") actions.push({ kind: "wait", from, to: from, duration: 1 });
   return actions;
 }
 export function actionEqual(a: Action, b: Action) {
@@ -350,9 +411,12 @@ export function resolveActions(l: LevelDefinition, w: RuleWorld, intents: Intent
   for (const { botId, action: a } of ranked) {
     const b = w.bots.find((v) => v.id === botId)!;
     const keys: string[] = [];
+    if (a.kind === "barrier" && !safeBarrier(l, w, a.object!)) continue;
     if (a.kind === "push") keys.push(`box:${a.object}`, `box-dest:${2 * a.to - a.from}`);
     if (["toggle", "build", "collect"].includes(a.kind)) keys.push(`${a.kind}:${a.object}`);
     if (a.kind === "claim" && a.object !== -1) keys.push(`claim:${a.object}`);
+    if (a.kind === "barrier") keys.push(`barrier:${a.object}`);
+    if (s.mode === "snake" && a.kind === "move") keys.push(`snake:${a.to}`);
     if (keys.some((k) => lock.has(k))) continue;
     for (const k of keys) lock.add(k);
     accepted.add(botId);
@@ -432,6 +496,7 @@ export function resolveActions(l: LevelDefinition, w: RuleWorld, intents: Intent
       s.events.push({ kind: "claim", botId, object: a.object });
       s.revision++;
     }
+    resolveExtra(l, w, b, a);
   }
   syncCircuit(l, w);
   settleWorld(l, w, seed);
@@ -441,7 +506,12 @@ export function settleWorld(l: LevelDefinition, w: RuleWorld, seed: number) {
   const s = w.modeState;
   for (const b of w.bots) {
     if (b.eliminatedTick !== null) continue;
-    if (l.mode === "collapse" && legalActions(l, w, b).length === 0) {
+    if (s.mode === "snake" && Object.values(s.tails).some((tail) => tail.includes(cellOf(b, l.board.width)))) {
+      b.eliminatedTick = w.tick;
+      s.events.push({ kind: "eliminated", botId: b.id });
+      continue;
+    }
+    if ((l.mode === "collapse" || l.mode === "snake") && legalActions(l, w, b).length === 0) {
       b.eliminatedTick = w.tick;
       s.events.push({ kind: "eliminated", botId: b.id });
       continue;
@@ -480,7 +550,8 @@ export function terminal(l: LevelDefinition, w: RuleWorld) {
     (l.mode === "circuit" && s.mode === "circuit" && s.contract >= l.circuit.contracts.length) ||
     (s.mode === "energy" && s.owners.every(Boolean)) ||
     (s.mode === "bridge" && w.bots.some((b) => b.finishTick !== null)) ||
-    (s.mode === "crates" && s.boxes.every((b) => b.owner !== null))
+    (s.mode === "crates" && s.boxes.every((b) => b.owner !== null)) ||
+    extraTerminal(l, w)
   );
 }
 export function ruleWinners(mode: GameMode, bots: RuleBot[], tick: number) {
@@ -489,8 +560,14 @@ export function ruleWinners(mode: GameMode, bots: RuleBot[], tick: number) {
     return Number.isFinite(best) ? bots.filter((b) => b.finishTick === best).map((b) => b.id) : [];
   }
   if (mode === "collapse") {
+    const alive = bots.filter((b) => b.eliminatedTick === null);
+    if (alive.length) return alive.map((b) => b.id);
     const best = Math.max(...bots.map((b) => b.eliminatedTick ?? tick));
     return bots.filter((b) => (b.eliminatedTick ?? tick) === best).map((b) => b.id);
+  }
+  if (mode === "snake" || mode === "bomb") {
+    const alive = bots.filter((b) => b.eliminatedTick === null);
+    if (alive.length === 1) return [alive[0].id];
   }
   const best = Math.max(...bots.map((b) => b.score));
   return best > 0 ? bots.filter((b) => b.score === best).map((b) => b.id) : [];

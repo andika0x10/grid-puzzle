@@ -15,6 +15,7 @@ import {
   type RuleWorld,
 } from "./modes";
 import type { LevelDefinition } from "./schema";
+import { blastCells, extraBlocked, guardCells } from "./extra-modes";
 export function randomSource(seed: number) {
   let state = seed >>> 0;
   return () => {
@@ -29,7 +30,8 @@ function usefulActions(l: LevelDefinition, w: RuleWorld, b: RuleBot, domain: Mod
       a.kind !== "wait" ||
       (l.mode === "hunt" && domain.target.cell === a.from) ||
       (l.mode === "bridge" && l.bridge.supplies.some((p) => cellOf(p, l.board.width) === a.from)) ||
-      (l.mode === "energy" && l.energy.chargers.some((p) => cellOf(p, l.board.width) === a.from))
+      (l.mode === "energy" && l.energy.chargers.some((p) => cellOf(p, l.board.width) === a.from)) ||
+      (a.kind === "wait" && l.mode === "stealth")
   );
 }
 export class RandomDecision extends MeteredSearch {
@@ -150,12 +152,14 @@ export class MctsDecision extends MeteredSearch {
   private *opponent(state: DecisionState, bot: RuleBot): Work<Action | undefined> {
     const actions = legalActions(this.level, state, bot).filter((a) => a.kind !== "wait");
     if (!actions.length) return undefined;
+    const ownDomain = new ModeDomain(this.level, state, bot);
+    for (let i = 0; i < ownDomain.preparation; i++) yield;
     let best = actions[0],
       value = -Infinity;
     for (const a of actions) {
       let v = -(
-        Math.abs((a.to % this.level.board.width) - (this.rootDomain.target.cell % this.level.board.width)) +
-        Math.abs(Math.floor(a.to / this.level.board.width) - Math.floor(this.rootDomain.target.cell / this.level.board.width))
+        Math.abs((a.to % this.level.board.width) - (ownDomain.target.cell % this.level.board.width)) +
+        Math.abs(Math.floor(a.to / this.level.board.width) - Math.floor(ownDomain.target.cell / this.level.board.width))
       );
       if (["claim", "build", "collect"].includes(a.kind)) v += 30;
       if (a.kind === "charge") v += bot.energy < 12 ? 40 : 1;
@@ -303,8 +307,147 @@ export class MctsDecision extends MeteredSearch {
       this.completedRollouts++;
       if (this.root.untried?.length === 0 && this.root.children.every((c) => c.visits > 0)) {
         const ranked = [...this.root.children].sort((a, b) => b.value / b.visits - a.value / a.visits);
-        if (ranked.length === 1 || ranked[0].value / ranked[0].visits - ranked[1].value / ranked[1].visits > 0.01 || this.completedRollouts >= 12) break;
+        if (ranked.length <= 1 || ranked[0].value / ranked[0].visits - ranked[1].value / ranked[1].visits > 0.01 || this.completedRollouts >= 12) break;
       }
+    }
+    yield* this.finish();
+  }
+}
+
+/** Depth-limited multiplayer search over simultaneous commitments. Opponents
+ * choose for their own utility (Max-n) or minimize the root utility (Paranoid).
+ * Existing actions retain their remaining duration in every simulated tick. */
+export class MultiplayerDecision extends MeteredSearch {
+  private best: Action | null = null;
+  private finishing = false;
+  private actorId: string;
+  private rootDomain: ModeDomain;
+  private rootValues = new Map<Action, number>();
+  constructor(
+    private level: LevelDefinition,
+    private state: DecisionState,
+    actor: RuleBot,
+    private seed: number,
+    private paranoid: boolean,
+    private visits: ReadonlyMap<number, number>
+  ) {
+    super();
+    this.actorId = actor.id;
+    this.rootDomain = new ModeDomain(level, state, actor, visits);
+  }
+  frontier() {
+    return [...this.rootValues.keys()].map((a) => a.to);
+  }
+  advance(budget: number) {
+    if (!Number.isFinite(budget) || budget < 0) throw Error("Anggaran harus berupa angka nonnegatif.");
+    let used = super.advance(Math.min(Math.floor(budget), Math.max(0, 2016 - this.operations)));
+    if (!this.done && this.operations >= 2016 && !this.finishing) {
+      this.work = this.finish();
+      this.finishing = true;
+    }
+    if (this.finishing && used < budget) used += super.advance(Math.floor(budget) - used);
+    return used;
+  }
+  private *options(w: DecisionState, b: RuleBot, count: number): Work<Action[]> {
+    const domain = new ModeDomain(this.level, w, b, b.id === this.actorId ? this.visits : new Map());
+    for (let i = 0; i < domain.preparation; i++) yield;
+    const edges = yield* domain.successors(domain.start),
+      actions = usefulActions(this.level, w, b, domain);
+    const score = (a: Action) => {
+      const next = edges.find((e) => actionEqual(e.action, a))?.state ?? domain.start;
+      let value = domain.utility(next);
+      if (["claim", "build", "collect"].includes(a.kind)) value += 3;
+      if (a.kind === "distract" && guardCells(this.level, w).has(a.from)) value += 2;
+      if (a.kind === "bomb" && w.modeState.mode === "bomb") {
+        const cells = blastCells(this.level, w, a.from);
+        value += cells.filter((c) => w.modeState.mode === "bomb" && w.modeState.wood.includes(c)).length * 0.5 - 0.3;
+      }
+      if (a.kind === "barrier") value -= 0.15;
+      if (a.kind === "wait") value -= 0.2;
+      return value;
+    };
+    const ranked = actions.map((a) => ({ a, value: score(a) }));
+    for (let i = 0; i < ranked.length; i++) yield;
+    ranked.sort((a, b) => b.value - a.value);
+    return ranked.slice(0, count).map((v) => v.a);
+  }
+  private *simulate(intents: Intent[]): Work<number[]> {
+    const w: DecisionState = { ...cloneWorld(this.state), tasks: structuredClone(this.state.tasks ?? {}) };
+    for (const i of intents) if (!w.tasks![i.botId]) w.tasks![i.botId] = { action: i.action, remaining: i.action.duration };
+    const duration = Math.max(1, ...Object.values(w.tasks!).map((t) => t.remaining));
+    for (let tick = 0; tick < duration && !terminal(this.level, w); tick++) {
+      advanceWorld(this.level, w, w.tick + 1);
+      const completed: Intent[] = [];
+      for (const b of w.bots) {
+        const task = w.tasks![b.id];
+        if (task && --task.remaining <= 0) {
+          completed.push({ botId: b.id, action: task.action });
+          delete w.tasks![b.id];
+        }
+        yield;
+      }
+      resolveActions(this.level, w, completed, this.seed);
+      yield;
+    }
+    this.expanded++;
+    const sight = guardCells(this.level, w),
+      values: number[] = [];
+    for (const b of w.bots) {
+      if (b.eliminatedTick !== null) values.push(-1000);
+      else {
+        const d =
+          b.id === this.actorId
+            ? this.rootDomain
+            : new ModeDomain(
+                this.level,
+                this.state,
+                this.state.bots.find((v) => v.id === b.id)!
+              );
+        const start = { ...d.start, cell: cellOf(b, this.level.board.width), energy: this.level.mode === "energy" ? b.energy : 0, inventory: b.inventory };
+        values.push(
+          b.score * 20 + (b.finishTick !== null ? 500 : 0) + d.utility(start) * 8 - (sight.has(start.cell) ? 4 : 0) - (extraBlocked(this.level, w, start.cell, 24) ? 12 : 0)
+        );
+      }
+      yield;
+    }
+    return values;
+  }
+  private *responses(players: { bot: RuleBot; options: Action[] }[], index: number, intents: Intent[]): Work<number[]> {
+    if (index >= players.length) return yield* this.simulate(intents);
+    const p = players[index],
+      actorIndex = this.state.bots.findIndex((b) => b.id === p.bot.id),
+      root = this.state.bots.findIndex((b) => b.id === this.actorId);
+    let chosen: number[] | null = null;
+    for (const a of p.options) {
+      const result = yield* this.responses(players, index + 1, [...intents, { botId: p.bot.id, action: a }]);
+      if (!chosen || (this.paranoid ? result[root] < chosen[root] : result[actorIndex] > chosen[actorIndex])) chosen = result;
+      yield;
+    }
+    return chosen ?? (yield* this.simulate(intents));
+  }
+  private *finish(): Work {
+    yield* this.complete(this.best ? [this.best] : null, this.level.board.width, this.rootDomain.start.cell);
+  }
+  protected *run(): Work {
+    const actor = this.state.bots.find((b) => b.id === this.actorId)!,
+      root = this.state.bots.indexOf(actor);
+    const options = yield* this.options(this.state, actor, 4);
+    this.best = options[0] ?? null;
+    const opponents: { bot: RuleBot; options: Action[] }[] = [];
+    for (const b of this.state.bots)
+      if (b.id !== actor.id && b.eliminatedTick === null && !this.state.tasks?.[b.id]) opponents.push({ bot: b, options: yield* this.options(this.state, b, 2) });
+    let bestValue = -Infinity;
+    for (const a of options) {
+      const values = yield* this.responses(opponents, 0, [{ botId: actor.id, action: a }]);
+      const value = values[root] - Math.max(...values.filter((_, i) => i !== root), 0) * 0.25;
+      this.rootValues.set(a, value);
+      if (value > bestValue) {
+        bestValue = value;
+        this.best = a;
+      }
+      this.visited.add(a.to);
+      this.memory = Math.max(this.memory, this.state.terrain.length * (opponents.length + 2));
+      yield;
     }
     yield* this.finish();
   }

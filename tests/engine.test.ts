@@ -7,11 +7,11 @@ import { SEARCH_OPERATIONS_PER_TICK } from "../game/search";
 import { isWalkable } from "../game/schema";
 import { fixture, LocalWorker } from "./fixtures";
 describe("new live campaign", () => {
-  it("contains seven replacement games, 49 levels and ten algorithms", () => {
-    expect(levels).toHaveLength(49);
-    expect(sections).toHaveLength(7);
-    expect(new Set(algorithms.map((a) => a.id)).size).toBe(10);
-    expect(levels.every((l) => l.schemaVersion === 4 && l.rulesVersion === 4)).toBe(true);
+  it("contains 13 games, 91 rebuilt levels and 16 algorithms", () => {
+    expect(levels).toHaveLength(91);
+    expect(sections).toHaveLength(13);
+    expect(new Set(algorithms.map((a) => a.id)).size).toBe(16);
+    expect(levels.every((l) => l.schemaVersion === 5 && l.rulesVersion === 5)).toBe(true);
   });
   for (const level of levels)
     it(`${level.id} completes legally and deterministically`, () => {

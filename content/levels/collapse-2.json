@@ -1,18 +1,18 @@
 {
-  "schemaVersion": 4,
-  "rulesVersion": 4,
+  "schemaVersion": 5,
+  "rulesVersion": 5,
   "id": "collapse-2",
   "sectionId": "collapse",
   "order": 2,
-  "title": "Putaran retak",
-  "mission": "Cari pijakan dan bertahan paling lama.",
-  "briefing": "Retakan dari bot lain ikut memutus jalanmu. Perhatikan hitung mundur dan sisakan beberapa jalur pelarian sebelum gelombang berikutnya.",
+  "title": "Suaka berlapis",
+  "mission": "Lantai runtuh 24 tick setelah ditinggalkan.",
+  "briefing": "Gugus ruang. Lantai runtuh 24 tick setelah ditinggalkan. Gelombang keruntuhan juga menyapu arena. Spawn terlindungi delapan detik. Terus bergerak dan bertahan paling lama; bot tanpa pijakan lanjutan tereliminasi. Retakan berlaku untuk semua bot.",
   "theme": "desert",
-  "seed": 42002,
+  "seed": 1032651,
   "timeLimit": 1200,
   "board": {
-    "width": 13,
-    "height": 9,
+    "width": 11,
+    "height": 17,
     "terrain": [
       "wall",
       "wall",
@@ -26,6 +26,136 @@
       "wall",
       "wall",
       "wall",
+      "path",
+      "ground",
+      "ground",
+      "path",
+      "wall",
+      "wall",
+      "ground",
+      "ground",
+      "ground",
+      "wall",
+      "wall",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "wall",
+      "wall",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "wall",
+      "wall",
+      "ground",
+      "ground",
+      "ground",
+      "wall",
+      "wall",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "wall",
+      "wall",
+      "ground",
+      "ground",
+      "ground",
+      "wall",
+      "wall",
+      "wall",
+      "ground",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "ground",
+      "wall",
+      "wall",
+      "wall",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "wall",
+      "wall",
+      "ground",
+      "ground",
+      "ground",
+      "wall",
+      "wall",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "wall",
+      "wall",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "path",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "wall",
+      "wall",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "wall",
+      "wall",
+      "ground",
+      "ground",
+      "ground",
+      "wall",
+      "wall",
+      "wall",
+      "ground",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "ground",
+      "wall",
+      "wall",
+      "wall",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "wall",
+      "ground",
+      "ground",
+      "ground",
+      "wall",
+      "wall",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
       "wall",
       "wall",
       "ground",
@@ -37,73 +167,6 @@
       "ground",
       "ground",
       "ground",
-      "ground",
-      "ground",
-      "wall",
-      "wall",
-      "ground",
-      "wall",
-      "wall",
-      "wall",
-      "ground",
-      "wall",
-      "ground",
-      "wall",
-      "wall",
-      "wall",
-      "ground",
-      "wall",
-      "wall",
-      "ground",
-      "wall",
-      "ground",
-      "ground",
-      "ground",
-      "ground",
-      "ground",
-      "ground",
-      "ground",
-      "wall",
-      "ground",
-      "wall",
-      "wall",
-      "ground",
-      "wall",
-      "ground",
-      "wall",
-      "wall",
-      "wall",
-      "wall",
-      "wall",
-      "ground",
-      "wall",
-      "ground",
-      "wall",
-      "wall",
-      "ground",
-      "ground",
-      "ground",
-      "wall",
-      "ground",
-      "ground",
-      "ground",
-      "wall",
-      "ground",
-      "ground",
-      "ground",
-      "wall",
-      "wall",
-      "wall",
-      "wall",
-      "ground",
-      "wall",
-      "ground",
-      "wall",
-      "ground",
-      "wall",
-      "ground",
-      "wall",
-      "wall",
       "wall",
       "wall",
       "path",
@@ -115,8 +178,15 @@
       "ground",
       "ground",
       "ground",
-      "ground",
-      "ground",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
       "wall",
       "wall",
       "wall",
@@ -134,16 +204,34 @@
     ],
     "spawn": {
       "x": 1,
-      "y": 7
+      "y": 1
     },
+    "spawns": [
+      {
+        "x": 1,
+        "y": 1
+      },
+      {
+        "x": 1,
+        "y": 14
+      },
+      {
+        "x": 5,
+        "y": 8
+      },
+      {
+        "x": 4,
+        "y": 1
+      }
+    ],
     "decorations": [
       {
         "x": 0,
         "y": 0
       },
       {
-        "x": 12,
-        "y": 8
+        "x": 10,
+        "y": 16
       }
     ]
   },
@@ -160,10 +248,6 @@
             "y": 1
           },
           {
-            "x": 2,
-            "y": 1
-          },
-          {
             "x": 1,
             "y": 2
           },
@@ -177,19 +261,35 @@
           },
           {
             "x": 1,
-            "y": 5
-          },
-          {
-            "x": 2,
-            "y": 5
+            "y": 6
           },
           {
             "x": 1,
             "y": 7
           },
           {
-            "x": 2,
-            "y": 7
+            "x": 1,
+            "y": 8
+          },
+          {
+            "x": 1,
+            "y": 9
+          },
+          {
+            "x": 1,
+            "y": 11
+          },
+          {
+            "x": 1,
+            "y": 12
+          },
+          {
+            "x": 1,
+            "y": 13
+          },
+          {
+            "x": 1,
+            "y": 14
           }
         ]
       },
@@ -197,28 +297,60 @@
         "tick": 280,
         "cells": [
           {
-            "x": 3,
+            "x": 2,
             "y": 1
           },
           {
-            "x": 3,
+            "x": 2,
+            "y": 2
+          },
+          {
+            "x": 2,
             "y": 3
           },
           {
-            "x": 3,
+            "x": 2,
             "y": 4
           },
           {
-            "x": 3,
+            "x": 2,
             "y": 5
           },
           {
-            "x": 3,
+            "x": 2,
             "y": 6
           },
           {
-            "x": 3,
+            "x": 2,
             "y": 7
+          },
+          {
+            "x": 2,
+            "y": 8
+          },
+          {
+            "x": 2,
+            "y": 9
+          },
+          {
+            "x": 2,
+            "y": 10
+          },
+          {
+            "x": 2,
+            "y": 11
+          },
+          {
+            "x": 2,
+            "y": 12
+          },
+          {
+            "x": 2,
+            "y": 13
+          },
+          {
+            "x": 2,
+            "y": 14
           }
         ]
       },
@@ -226,16 +358,100 @@
         "tick": 400,
         "cells": [
           {
+            "x": 3,
+            "y": 1
+          },
+          {
             "x": 4,
             "y": 1
+          },
+          {
+            "x": 3,
+            "y": 2
+          },
+          {
+            "x": 4,
+            "y": 2
+          },
+          {
+            "x": 3,
+            "y": 3
           },
           {
             "x": 4,
             "y": 3
           },
           {
+            "x": 3,
+            "y": 4
+          },
+          {
+            "x": 4,
+            "y": 4
+          },
+          {
+            "x": 3,
+            "y": 6
+          },
+          {
+            "x": 4,
+            "y": 6
+          },
+          {
+            "x": 3,
+            "y": 7
+          },
+          {
             "x": 4,
             "y": 7
+          },
+          {
+            "x": 3,
+            "y": 8
+          },
+          {
+            "x": 4,
+            "y": 8
+          },
+          {
+            "x": 3,
+            "y": 9
+          },
+          {
+            "x": 4,
+            "y": 9
+          },
+          {
+            "x": 3,
+            "y": 11
+          },
+          {
+            "x": 4,
+            "y": 11
+          },
+          {
+            "x": 3,
+            "y": 12
+          },
+          {
+            "x": 4,
+            "y": 12
+          },
+          {
+            "x": 3,
+            "y": 13
+          },
+          {
+            "x": 4,
+            "y": 13
+          },
+          {
+            "x": 3,
+            "y": 14
+          },
+          {
+            "x": 4,
+            "y": 14
           }
         ]
       },
@@ -244,27 +460,31 @@
         "cells": [
           {
             "x": 5,
-            "y": 1
-          },
-          {
-            "x": 5,
             "y": 2
           },
           {
             "x": 5,
-            "y": 3
-          },
-          {
-            "x": 5,
-            "y": 5
-          },
-          {
-            "x": 5,
-            "y": 6
-          },
-          {
-            "x": 5,
             "y": 7
+          },
+          {
+            "x": 5,
+            "y": 8
+          },
+          {
+            "x": 5,
+            "y": 11
+          },
+          {
+            "x": 5,
+            "y": 12
+          },
+          {
+            "x": 5,
+            "y": 13
+          },
+          {
+            "x": 5,
+            "y": 14
           }
         ]
       },
@@ -272,36 +492,20 @@
         "tick": 640,
         "cells": [
           {
-            "x": 7,
-            "y": 1
-          },
-          {
-            "x": 7,
+            "x": 6,
             "y": 2
           },
           {
             "x": 6,
-            "y": 3
-          },
-          {
-            "x": 7,
-            "y": 3
+            "y": 7
           },
           {
             "x": 6,
-            "y": 5
+            "y": 8
           },
           {
-            "x": 7,
-            "y": 5
-          },
-          {
-            "x": 7,
-            "y": 6
-          },
-          {
-            "x": 7,
-            "y": 7
+            "x": 6,
+            "y": 12
           }
         ]
       },
@@ -309,16 +513,108 @@
         "tick": 760,
         "cells": [
           {
+            "x": 7,
+            "y": 1
+          },
+          {
             "x": 8,
             "y": 1
+          },
+          {
+            "x": 7,
+            "y": 2
+          },
+          {
+            "x": 8,
+            "y": 2
+          },
+          {
+            "x": 7,
+            "y": 3
           },
           {
             "x": 8,
             "y": 3
           },
           {
+            "x": 7,
+            "y": 4
+          },
+          {
+            "x": 8,
+            "y": 4
+          },
+          {
+            "x": 8,
+            "y": 5
+          },
+          {
+            "x": 7,
+            "y": 6
+          },
+          {
+            "x": 8,
+            "y": 6
+          },
+          {
+            "x": 7,
+            "y": 7
+          },
+          {
             "x": 8,
             "y": 7
+          },
+          {
+            "x": 7,
+            "y": 8
+          },
+          {
+            "x": 8,
+            "y": 8
+          },
+          {
+            "x": 7,
+            "y": 9
+          },
+          {
+            "x": 8,
+            "y": 9
+          },
+          {
+            "x": 8,
+            "y": 10
+          },
+          {
+            "x": 7,
+            "y": 11
+          },
+          {
+            "x": 8,
+            "y": 11
+          },
+          {
+            "x": 7,
+            "y": 12
+          },
+          {
+            "x": 8,
+            "y": 12
+          },
+          {
+            "x": 7,
+            "y": 13
+          },
+          {
+            "x": 8,
+            "y": 13
+          },
+          {
+            "x": 7,
+            "y": 14
+          },
+          {
+            "x": 8,
+            "y": 14
           }
         ]
       },
@@ -331,15 +627,15 @@
           },
           {
             "x": 9,
+            "y": 2
+          },
+          {
+            "x": 9,
             "y": 3
           },
           {
             "x": 9,
             "y": 4
-          },
-          {
-            "x": 9,
-            "y": 5
           },
           {
             "x": 9,
@@ -348,52 +644,30 @@
           {
             "x": 9,
             "y": 7
-          }
-        ]
-      },
-      {
-        "tick": 1000,
-        "cells": [
-          {
-            "x": 10,
-            "y": 1
           },
           {
-            "x": 10,
-            "y": 5
+            "x": 9,
+            "y": 8
           },
           {
-            "x": 10,
-            "y": 7
-          }
-        ]
-      },
-      {
-        "tick": 1120,
-        "cells": [
-          {
-            "x": 11,
-            "y": 1
+            "x": 9,
+            "y": 9
           },
           {
-            "x": 11,
-            "y": 2
+            "x": 9,
+            "y": 11
           },
           {
-            "x": 11,
-            "y": 3
+            "x": 9,
+            "y": 12
           },
           {
-            "x": 11,
-            "y": 4
+            "x": 9,
+            "y": 13
           },
           {
-            "x": 11,
-            "y": 5
-          },
-          {
-            "x": 11,
-            "y": 7
+            "x": 9,
+            "y": 14
           }
         ]
       }

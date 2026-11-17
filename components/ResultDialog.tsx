@@ -36,12 +36,14 @@ export default function ResultDialog({
   const winners = frame.bots.filter((b) => frame.winners.includes(b.id));
   const playerWon = frame.winners.includes(player.id);
   const winnerNames = winners.map((b) => getAlgorithm(b.algorithm).name).join(" dan ");
-  const ordered = [...frame.bots].sort((a, b) =>
-    isRaceMode(mode)
-      ? (a.finishTick ?? Infinity) - (b.finishTick ?? Infinity)
-      : mode === "collapse"
-        ? (b.eliminatedTick ?? frame.tick) - (a.eliminatedTick ?? frame.tick)
-        : b.score - a.score
+  const ordered = [...frame.bots].sort(
+    (a, b) =>
+      Number(frame.winners.includes(b.id)) - Number(frame.winners.includes(a.id)) ||
+      (isRaceMode(mode)
+        ? (a.finishTick ?? Infinity) - (b.finishTick ?? Infinity)
+        : mode === "collapse"
+          ? (b.eliminatedTick ?? frame.tick) - (a.eliminatedTick ?? frame.tick)
+          : b.score - a.score)
   );
   const outcome =
     winners.length === 0

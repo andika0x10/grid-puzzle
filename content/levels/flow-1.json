@@ -1,0 +1,271 @@
+{
+  "schemaVersion": 5,
+  "rulesVersion": 5,
+  "id": "flow-1",
+  "sectionId": "flow",
+  "order": 1,
+  "title": "Belok setelah es",
+  "mission": "Panah mendorong satu sampai tiga petak.",
+  "briefing": "Cincin bersimpang. Panah mendorong satu sampai tiga petak. Es meluncurkan bot sampai keluar es atau terhalang. Satu masukan bisa memindahkan beberapa petak dan waktu gerak tetap dihitung. Rebut semua token yang tersebar, dua poin per token.",
+  "theme": "farm",
+  "seed": 991274,
+  "timeLimit": 1200,
+  "board": {
+    "width": 13,
+    "height": 11,
+    "terrain": [
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "path",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "path",
+      "wall",
+      "wall",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "wall",
+      "wall",
+      "ground",
+      "ground",
+      "wall",
+      "wall",
+      "wall",
+      "ground",
+      "wall",
+      "wall",
+      "wall",
+      "ground",
+      "ground",
+      "wall",
+      "wall",
+      "ground",
+      "ground",
+      "wall",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "wall",
+      "ground",
+      "ground",
+      "wall",
+      "wall",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "wall",
+      "ground",
+      "path",
+      "wall",
+      "wall",
+      "ground",
+      "ground",
+      "wall",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "wall",
+      "wall",
+      "ground",
+      "ground",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "ground",
+      "ground",
+      "wall",
+      "wall",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "wall",
+      "wall",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "path",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall"
+    ],
+    "spawn": {
+      "x": 6,
+      "y": 1
+    },
+    "spawns": [
+      {
+        "x": 6,
+        "y": 1
+      },
+      {
+        "x": 11,
+        "y": 9
+      },
+      {
+        "x": 11,
+        "y": 1
+      },
+      {
+        "x": 11,
+        "y": 5
+      }
+    ],
+    "decorations": [
+      {
+        "x": 0,
+        "y": 0
+      },
+      {
+        "x": 12,
+        "y": 10
+      }
+    ]
+  },
+  "mode": "flow",
+  "flow": {
+    "currents": [
+      {
+        "x": 1,
+        "y": 5,
+        "dx": 1,
+        "dy": 0,
+        "distance": 1
+      },
+      {
+        "x": 4,
+        "y": 9,
+        "dx": 0,
+        "dy": 1,
+        "distance": 2
+      },
+      {
+        "x": 6,
+        "y": 6,
+        "dx": -1,
+        "dy": 0,
+        "distance": 3
+      },
+      {
+        "x": 2,
+        "y": 1,
+        "dx": 0,
+        "dy": -1,
+        "distance": 1
+      }
+    ],
+    "ice": [
+      {
+        "x": 8,
+        "y": 8
+      },
+      {
+        "x": 9,
+        "y": 8
+      },
+      {
+        "x": 10,
+        "y": 8
+      },
+      {
+        "x": 2,
+        "y": 8
+      },
+      {
+        "x": 3,
+        "y": 8
+      },
+      {
+        "x": 4,
+        "y": 8
+      }
+    ],
+    "tokens": [
+      {
+        "x": 7,
+        "y": 4
+      },
+      {
+        "x": 8,
+        "y": 2
+      },
+      {
+        "x": 4,
+        "y": 2
+      },
+      {
+        "x": 10,
+        "y": 7
+      }
+    ]
+  }
+}

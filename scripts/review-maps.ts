@@ -1,16 +1,17 @@
 import fs from "node:fs/promises";
 import sharp from "sharp";
 import { levels, sections } from "../game/provider";
+import { extraTokens } from "../game/extra-modes";
 import { cellOf } from "../game/modes";
 import { layoutFingerprint } from "./level-checks";
 const boxWidth = 224,
   boxHeight = 186,
   width = boxWidth * 7,
-  height = boxHeight * 7 + 52;
+  height = boxHeight * sections.length + 52;
 const colors = { ground: "#c7d8a0", path: "#b8d38b", slow: "#b49570", wall: "#344b43", water: "#83bdce", "bridge-h": "#e2b979", "bridge-v": "#e2b979" };
 const escape = (s: string) => s.replaceAll("&", "&amp;").replaceAll("<", "&lt;");
 const items: string[] = [
-  `<rect width="${width}" height="${height}" fill="#fff"/><text x="12" y="23" font-size="18" font-weight="700">49 arena · ${new Set(levels.map(layoutFingerprint)).size} topologi unik · 7 permainan baru</text><text x="12" y="42" font-size="11" fill="#52616a">Peta authoring penuh. S: spawn, G: keluar, C: pengisian, E: suar, P: bahan, M: pulau, B: peti, D: tujuan, T: terminal.</text>`,
+  `<rect width="${width}" height="${height}" fill="#fff"/><text x="12" y="23" font-size="18" font-weight="700">${levels.length} arena · ${new Set(levels.map(layoutFingerprint)).size} topologi unik · ${sections.length} permainan</text><text x="12" y="42" font-size="11" fill="#52616a">Peta authoring penuh. S: spawn, G: keluar, C: pengisian, E: suar, P: bahan, M: pulau, B: peti, D: tujuan, T: terminal.</text>`,
 ];
 for (const l of levels) {
   const x = (l.order - 1) * boxWidth,
@@ -28,7 +29,11 @@ for (const l of levels) {
     items.push(
       `<rect x="${mx + (cell % l.board.width) * size + 0.5}" y="${my + Math.floor(cell / l.board.width) * size + 0.5}" width="${size - 1}" height="${size - 1}" fill="${color}"/><text text-anchor="middle" x="${mx + ((cell % l.board.width) + 0.5) * size}" y="${my + (Math.floor(cell / l.board.width) + 0.82) * size}" font-size="${size * 0.85}" font-weight="700" fill="#172c2d">${symbol}</text>`
     );
-  label(cellOf(l.board.spawn, l.board.width), "S", "#7edb4b");
+  for (const [i, p] of (l.board.spawns ?? [l.board.spawn]).entries()) label(cellOf(p, l.board.width), String(i + 1), "#7edb4b");
+  for (const p of extraTokens(l)) label(cellOf(p, l.board.width), "*", "#ffdd77");
+  if (l.mode === "portal") for (const [i, p] of l.portal.pads.entries()) label(cellOf(p, l.board.width), String(i + 1), "#c4a5ef");
+  if (l.mode === "flow") for (const p of l.flow.currents) label(cellOf(p, l.board.width), p.dx > 0 ? "→" : p.dx < 0 ? "←" : p.dy > 0 ? "↓" : "↑", "#8ed8e5");
+  if (l.mode === "stealth") for (const g of l.stealth.guards) for (const p of g.route) label(cellOf(p, l.board.width), "·", "#e9ad84");
   if (l.board.goal) label(cellOf(l.board.goal, l.board.width), "G");
   if (l.mode === "hunt") l.hunt.targets.forEach((t, i) => t.route.forEach((p, n) => label(cellOf(p, l.board.width), n === 0 ? String(i + 1) : "·", "#ffdc7b")));
   if (l.mode === "circuit") {

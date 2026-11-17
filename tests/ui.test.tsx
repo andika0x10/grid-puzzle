@@ -55,16 +55,30 @@ function unlockLevels() {
   );
 }
 describe("penjelajah arena interface", () => {
+  it("lists a surviving winner before eliminated rivals with more points", () => {
+    const frame = previewFrame(getLevel("snake-1")!, defaultConfig(1));
+    frame.phase = "finished";
+    frame.tick = 100;
+    frame.winners = ["bot-2"];
+    frame.bots[0].score = 9;
+    frame.bots[0].eliminatedTick = 100;
+    frame.bots[1].score = 8;
+    frame.bots[1].eliminatedTick = 100;
+    render(<ResultDialog frame={frame} mode="snake" onClose={() => {}} onReplay={() => {}} onSettings={() => {}} nextHref={null} saved />);
+    const entries = within(screen.getByRole("list", { name: "Hasil peserta" })).getAllByRole("listitem");
+    expect(entries[0].textContent).toContain("Greedy Best-First");
+    expect(entries[0].textContent).toContain("Pemenang");
+  });
   it("uses a human portrait for each world on the level selection screen", () => {
     const { container } = render(<Home />);
-    for (const theme of themeIds) expect(container.querySelectorAll(`.world-character[src="${characterPortrait(theme)}"]`)).toHaveLength(7);
+    for (const theme of themeIds) expect(container.querySelectorAll(`.world-character[src="${characterPortrait(theme)}"]`)).toHaveLength(sections.length);
     expect(container.querySelector('img[src*="robot"]')).toBeNull();
   });
-  it("shows seven categories and seven themes, with progression", async () => {
+  it("shows all categories and seven themes, with progression", async () => {
     render(<Home />);
     expect(await screen.findByRole("link", { name: /Level 1 Simpang pertama/ })).toBeTruthy();
     expect(screen.getByRole("heading", { name: "Perburuan Bergerak" })).toBeTruthy();
-    expect(screen.getAllByText("Luar angkasa")).toHaveLength(7);
+    expect(screen.getAllByText("Luar angkasa")).toHaveLength(sections.length);
     expect(screen.queryByRole("link", { name: /Ruang tersembunyi/ })).toBeNull();
   });
   it("opens the roster automatically and saves without starting a worker", async () => {

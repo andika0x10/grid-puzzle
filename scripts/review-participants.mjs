@@ -11,7 +11,7 @@ const browser = await chromium.launch({ headless: true, args: ["--enable-unsafe-
 const errors = [],
   checks = [];
 await fs.mkdir(output, { recursive: true });
-const modes = ["fog-1", "collapse-1", "hunt-1", "circuit-1", "energy-1", "bridge-7", "crates-1"];
+const modes = catalog.sections.map((s) => `${s.id}-1`);
 const sizes = [
   [320, 568],
   [390, 844],
@@ -24,8 +24,17 @@ async function check(page, name, stress = false) {
   const entries = await assertParticipantLayout(page, name);
   assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true, `${name}: page overflows`);
   const board = await page.locator(".board-wrap").boundingBox(),
-    dock = await page.locator(".match-dock").boundingBox();
-  assert.ok(board.height >= 100 && board.y + board.height <= dock.y + 1, `${name}: board hidden by participant strip`);
+    dock = await page.locator(".match-dock").boundingBox(),
+    strip = await page.locator(".participant-strip").boundingBox();
+  assert.ok(board.height >= 100 && board.y >= strip.y + strip.height, `${name}: board overlaps participant strip`);
+  await page.locator(".match-main").evaluate((main) => {
+    main.scrollTop = main.scrollHeight;
+  });
+  const reachable = await page.locator(".board-wrap").boundingBox();
+  assert.ok(reachable.y + reachable.height <= dock.y + 1, `${name}: board cannot be reached above controls`);
+  await page.locator(".match-main").evaluate((main) => {
+    main.scrollTop = 0;
+  });
   checks.push({ name, stress, participants: entries.length });
   if (!stress) await page.locator(".participant-strip").screenshot({ path: `${output}/${name}.png` });
 }
@@ -72,14 +81,14 @@ try {
     await roster.waitFor();
     for (const checkbox of await roster.getByRole("checkbox").all()) if (await checkbox.isChecked()) await checkbox.uncheck();
     await roster.getByRole("radio", { name: "Gunakan Dijkstra", exact: true }).check();
-    for (const name of ["D* Lite", "Monte Carlo Tree Search", "Breadth-First Search"]) await roster.getByRole("checkbox", { name: `Lawan ${name}`, exact: true }).check();
+    for (const name of ["Paranoid Search", "Utility AI + A*", "Real-Time Adaptive A*"]) await roster.getByRole("checkbox", { name: `Lawan ${name}`, exact: true }).check();
     await roster.getByRole("button", { name: "Save", exact: true }).click();
     await page.getByText("Menyiapkan arena…", { exact: true }).waitFor({ state: "hidden" });
     await check(page, `long-names-${width}`);
     await context.close();
   }
   assert.deepEqual(errors, []);
-  console.log(`Passed ${checks.length} participant layout checks: 7 modes, 6 viewports, 2–4 bots, energy and building materials, long names and stress values.`);
+  console.log(`Passed ${checks.length} participant layout checks: 13 modes, 6 viewports, 2–4 bots, energy and building materials, long names and stress values.`);
 } finally {
   await fs.writeFile(`${output}/findings.json`, JSON.stringify({ errors, checks }, null, 2));
   await browser.close();

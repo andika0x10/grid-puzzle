@@ -4,7 +4,7 @@ import { themeIds } from "../game/themes";
 import { cellOf } from "../game/modes";
 import { MatchEngine } from "../game/engine";
 import { defaultConfig } from "../game/algorithms";
-import { layoutFingerprint, objectivePoints, reachableCells, circuitReachable, weightedDistances } from "./level-checks";
+import { layoutFingerprint, layoutSimilarity, objectivePoints, reachableCells, circuitReachable, weightedDistances } from "./level-checks";
 function ensure(ok: unknown, message: string): asserts ok {
   if (!ok) throw new Error(message);
 }
@@ -12,13 +12,14 @@ const read = async (p: string) => JSON.parse(await fs.readFile(p, "utf8"));
 const sections: SectionDefinition[] = (await read("content/sections.json")).map((s: unknown) => sectionSchema.parse(s));
 const files = (await fs.readdir("content/levels")).filter((f) => f.endsWith(".json"));
 const levels = await Promise.all(files.map(async (f) => levelSchema.parse(await read(`content/levels/${f}`))));
-ensure(levels.length === 49 && sections.length === 7, "Expected seven new games and 49 arenas");
-ensure(new Set(levels.map((l) => l.id)).size === 49, "Duplicate IDs");
+ensure(levels.length === gameModes.length * 7 && sections.length === gameModes.length, "Expected 13 games and 91 arenas");
+ensure(new Set(levels.map((l) => l.id)).size === levels.length, "Duplicate IDs");
 const fingerprints = new Map<string, string>();
 for (const l of levels) {
   const fp = layoutFingerprint(l);
   ensure(!fingerprints.has(fp), `Repeated topology: ${l.id} / ${fingerprints.get(fp)}`);
   fingerprints.set(fp, l.id);
+  for (const peer of levels.filter((p) => p.mode === l.mode && p.order < l.order)) ensure(layoutSimilarity(l, peer) < 0.9, `Resized lookalikes: ${l.id}/${peer.id}`);
   const seen = reachableCells(l);
   for (const p of objectivePoints(l)) ensure(seen.has(cellOf(p, l.board.width)), `Unreachable object ${l.id} at ${p.x},${p.y}`);
   ensure(circuitReachable(l), `Unreachable switch configuration ${l.id}`);
@@ -46,7 +47,7 @@ for (const [order, mode] of gameModes.entries()) {
 const catalog = await read("content/catalog.json");
 ensure(JSON.stringify(catalog.sections) === JSON.stringify(sections), "Stale sections");
 ensure(
-  catalog.levels.length === 49 && catalog.levels.every((l: { id: string }) => JSON.stringify(l) === JSON.stringify(levels.find((source) => source.id === l.id))),
+  catalog.levels.length === levels.length && catalog.levels.every((l: { id: string }) => JSON.stringify(l) === JSON.stringify(levels.find((source) => source.id === l.id))),
   "Stale catalog"
 );
 for (const theme of themeIds) {
@@ -58,4 +59,4 @@ for (const theme of themeIds) {
   const characters = await read(`public/assets/game/characters/${theme}/atlas.json`);
   for (const direction of ["up", "down", "left", "right"]) for (let i = 0; i < 4; i++) ensure(characters.frames[`actor-${direction}-walk-${i}`], `Missing actor ${theme}`);
 }
-console.log("Validated 49 distinct topologies, 7 shared games, reachable objectives, energy returns, live outcomes, catalog and theme assets.");
+console.log("Validated 91 distinct topologies, 13 shared games, reachable objectives, energy returns, live outcomes, catalog and theme assets.");

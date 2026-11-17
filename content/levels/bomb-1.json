@@ -1,0 +1,234 @@
+{
+  "schemaVersion": 5,
+  "rulesVersion": 5,
+  "id": "bomb-1",
+  "sectionId": "bomb",
+  "order": 1,
+  "title": "Kayu di halaman",
+  "mission": "Pasang bom dengan sumbu 1,8 detik dan ledakan tiga petak tiap arah.",
+  "briefing": "Pelataran bercabang. Pasang bom dengan sumbu 1,8 detik dan ledakan tiga petak tiap arah. Tembok kayu hancur memberi satu poin, permata dua, menjatuhkan lawan tiga. Ledakan dapat berantai dan mengenai pemasangnya. Rebut permata sambil menyisakan jalur aman.",
+  "theme": "farm",
+  "seed": 975436,
+  "timeLimit": 1200,
+  "board": {
+    "width": 11,
+    "height": 13,
+    "terrain": [
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "ground",
+      "ground",
+      "ground",
+      "wall",
+      "path",
+      "ground",
+      "ground",
+      "ground",
+      "path",
+      "wall",
+      "wall",
+      "ground",
+      "wall",
+      "wall",
+      "ground",
+      "wall",
+      "ground",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "ground",
+      "wall",
+      "wall",
+      "ground",
+      "ground",
+      "ground",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "ground",
+      "wall",
+      "wall",
+      "ground",
+      "ground",
+      "ground",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "wall",
+      "wall",
+      "ground",
+      "wall",
+      "wall",
+      "ground",
+      "path",
+      "ground",
+      "ground",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "ground",
+      "wall",
+      "wall",
+      "ground",
+      "ground",
+      "ground",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "ground",
+      "ground",
+      "wall",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "wall",
+      "wall",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "wall",
+      "wall",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "wall",
+      "wall",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "path",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall"
+    ],
+    "spawn": {
+      "x": 5,
+      "y": 6
+    },
+    "spawns": [
+      {
+        "x": 5,
+        "y": 6
+      },
+      {
+        "x": 5,
+        "y": 1
+      },
+      {
+        "x": 9,
+        "y": 11
+      },
+      {
+        "x": 9,
+        "y": 1
+      }
+    ],
+    "decorations": [
+      {
+        "x": 0,
+        "y": 0
+      },
+      {
+        "x": 10,
+        "y": 12
+      }
+    ]
+  },
+  "mode": "bomb",
+  "bomb": {
+    "destructible": [
+      {
+        "x": 4,
+        "y": 1
+      },
+      {
+        "x": 5,
+        "y": 2
+      },
+      {
+        "x": 1,
+        "y": 5
+      },
+      {
+        "x": 3,
+        "y": 8
+      }
+    ],
+    "gems": [
+      {
+        "x": 3,
+        "y": 11
+      },
+      {
+        "x": 1,
+        "y": 4
+      },
+      {
+        "x": 7,
+        "y": 9
+      },
+      {
+        "x": 1,
+        "y": 9
+      }
+    ],
+    "fuseTicks": 36
+  }
+}

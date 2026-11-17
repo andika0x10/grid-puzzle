@@ -2,7 +2,8 @@ import { algorithms, unavailableReason, type AlgorithmId, type MatchConfig } fro
 import { createDomainSearch, SEARCH_OPERATIONS_PER_TICK, type Search } from "./search";
 import { levelSchema, type LevelDefinition, type Point, type Terrain } from "./schema";
 import { ModeDomain } from "./planning";
-import { MctsDecision, RandomDecision, randomSource, type DecisionState } from "./decisions";
+import { MctsDecision, MultiplayerDecision, RandomDecision, randomSource, type DecisionState } from "./decisions";
+import { transientArena } from "./extra-modes";
 import {
   actionEqual,
   advanceWorld,
@@ -79,7 +80,7 @@ interface Bot extends BotFrame {
 }
 function initialBots(l: LevelDefinition, c: MatchConfig): BotFrame[] {
   return [c.player, ...c.opponents].map((algorithm, i) => ({
-    ...l.board.spawn,
+    ...(l.board.spawns?.[(i + (c.seatOffset ?? 0)) % 4] ?? l.board.spawn),
     id: `bot-${i}`,
     algorithm,
     player: i === 0,
@@ -205,7 +206,9 @@ export class MatchEngine {
         bot.random,
         bot.visits
       );
-    else if (bot.algorithm === "dstar-lite" && bot.search?.updateDomain) bot.search.updateDomain(domain, bot.dirty);
+    else if (bot.algorithm === "maxn" || bot.algorithm === "paranoid")
+      bot.search = new MultiplayerDecision(this.level, observed, actor, this.config.seed, bot.algorithm === "paranoid", bot.visits);
+    else if ((bot.algorithm === "dstar-lite" || bot.algorithm === "rtaa") && bot.search?.updateDomain) bot.search.updateDomain(domain, bot.dirty);
     else bot.search = createDomainSearch(domain, bot.algorithm, this.level.board.width);
     bot.dirty.clear();
   }
@@ -284,7 +287,7 @@ export class MatchEngine {
             bot.status = "waiting";
             bot.retryAt = this.world.tick + 1;
           } else {
-            bot.plan = bot.search.actions.map((a) => ({ ...a }));
+            bot.plan = (transientArena(this.level) ? bot.search.actions.slice(0, 1) : bot.search.actions).map((a) => ({ ...a }));
             bot.index = 0;
             bot.route = bot.search.path?.map((p) => ({ ...p })) ?? [];
             if (!bot.plan.length) {
@@ -350,6 +353,11 @@ export class MatchEngine {
         push: "Posisi peti berubah. Rencana lawan ikut terpengaruh.",
         dock: "Peti terkunci di tujuan. Satu poin untuk pendorongnya.",
         eliminated: "Satu penjelajah tereliminasi.",
+        bomb: "Bom terpasang. Cari perlindungan sebelum meledak!",
+        explosion: "Ledakan mengubah arena dan dapat memicu bom lain.",
+        barrier: "Pagar baru memaksa peserta mencari jalan memutar.",
+        teleport: "Pasangan seluruh portal bergeser.",
+        distract: "Penjaga terdekat teralihkan sementara.",
       };
       this.note = names[event.kind] ?? this.note;
     }

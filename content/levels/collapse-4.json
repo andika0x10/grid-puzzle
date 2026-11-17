@@ -1,18 +1,18 @@
 {
-  "schemaVersion": 4,
-  "rulesVersion": 4,
+  "schemaVersion": 5,
+  "rulesVersion": 5,
   "id": "collapse-4",
   "sectionId": "collapse",
   "order": 4,
-  "title": "Jembatan pijakan",
-  "mission": "Cari pijakan dan bertahan paling lama.",
-  "briefing": "Retakan dari bot lain ikut memutus jalanmu. Perhatikan hitung mundur dan sisakan beberapa jalur pelarian sebelum gelombang berikutnya.",
+  "title": "Pulau terakhir",
+  "mission": "Lantai runtuh 24 tick setelah ditinggalkan.",
+  "briefing": "Cincin bersimpang. Lantai runtuh 24 tick setelah ditinggalkan. Gelombang keruntuhan juga menyapu arena. Spawn terlindungi delapan detik. Terus bergerak dan bertahan paling lama; bot tanpa pijakan lanjutan tereliminasi. Retakan berlaku untuk semua bot.",
   "theme": "snow",
-  "seed": 42004,
+  "seed": 1242109,
   "timeLimit": 1200,
   "board": {
-    "width": 15,
-    "height": 11,
+    "width": 19,
+    "height": 15,
     "terrain": [
       "wall",
       "wall",
@@ -30,66 +30,11 @@
       "wall",
       "wall",
       "wall",
-      "ground",
-      "ground",
-      "ground",
-      "wall",
-      "ground",
-      "ground",
-      "ground",
-      "ground",
-      "ground",
-      "wall",
-      "ground",
-      "ground",
-      "ground",
-      "wall",
-      "wall",
-      "ground",
-      "wall",
-      "ground",
-      "wall",
-      "ground",
-      "wall",
-      "wall",
-      "wall",
-      "ground",
-      "wall",
-      "ground",
-      "wall",
-      "ground",
-      "wall",
-      "wall",
-      "ground",
-      "wall",
-      "ground",
-      "ground",
-      "ground",
-      "wall",
-      "ground",
-      "ground",
-      "ground",
-      "wall",
-      "ground",
-      "wall",
-      "ground",
-      "wall",
-      "wall",
-      "ground",
-      "wall",
       "wall",
       "wall",
       "wall",
       "wall",
       "ground",
-      "wall",
-      "wall",
-      "wall",
-      "ground",
-      "wall",
-      "ground",
-      "wall",
-      "wall",
       "ground",
       "ground",
       "ground",
@@ -97,59 +42,6 @@
       "ground",
       "ground",
       "ground",
-      "ground",
-      "ground",
-      "ground",
-      "ground",
-      "ground",
-      "ground",
-      "wall",
-      "wall",
-      "ground",
-      "wall",
-      "wall",
-      "wall",
-      "ground",
-      "wall",
-      "wall",
-      "wall",
-      "wall",
-      "wall",
-      "ground",
-      "wall",
-      "ground",
-      "wall",
-      "wall",
-      "ground",
-      "wall",
-      "ground",
-      "ground",
-      "ground",
-      "wall",
-      "ground",
-      "ground",
-      "ground",
-      "wall",
-      "ground",
-      "wall",
-      "ground",
-      "wall",
-      "wall",
-      "ground",
-      "wall",
-      "ground",
-      "wall",
-      "wall",
-      "wall",
-      "ground",
-      "wall",
-      "ground",
-      "wall",
-      "ground",
-      "wall",
-      "ground",
-      "wall",
-      "wall",
       "path",
       "ground",
       "ground",
@@ -157,12 +49,240 @@
       "ground",
       "ground",
       "ground",
+      "ground",
+      "path",
+      "wall",
       "wall",
       "ground",
       "ground",
       "ground",
       "ground",
       "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "wall",
+      "wall",
+      "ground",
+      "ground",
+      "wall",
+      "wall",
+      "wall",
+      "ground",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "ground",
+      "ground",
+      "wall",
+      "wall",
+      "ground",
+      "ground",
+      "wall",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "wall",
+      "ground",
+      "ground",
+      "wall",
+      "wall",
+      "ground",
+      "ground",
+      "wall",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "wall",
+      "ground",
+      "ground",
+      "wall",
+      "wall",
+      "ground",
+      "ground",
+      "wall",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "wall",
+      "ground",
+      "ground",
+      "wall",
+      "wall",
+      "ground",
+      "ground",
+      "wall",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "path",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "wall",
+      "ground",
+      "ground",
+      "wall",
+      "wall",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "wall",
+      "ground",
+      "ground",
+      "wall",
+      "wall",
+      "ground",
+      "ground",
+      "wall",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "wall",
+      "ground",
+      "ground",
+      "wall",
+      "wall",
+      "ground",
+      "ground",
+      "wall",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "wall",
+      "wall",
+      "ground",
+      "ground",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "ground",
+      "ground",
+      "wall",
+      "wall",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "wall",
+      "wall",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "path",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
       "wall",
       "wall",
       "wall",
@@ -181,17 +301,35 @@
       "wall"
     ],
     "spawn": {
-      "x": 1,
-      "y": 9
+      "x": 9,
+      "y": 7
     },
+    "spawns": [
+      {
+        "x": 9,
+        "y": 7
+      },
+      {
+        "x": 9,
+        "y": 1
+      },
+      {
+        "x": 17,
+        "y": 13
+      },
+      {
+        "x": 17,
+        "y": 1
+      }
+    ],
     "decorations": [
       {
         "x": 0,
         "y": 0
       },
       {
-        "x": 14,
-        "y": 10
+        "x": 18,
+        "y": 14
       }
     ]
   },
@@ -204,12 +342,20 @@
         "tick": 160,
         "cells": [
           {
-            "x": 7,
-            "y": 5
+            "x": 9,
+            "y": 7
           },
           {
-            "x": 8,
-            "y": 5
+            "x": 10,
+            "y": 7
+          },
+          {
+            "x": 9,
+            "y": 8
+          },
+          {
+            "x": 10,
+            "y": 8
           }
         ]
       },
@@ -217,28 +363,52 @@
         "tick": 280,
         "cells": [
           {
-            "x": 7,
-            "y": 4
-          },
-          {
-            "x": 6,
-            "y": 5
+            "x": 8,
+            "y": 6
           },
           {
             "x": 9,
-            "y": 5
+            "y": 6
           },
           {
-            "x": 7,
-            "y": 7
+            "x": 10,
+            "y": 6
+          },
+          {
+            "x": 11,
+            "y": 6
           },
           {
             "x": 8,
             "y": 7
           },
           {
-            "x": 9,
+            "x": 11,
             "y": 7
+          },
+          {
+            "x": 8,
+            "y": 8
+          },
+          {
+            "x": 11,
+            "y": 8
+          },
+          {
+            "x": 8,
+            "y": 9
+          },
+          {
+            "x": 9,
+            "y": 9
+          },
+          {
+            "x": 10,
+            "y": 9
+          },
+          {
+            "x": 11,
+            "y": 9
           }
         ]
       },
@@ -246,23 +416,19 @@
         "tick": 400,
         "cells": [
           {
-            "x": 5,
-            "y": 3
+            "x": 6,
+            "y": 5
           },
           {
             "x": 7,
-            "y": 3
+            "y": 5
           },
           {
             "x": 8,
-            "y": 3
+            "y": 5
           },
           {
             "x": 9,
-            "y": 3
-          },
-          {
-            "x": 5,
             "y": 5
           },
           {
@@ -270,81 +436,64 @@
             "y": 5
           },
           {
-            "x": 5,
+            "x": 11,
+            "y": 5
+          },
+          {
+            "x": 12,
+            "y": 5
+          },
+          {
+            "x": 13,
+            "y": 5
+          },
+          {
+            "x": 6,
             "y": 6
           },
           {
-            "x": 5,
+            "x": 7,
+            "y": 6
+          },
+          {
+            "x": 12,
+            "y": 6
+          },
+          {
+            "x": 13,
+            "y": 6
+          },
+          {
+            "x": 6,
             "y": 7
+          },
+          {
+            "x": 7,
+            "y": 7
+          },
+          {
+            "x": 12,
+            "y": 7
+          },
+          {
+            "x": 13,
+            "y": 7
+          },
+          {
+            "x": 6,
+            "y": 8
           },
           {
             "x": 7,
             "y": 8
           },
           {
-            "x": 9,
-            "y": 8
-          }
-        ]
-      },
-      {
-        "tick": 640,
-        "cells": [
-          {
-            "x": 5,
-            "y": 2
-          },
-          {
-            "x": 9,
-            "y": 2
-          },
-          {
-            "x": 11,
-            "y": 2
-          },
-          {
-            "x": 4,
-            "y": 3
-          },
-          {
-            "x": 11,
-            "y": 3
-          },
-          {
-            "x": 11,
-            "y": 4
-          },
-          {
-            "x": 4,
-            "y": 5
-          },
-          {
-            "x": 11,
-            "y": 5
-          },
-          {
-            "x": 11,
-            "y": 6
-          },
-          {
-            "x": 4,
-            "y": 7
-          },
-          {
-            "x": 11,
-            "y": 7
-          },
-          {
-            "x": 11,
+            "x": 12,
             "y": 8
           },
           {
-            "x": 4,
-            "y": 9
-          },
-          {
-            "x": 5,
-            "y": 9
+            "x": 13,
+            "y": 8
           },
           {
             "x": 6,
@@ -355,16 +504,226 @@
             "y": 9
           },
           {
-            "x": 9,
+            "x": 12,
             "y": 9
+          },
+          {
+            "x": 13,
+            "y": 9
+          },
+          {
+            "x": 6,
+            "y": 10
+          },
+          {
+            "x": 7,
+            "y": 10
+          },
+          {
+            "x": 8,
+            "y": 10
+          },
+          {
+            "x": 9,
+            "y": 10
           },
           {
             "x": 10,
-            "y": 9
+            "y": 10
           },
           {
             "x": 11,
+            "y": 10
+          },
+          {
+            "x": 12,
+            "y": 10
+          },
+          {
+            "x": 13,
+            "y": 10
+          }
+        ]
+      },
+      {
+        "tick": 520,
+        "cells": [
+          {
+            "x": 5,
+            "y": 4
+          },
+          {
+            "x": 6,
+            "y": 4
+          },
+          {
+            "x": 7,
+            "y": 4
+          },
+          {
+            "x": 8,
+            "y": 4
+          },
+          {
+            "x": 9,
+            "y": 4
+          },
+          {
+            "x": 10,
+            "y": 4
+          },
+          {
+            "x": 11,
+            "y": 4
+          },
+          {
+            "x": 12,
+            "y": 4
+          },
+          {
+            "x": 13,
+            "y": 4
+          },
+          {
+            "x": 14,
+            "y": 4
+          },
+          {
+            "x": 5,
+            "y": 5
+          },
+          {
+            "x": 14,
+            "y": 5
+          },
+          {
+            "x": 5,
+            "y": 6
+          },
+          {
+            "x": 14,
+            "y": 6
+          },
+          {
+            "x": 5,
+            "y": 7
+          },
+          {
+            "x": 14,
+            "y": 7
+          },
+          {
+            "x": 5,
+            "y": 8
+          },
+          {
+            "x": 14,
+            "y": 8
+          },
+          {
+            "x": 5,
             "y": 9
+          },
+          {
+            "x": 14,
+            "y": 9
+          },
+          {
+            "x": 5,
+            "y": 10
+          },
+          {
+            "x": 14,
+            "y": 10
+          }
+        ]
+      },
+      {
+        "tick": 640,
+        "cells": [
+          {
+            "x": 6,
+            "y": 3
+          },
+          {
+            "x": 4,
+            "y": 4
+          },
+          {
+            "x": 4,
+            "y": 5
+          },
+          {
+            "x": 4,
+            "y": 6
+          },
+          {
+            "x": 4,
+            "y": 7
+          },
+          {
+            "x": 4,
+            "y": 8
+          },
+          {
+            "x": 4,
+            "y": 9
+          },
+          {
+            "x": 4,
+            "y": 10
+          },
+          {
+            "x": 15,
+            "y": 10
+          },
+          {
+            "x": 4,
+            "y": 12
+          },
+          {
+            "x": 5,
+            "y": 12
+          },
+          {
+            "x": 6,
+            "y": 12
+          },
+          {
+            "x": 7,
+            "y": 12
+          },
+          {
+            "x": 8,
+            "y": 12
+          },
+          {
+            "x": 9,
+            "y": 12
+          },
+          {
+            "x": 10,
+            "y": 12
+          },
+          {
+            "x": 11,
+            "y": 12
+          },
+          {
+            "x": 12,
+            "y": 12
+          },
+          {
+            "x": 13,
+            "y": 12
+          },
+          {
+            "x": 14,
+            "y": 12
+          },
+          {
+            "x": 15,
+            "y": 12
           }
         ]
       },
@@ -373,54 +732,78 @@
         "cells": [
           {
             "x": 3,
-            "y": 1
-          },
-          {
-            "x": 5,
-            "y": 1
-          },
-          {
-            "x": 6,
-            "y": 1
-          },
-          {
-            "x": 7,
-            "y": 1
-          },
-          {
-            "x": 8,
-            "y": 1
-          },
-          {
-            "x": 9,
-            "y": 1
-          },
-          {
-            "x": 11,
-            "y": 1
-          },
-          {
-            "x": 12,
-            "y": 1
-          },
-          {
-            "x": 3,
             "y": 2
           },
           {
-            "x": 3,
-            "y": 3
+            "x": 4,
+            "y": 2
           },
           {
-            "x": 3,
-            "y": 5
+            "x": 5,
+            "y": 2
+          },
+          {
+            "x": 6,
+            "y": 2
+          },
+          {
+            "x": 7,
+            "y": 2
+          },
+          {
+            "x": 8,
+            "y": 2
+          },
+          {
+            "x": 9,
+            "y": 2
+          },
+          {
+            "x": 10,
+            "y": 2
+          },
+          {
+            "x": 11,
+            "y": 2
           },
           {
             "x": 12,
+            "y": 2
+          },
+          {
+            "x": 13,
+            "y": 2
+          },
+          {
+            "x": 14,
+            "y": 2
+          },
+          {
+            "x": 15,
+            "y": 2
+          },
+          {
+            "x": 16,
+            "y": 2
+          },
+          {
+            "x": 16,
+            "y": 3
+          },
+          {
+            "x": 16,
+            "y": 4
+          },
+          {
+            "x": 16,
             "y": 5
           },
           {
-            "x": 3,
+            "x": 16,
+            "y": 6
+          },
+          {
+            "x": 16,
             "y": 7
           },
           {
@@ -428,12 +811,84 @@
             "y": 8
           },
           {
-            "x": 3,
+            "x": 16,
+            "y": 8
+          },
+          {
+            "x": 16,
             "y": 9
           },
           {
+            "x": 16,
+            "y": 10
+          },
+          {
+            "x": 16,
+            "y": 11
+          },
+          {
+            "x": 3,
+            "y": 12
+          },
+          {
+            "x": 16,
+            "y": 12
+          },
+          {
+            "x": 3,
+            "y": 13
+          },
+          {
+            "x": 4,
+            "y": 13
+          },
+          {
+            "x": 5,
+            "y": 13
+          },
+          {
+            "x": 6,
+            "y": 13
+          },
+          {
+            "x": 7,
+            "y": 13
+          },
+          {
+            "x": 8,
+            "y": 13
+          },
+          {
+            "x": 9,
+            "y": 13
+          },
+          {
+            "x": 10,
+            "y": 13
+          },
+          {
+            "x": 11,
+            "y": 13
+          },
+          {
             "x": 12,
-            "y": 9
+            "y": 13
+          },
+          {
+            "x": 13,
+            "y": 13
+          },
+          {
+            "x": 14,
+            "y": 13
+          },
+          {
+            "x": 15,
+            "y": 13
+          },
+          {
+            "x": 16,
+            "y": 13
           }
         ]
       },
@@ -445,19 +900,87 @@
             "y": 1
           },
           {
-            "x": 13,
+            "x": 3,
+            "y": 1
+          },
+          {
+            "x": 4,
+            "y": 1
+          },
+          {
+            "x": 5,
+            "y": 1
+          },
+          {
+            "x": 6,
+            "y": 1
+          },
+          {
+            "x": 7,
+            "y": 1
+          },
+          {
+            "x": 8,
+            "y": 1
+          },
+          {
+            "x": 9,
+            "y": 1
+          },
+          {
+            "x": 10,
+            "y": 1
+          },
+          {
+            "x": 11,
+            "y": 1
+          },
+          {
+            "x": 12,
             "y": 1
           },
           {
             "x": 13,
+            "y": 1
+          },
+          {
+            "x": 14,
+            "y": 1
+          },
+          {
+            "x": 15,
+            "y": 1
+          },
+          {
+            "x": 16,
+            "y": 1
+          },
+          {
+            "x": 17,
+            "y": 1
+          },
+          {
+            "x": 2,
             "y": 2
           },
           {
-            "x": 13,
+            "x": 17,
+            "y": 2
+          },
+          {
+            "x": 2,
             "y": 3
           },
           {
-            "x": 13,
+            "x": 17,
+            "y": 3
+          },
+          {
+            "x": 2,
+            "y": 4
+          },
+          {
+            "x": 17,
             "y": 4
           },
           {
@@ -465,19 +988,31 @@
             "y": 5
           },
           {
-            "x": 13,
+            "x": 17,
             "y": 5
           },
           {
-            "x": 13,
+            "x": 2,
             "y": 6
           },
           {
-            "x": 13,
+            "x": 17,
+            "y": 6
+          },
+          {
+            "x": 2,
             "y": 7
           },
           {
-            "x": 13,
+            "x": 17,
+            "y": 7
+          },
+          {
+            "x": 2,
+            "y": 8
+          },
+          {
+            "x": 17,
             "y": 8
           },
           {
@@ -485,13 +1020,45 @@
             "y": 9
           },
           {
-            "x": 13,
+            "x": 17,
             "y": 9
+          },
+          {
+            "x": 2,
+            "y": 10
+          },
+          {
+            "x": 17,
+            "y": 10
+          },
+          {
+            "x": 2,
+            "y": 11
+          },
+          {
+            "x": 17,
+            "y": 11
+          },
+          {
+            "x": 2,
+            "y": 12
+          },
+          {
+            "x": 17,
+            "y": 12
+          },
+          {
+            "x": 2,
+            "y": 13
+          },
+          {
+            "x": 17,
+            "y": 13
           }
         ]
       },
       {
-        "tick": 1120,
+        "tick": 1000,
         "cells": [
           {
             "x": 1,
@@ -528,6 +1095,22 @@
           {
             "x": 1,
             "y": 9
+          },
+          {
+            "x": 1,
+            "y": 10
+          },
+          {
+            "x": 1,
+            "y": 11
+          },
+          {
+            "x": 1,
+            "y": 12
+          },
+          {
+            "x": 1,
+            "y": 13
           }
         ]
       }

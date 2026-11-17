@@ -1,18 +1,18 @@
 {
-  "schemaVersion": 4,
-  "rulesVersion": 4,
+  "schemaVersion": 5,
+  "rulesVersion": 5,
   "id": "bridge-1",
   "sectionId": "bridge",
   "order": 1,
-  "title": "Bentang pertama",
-  "mission": "Bangun jalan, rebut pulau, capai keluar.",
-  "briefing": "Pembuat jembatan mendapat poin, penjelajah lain mendapat akses. Bandingkan keuntungan membangun, merebut penanda pulau, dan mengejar bonus keluar.",
+  "title": "Dua tepi sungai",
+  "mission": "Ambil bahan, lalu bangun bentang bertanda untuk dua poin.",
+  "briefing": "Lorong berjalin. Ambil bahan, lalu bangun bentang bertanda untuk dua poin. Semua bot dapat memakai jembatan jadi. Penanda pulau memberi tiga poin. Setelah semua penanda diklaim, keluar memberi lima dan mengakhiri pertandingan. Bahan maksimal tiga, muncul kembali setiap empat detik.",
   "theme": "farm",
-  "seed": 46001,
+  "seed": 959598,
   "timeLimit": 1200,
   "board": {
-    "width": 11,
-    "height": 9,
+    "width": 15,
+    "height": 11,
     "terrain": [
       "wall",
       "wall",
@@ -26,81 +26,147 @@
       "wall",
       "wall",
       "wall",
-      "ground",
-      "ground",
-      "ground",
       "wall",
-      "water",
-      "ground",
-      "ground",
-      "ground",
-      "ground",
+      "wall",
       "wall",
       "wall",
       "ground",
       "ground",
-      "ground",
-      "wall",
-      "water",
-      "ground",
-      "ground",
-      "ground",
-      "ground",
-      "wall",
-      "wall",
       "ground",
       "ground",
       "ground",
       "ground",
       "water",
-      "ground",
-      "ground",
-      "ground",
-      "ground",
-      "wall",
-      "wall",
-      "ground",
-      "ground",
-      "ground",
-      "wall",
-      "water",
-      "ground",
-      "ground",
-      "ground",
-      "ground",
-      "wall",
-      "wall",
-      "ground",
-      "ground",
-      "ground",
-      "ground",
-      "water",
-      "ground",
-      "ground",
-      "ground",
-      "ground",
-      "wall",
-      "wall",
-      "ground",
-      "wall",
-      "wall",
-      "ground",
-      "water",
-      "ground",
-      "wall",
-      "wall",
-      "ground",
-      "wall",
-      "wall",
       "path",
       "ground",
       "ground",
       "ground",
+      "ground",
+      "path",
+      "wall",
+      "wall",
+      "ground",
+      "wall",
+      "wall",
+      "ground",
+      "ground",
+      "ground",
       "water",
       "ground",
       "ground",
       "ground",
       "ground",
+      "ground",
+      "ground",
+      "wall",
+      "wall",
+      "ground",
+      "wall",
+      "wall",
+      "ground",
+      "ground",
+      "ground",
+      "water",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "wall",
+      "wall",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "water",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "wall",
+      "wall",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "water",
+      "water",
+      "water",
+      "ground",
+      "ground",
+      "ground",
+      "path",
+      "wall",
+      "wall",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "water",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "wall",
+      "wall",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "water",
+      "ground",
+      "wall",
+      "wall",
+      "ground",
+      "wall",
+      "wall",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "wall",
+      "ground",
+      "ground",
+      "ground",
+      "water",
+      "ground",
+      "wall",
+      "wall",
+      "ground",
+      "wall",
+      "wall",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "water",
+      "path",
+      "ground",
+      "ground",
+      "ground",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
       "wall",
       "wall",
       "wall",
@@ -115,12 +181,30 @@
       "wall"
     ],
     "spawn": {
-      "x": 1,
-      "y": 7
+      "x": 13,
+      "y": 5
     },
+    "spawns": [
+      {
+        "x": 13,
+        "y": 5
+      },
+      {
+        "x": 8,
+        "y": 1
+      },
+      {
+        "x": 10,
+        "y": 9
+      },
+      {
+        "x": 13,
+        "y": 1
+      }
+    ],
     "goal": {
-      "x": 9,
-      "y": 1
+      "x": 2,
+      "y": 9
     },
     "decorations": [
       {
@@ -128,8 +212,8 @@
         "y": 0
       },
       {
-        "x": 10,
-        "y": 8
+        "x": 14,
+        "y": 10
       }
     ]
   },
@@ -139,17 +223,17 @@
       {
         "banks": [
           {
-            "x": 4,
+            "x": 6,
             "y": 3
           },
           {
-            "x": 6,
+            "x": 8,
             "y": 3
           }
         ],
         "cells": [
           {
-            "x": 5,
+            "x": 7,
             "y": 3
           }
         ]
@@ -157,36 +241,36 @@
       {
         "banks": [
           {
-            "x": 4,
-            "y": 7
+            "x": 8,
+            "y": 8
           },
           {
-            "x": 6,
-            "y": 7
+            "x": 10,
+            "y": 8
           }
         ],
         "cells": [
           {
-            "x": 5,
-            "y": 7
+            "x": 9,
+            "y": 8
           }
         ]
       }
     ],
     "supplies": [
       {
-        "x": 1,
-        "y": 1
+        "x": 13,
+        "y": 5
       },
       {
-        "x": 1,
-        "y": 5
+        "x": 3,
+        "y": 4
       }
     ],
     "markers": [
       {
-        "x": 7,
-        "y": 3
+        "x": 6,
+        "y": 7
       }
     ]
   }

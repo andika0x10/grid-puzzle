@@ -3,7 +3,7 @@
     "id": "fog",
     "order": 1,
     "title": "Labirin Kabut",
-    "subtitle": "Ungkap labirin dan capai keluar.",
+    "subtitle": "Cari jalan keluar dengan pemindai radius dua petak.",
     "levelIds": [
       "fog-1",
       "fog-2",
@@ -18,7 +18,7 @@
     "id": "collapse",
     "order": 2,
     "title": "Lantai Runtuh",
-    "subtitle": "Cari pijakan dan bertahan paling lama.",
+    "subtitle": "Lantai runtuh 24 tick setelah ditinggalkan.",
     "levelIds": [
       "collapse-1",
       "collapse-2",
@@ -33,7 +33,7 @@
     "id": "hunt",
     "order": 3,
     "title": "Perburuan Bergerak",
-    "subtitle": "Cegat target, rebut poin terbanyak.",
+    "subtitle": "Potong lintasan target bergerak.",
     "levelIds": [
       "hunt-1",
       "hunt-2",
@@ -48,7 +48,7 @@
     "id": "circuit",
     "order": 4,
     "title": "Sambung Sirkuit",
-    "subtitle": "Sambung listrik, klaim terminal.",
+    "subtitle": "Datangi saklar untuk mengubah sambungan dan gerbang bersama.",
     "levelIds": [
       "circuit-1",
       "circuit-2",
@@ -63,7 +63,7 @@
     "id": "energy",
     "order": 5,
     "title": "Ekspedisi Energi",
-    "subtitle": "Isi energi dan aktifkan suar.",
+    "subtitle": "Energi maksimal 24.",
     "levelIds": [
       "energy-1",
       "energy-2",
@@ -78,7 +78,7 @@
     "id": "bridge",
     "order": 6,
     "title": "Jembatan Rakitan",
-    "subtitle": "Bangun jalan, rebut pulau, capai keluar.",
+    "subtitle": "Ambil bahan, lalu bangun bentang bertanda untuk dua poin.",
     "levelIds": [
       "bridge-1",
       "bridge-2",
@@ -93,7 +93,7 @@
     "id": "crates",
     "order": 7,
     "title": "Dorong Peti",
-    "subtitle": "Dorong peti bersama ke tujuannya.",
+    "subtitle": "Dorong peti ke tujuan bercorak.",
     "levelIds": [
       "crates-1",
       "crates-2",
@@ -102,6 +102,96 @@
       "crates-5",
       "crates-6",
       "crates-7"
+    ]
+  },
+  {
+    "id": "bomb",
+    "order": 8,
+    "title": "Zona Bom",
+    "subtitle": "Pasang bom dengan sumbu 1,8 detik dan ledakan tiga petak tiap arah.",
+    "levelIds": [
+      "bomb-1",
+      "bomb-2",
+      "bomb-3",
+      "bomb-4",
+      "bomb-5",
+      "bomb-6",
+      "bomb-7"
+    ]
+  },
+  {
+    "id": "snake",
+    "order": 9,
+    "title": "Ular Arena",
+    "subtitle": "Setiap langkah meninggalkan ekor.",
+    "levelIds": [
+      "snake-1",
+      "snake-2",
+      "snake-3",
+      "snake-4",
+      "snake-5",
+      "snake-6",
+      "snake-7"
+    ]
+  },
+  {
+    "id": "flow",
+    "order": 10,
+    "title": "Arus Paksa",
+    "subtitle": "Panah mendorong satu sampai tiga petak.",
+    "levelIds": [
+      "flow-1",
+      "flow-2",
+      "flow-3",
+      "flow-4",
+      "flow-5",
+      "flow-6",
+      "flow-7"
+    ]
+  },
+  {
+    "id": "portal",
+    "order": 11,
+    "title": "Portal Berantai",
+    "subtitle": "Injak portal untuk berpindah.",
+    "levelIds": [
+      "portal-1",
+      "portal-2",
+      "portal-3",
+      "portal-4",
+      "portal-5",
+      "portal-6",
+      "portal-7"
+    ]
+  },
+  {
+    "id": "tactical",
+    "order": 12,
+    "title": "Pagar Taktis",
+    "subtitle": "Rebut token dua poin sambil memasang maksimal tiga pagar per bot.",
+    "levelIds": [
+      "tactical-1",
+      "tactical-2",
+      "tactical-3",
+      "tactical-4",
+      "tactical-5",
+      "tactical-6",
+      "tactical-7"
+    ]
+  },
+  {
+    "id": "stealth",
+    "order": 13,
+    "title": "Operasi Senyap",
+    "subtitle": "Rebut dokumen tiga poin di antara patroli penjaga.",
+    "levelIds": [
+      "stealth-1",
+      "stealth-2",
+      "stealth-3",
+      "stealth-4",
+      "stealth-5",
+      "stealth-6",
+      "stealth-7"
     ]
   }
 ]

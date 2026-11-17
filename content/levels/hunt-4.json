@@ -1,18 +1,18 @@
 {
-  "schemaVersion": 4,
-  "rulesVersion": 4,
+  "schemaVersion": 5,
+  "rulesVersion": 5,
   "id": "hunt-4",
   "sectionId": "hunt",
   "order": 4,
-  "title": "Persilangan salju",
-  "mission": "Cegat target, rebut poin terbanyak.",
-  "briefing": "Mengekor belum tentu cepat. Perkirakan titik pertemuan dari lintasan dan arah target. Satu target hanya memberi poin kepada satu bot.",
+  "title": "Dua jalur bersilang",
+  "mission": "Potong lintasan target bergerak.",
+  "briefing": "Gua berongga. Potong lintasan target bergerak. Satu tangkapan memberi satu poin, lalu target muncul kembali satu detik kemudian. Garis putus menunjukkan lintasannya. Raih poin terbanyak.",
   "theme": "snow",
-  "seed": 43004,
-  "timeLimit": 1200,
+  "seed": 1250028,
+  "timeLimit": 900,
   "board": {
-    "width": 15,
-    "height": 11,
+    "width": 17,
+    "height": 19,
     "terrain": [
       "wall",
       "wall",
@@ -30,124 +30,25 @@
       "wall",
       "wall",
       "wall",
-      "ground",
-      "ground",
-      "ground",
-      "ground",
-      "ground",
-      "ground",
-      "ground",
-      "ground",
-      "ground",
-      "ground",
-      "ground",
-      "ground",
-      "ground",
-      "wall",
-      "wall",
-      "ground",
-      "ground",
-      "ground",
-      "ground",
-      "ground",
-      "ground",
-      "ground",
-      "ground",
-      "ground",
       "wall",
       "wall",
       "wall",
-      "ground",
       "wall",
       "wall",
-      "ground",
-      "ground",
-      "ground",
-      "ground",
-      "ground",
-      "ground",
-      "ground",
-      "ground",
-      "ground",
-      "wall",
-      "ground",
-      "ground",
-      "ground",
       "wall",
       "wall",
-      "ground",
+      "wall",
       "wall",
       "wall",
       "wall",
       "ground",
       "ground",
-      "ground",
-      "ground",
-      "ground",
-      "wall",
-      "ground",
-      "wall",
-      "ground",
-      "wall",
-      "wall",
-      "ground",
-      "ground",
-      "ground",
-      "ground",
-      "ground",
       "wall",
       "wall",
       "wall",
-      "ground",
-      "ground",
-      "ground",
-      "ground",
-      "ground",
-      "wall",
-      "wall",
-      "ground",
       "wall",
       "wall",
       "wall",
-      "ground",
-      "ground",
-      "ground",
-      "ground",
-      "ground",
-      "ground",
-      "ground",
-      "ground",
-      "ground",
-      "wall",
-      "wall",
-      "ground",
-      "ground",
-      "ground",
-      "wall",
-      "ground",
-      "ground",
-      "ground",
-      "ground",
-      "ground",
-      "ground",
-      "ground",
-      "ground",
-      "ground",
-      "wall",
-      "wall",
-      "ground",
-      "wall",
-      "ground",
-      "ground",
-      "ground",
-      "ground",
-      "ground",
-      "ground",
-      "ground",
-      "ground",
-      "ground",
-      "ground",
-      "ground",
       "wall",
       "wall",
       "path",
@@ -161,8 +62,265 @@
       "ground",
       "ground",
       "ground",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
       "ground",
       "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "path",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "path",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "wall",
+      "wall",
+      "wall",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "path",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "ground",
+      "ground",
+      "ground",
+      "ground",
+      "wall",
+      "wall",
+      "wall",
+      "ground",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
+      "wall",
       "wall",
       "wall",
       "wall",
@@ -181,17 +339,35 @@
       "wall"
     ],
     "spawn": {
-      "x": 1,
+      "x": 13,
       "y": 9
     },
+    "spawns": [
+      {
+        "x": 13,
+        "y": 9
+      },
+      {
+        "x": 3,
+        "y": 2
+      },
+      {
+        "x": 2,
+        "y": 16
+      },
+      {
+        "x": 8,
+        "y": 9
+      }
+    ],
     "decorations": [
       {
         "x": 0,
         "y": 0
       },
       {
-        "x": 14,
-        "y": 10
+        "x": 16,
+        "y": 18
       }
     ]
   },
@@ -201,52 +377,76 @@
       {
         "route": [
           {
+            "x": 2,
+            "y": 9
+          },
+          {
             "x": 3,
-            "y": 1
+            "y": 9
           },
           {
             "x": 4,
-            "y": 1
-          },
-          {
-            "x": 5,
-            "y": 1
-          },
-          {
-            "x": 6,
-            "y": 1
-          },
-          {
-            "x": 7,
-            "y": 1
-          },
-          {
-            "x": 7,
-            "y": 2
-          },
-          {
-            "x": 7,
-            "y": 3
-          },
-          {
-            "x": 6,
-            "y": 3
-          },
-          {
-            "x": 5,
-            "y": 3
+            "y": 9
           },
           {
             "x": 4,
-            "y": 3
+            "y": 10
+          },
+          {
+            "x": 4,
+            "y": 11
+          },
+          {
+            "x": 4,
+            "y": 12
+          },
+          {
+            "x": 4,
+            "y": 13
           },
           {
             "x": 3,
-            "y": 3
+            "y": 13
           },
           {
             "x": 3,
-            "y": 2
+            "y": 12
+          },
+          {
+            "x": 3,
+            "y": 11
+          },
+          {
+            "x": 3,
+            "y": 10
+          },
+          {
+            "x": 3,
+            "y": 11
+          },
+          {
+            "x": 3,
+            "y": 12
+          },
+          {
+            "x": 3,
+            "y": 13
+          },
+          {
+            "x": 2,
+            "y": 13
+          },
+          {
+            "x": 2,
+            "y": 12
+          },
+          {
+            "x": 2,
+            "y": 11
+          },
+          {
+            "x": 2,
+            "y": 10
           }
         ],
         "stepTicks": 8
@@ -254,11 +454,63 @@
       {
         "route": [
           {
-            "x": 8,
-            "y": 6
+            "x": 9,
+            "y": 2
+          },
+          {
+            "x": 10,
+            "y": 2
+          },
+          {
+            "x": 11,
+            "y": 2
+          },
+          {
+            "x": 11,
+            "y": 3
+          },
+          {
+            "x": 11,
+            "y": 4
+          },
+          {
+            "x": 10,
+            "y": 4
           },
           {
             "x": 9,
+            "y": 4
+          },
+          {
+            "x": 9,
+            "y": 3
+          },
+          {
+            "x": 9,
+            "y": 2
+          },
+          {
+            "x": 9,
+            "y": 3
+          },
+          {
+            "x": 9,
+            "y": 4
+          },
+          {
+            "x": 10,
+            "y": 4
+          },
+          {
+            "x": 11,
+            "y": 4
+          },
+          {
+            "x": 11,
+            "y": 5
+          },
+          {
+            "x": 11,
             "y": 6
           },
           {
@@ -266,40 +518,20 @@
             "y": 6
           },
           {
-            "x": 11,
+            "x": 9,
             "y": 6
-          },
-          {
-            "x": 12,
-            "y": 6
-          },
-          {
-            "x": 12,
-            "y": 7
-          },
-          {
-            "x": 12,
-            "y": 8
-          },
-          {
-            "x": 11,
-            "y": 8
-          },
-          {
-            "x": 10,
-            "y": 8
           },
           {
             "x": 9,
-            "y": 8
+            "y": 5
           },
           {
-            "x": 8,
-            "y": 8
+            "x": 9,
+            "y": 4
           },
           {
-            "x": 8,
-            "y": 7
+            "x": 9,
+            "y": 3
           }
         ],
         "stepTicks": 10

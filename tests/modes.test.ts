@@ -113,7 +113,8 @@ describe("shared action rules", () => {
     const { l, w } = setup("collapse");
     if (w.modeState.mode !== "collapse") throw Error();
     const from = cellOf(w.bots[0], l.board.width);
-    w.modeState.dangerAt[from] = 0;
+    w.modeState.dangerAt.fill(0);
+    locate(w, 1, from, l.board.width);
     w.modeState.nextCollapse = Infinity;
     w.tick = 200;
     const action = legalActions(l, w, w.bots[0]).find((a) => a.kind === "move")!;

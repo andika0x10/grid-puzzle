@@ -1,0 +1,3198 @@
+{
+  "comparedCommit": "6f545d7",
+  "arenas": 91,
+  "exactUniqueTopologies": 91,
+  "oldArenaCount": 49,
+  "oldSpawnCornerPatterns": [
+    "left:other",
+    "left:bottom",
+    "other:bottom"
+  ],
+  "changedPreviousTopologies": 49,
+  "changedPreviousSpawns": 49,
+  "changedPreviousObjectives": 49,
+  "worstCategorySimilarity": 0.8715277777777778,
+  "note": "Normalized occupancy similarity is a visual heuristic. Graph counts and spawn/target locations are reported separately; uniqueness alone does not establish enjoyable gameplay.",
+  "report": [
+    {
+      "id": "fog-1",
+      "size": "13x11",
+      "floor": 76,
+      "deadEnds": 0,
+      "junctions": 61,
+      "loops": 37,
+      "spawn": "0.50,0.50",
+      "targets": [
+        118,
+        71,
+        19,
+        128,
+        24
+      ],
+      "nearestInCategory": {
+        "id": "fog-4",
+        "similarity": 0.7725694444444444
+      },
+      "prior": {
+        "exactSameTopology": false,
+        "occupancySimilarity": 0.6927083333333334,
+        "spawnChanged": true,
+        "normalizedSpawnChanged": true,
+        "targetLayoutChanged": true,
+        "dimensionsChanged": true,
+        "graph": {
+          "floor": 43,
+          "deadEnds": 1,
+          "junctions": 9,
+          "loops": 5
+        }
+      }
+    },
+    {
+      "id": "fog-2",
+      "size": "17x11",
+      "floor": 87,
+      "deadEnds": 5,
+      "junctions": 26,
+      "loops": 13,
+      "spawn": "0.44,0.10",
+      "targets": [
+        154,
+        24,
+        168,
+        32,
+        100
+      ],
+      "nearestInCategory": {
+        "id": "fog-6",
+        "similarity": 0.6701388888888888
+      },
+      "prior": {
+        "exactSameTopology": false,
+        "occupancySimilarity": 0.6145833333333334,
+        "spawnChanged": true,
+        "normalizedSpawnChanged": true,
+        "targetLayoutChanged": true,
+        "dimensionsChanged": true,
+        "graph": {
+          "floor": 48,
+          "deadEnds": 2,
+          "junctions": 2,
+          "loops": 1
+        }
+      }
+    },
+    {
+      "id": "fog-3",
+      "size": "19x13",
+      "floor": 116,
+      "deadEnds": 1,
+      "junctions": 102,
+      "loops": 90,
+      "spawn": "0.83,0.83",
+      "targets": [
+        177,
+        205,
+        71,
+        128,
+        40
+      ],
+      "nearestInCategory": {
+        "id": "fog-5",
+        "similarity": 0.6788194444444444
+      },
+      "prior": {
+        "exactSameTopology": false,
+        "occupancySimilarity": 0.4513888888888889,
+        "spawnChanged": true,
+        "normalizedSpawnChanged": true,
+        "targetLayoutChanged": true,
+        "dimensionsChanged": true,
+        "graph": {
+          "floor": 73,
+          "deadEnds": 1,
+          "junctions": 9,
+          "loops": 5
+        }
+      }
+    },
+    {
+      "id": "fog-4",
+      "size": "15x19",
+      "floor": 173,
+      "deadEnds": 0,
+      "junctions": 136,
+      "loops": 95,
+      "spawn": "0.93,0.06",
+      "targets": [
+        234,
+        28,
+        133,
+        16,
+        256
+      ],
+      "nearestInCategory": {
+        "id": "fog-1",
+        "similarity": 0.7725694444444444
+      },
+      "prior": {
+        "exactSameTopology": false,
+        "occupancySimilarity": 0.5746527777777778,
+        "spawnChanged": true,
+        "normalizedSpawnChanged": true,
+        "targetLayoutChanged": true,
+        "dimensionsChanged": true,
+        "graph": {
+          "floor": 71,
+          "deadEnds": 2,
+          "junctions": 4,
+          "loops": 2
+        }
+      }
+    },
+    {
+      "id": "fog-5",
+      "size": "15x23",
+      "floor": 144,
+      "deadEnds": 0,
+      "junctions": 106,
+      "loops": 80,
+      "spawn": "0.79,0.50",
+      "targets": [
+        40,
+        176,
+        16,
+        286,
+        172
+      ],
+      "nearestInCategory": {
+        "id": "fog-3",
+        "similarity": 0.6788194444444444
+      },
+      "prior": {
+        "exactSameTopology": false,
+        "occupancySimilarity": 0.5104166666666666,
+        "spawnChanged": true,
+        "normalizedSpawnChanged": true,
+        "targetLayoutChanged": true,
+        "dimensionsChanged": true,
+        "graph": {
+          "floor": 97,
+          "deadEnds": 1,
+          "junctions": 3,
+          "loops": 2
+        }
+      }
+    },
+    {
+      "id": "fog-6",
+      "size": "19x23",
+      "floor": 280,
+      "deadEnds": 0,
+      "junctions": 254,
+      "loops": 164,
+      "spawn": "0.94,0.05",
+      "targets": [
+        359,
+        36,
+        400,
+        218,
+        28
+      ],
+      "nearestInCategory": {
+        "id": "fog-7",
+        "similarity": 0.7465277777777778
+      },
+      "prior": {
+        "exactSameTopology": false,
+        "occupancySimilarity": 0.5972222222222222,
+        "spawnChanged": true,
+        "normalizedSpawnChanged": true,
+        "targetLayoutChanged": true,
+        "dimensionsChanged": true,
+        "graph": {
+          "floor": 109,
+          "deadEnds": 1,
+          "junctions": 3,
+          "loops": 2
+        }
+      }
+    },
+    {
+      "id": "fog-7",
+      "size": "25x21",
+      "floor": 347,
+      "deadEnds": 0,
+      "junctions": 332,
+      "loops": 210,
+      "spawn": "0.04,0.95",
+      "targets": [
+        120,
+        476,
+        262,
+        37,
+        498
+      ],
+      "nearestInCategory": {
+        "id": "fog-6",
+        "similarity": 0.7465277777777778
+      },
+      "prior": {
+        "exactSameTopology": false,
+        "occupancySimilarity": 0.5972222222222222,
+        "spawnChanged": true,
+        "normalizedSpawnChanged": true,
+        "targetLayoutChanged": true,
+        "dimensionsChanged": true,
+        "graph": {
+          "floor": 143,
+          "deadEnds": 3,
+          "junctions": 9,
+          "loops": 4
+        }
+      }
+    },
+    {
+      "id": "collapse-1",
+      "size": "11x13",
+      "floor": 79,
+      "deadEnds": 0,
+      "junctions": 56,
+      "loops": 39,
+      "spawn": "0.90,0.50",
+      "targets": [
+        75,
+        12,
+        122,
+        60
+      ],
+      "nearestInCategory": {
+        "id": "collapse-2",
+        "similarity": 0.7517361111111112
+      },
+      "prior": {
+        "exactSameTopology": false,
+        "occupancySimilarity": 0.6458333333333334,
+        "spawnChanged": true,
+        "normalizedSpawnChanged": true,
+        "targetLayoutChanged": true,
+        "dimensionsChanged": true,
+        "graph": {
+          "floor": 42,
+          "deadEnds": 0,
+          "junctions": 4,
+          "loops": 3
+        }
+      }
+    },
+    {
+      "id": "collapse-2",
+      "size": "11x17",
+      "floor": 99,
+      "deadEnds": 0,
+      "junctions": 68,
+      "loops": 53,
+      "spawn": "0.10,0.06",
+      "targets": [
+        12,
+        155,
+        93,
+        15
+      ],
+      "nearestInCategory": {
+        "id": "collapse-1",
+        "similarity": 0.7517361111111112
+      },
+      "prior": {
+        "exactSameTopology": false,
+        "occupancySimilarity": 0.6076388888888888,
+        "spawnChanged": true,
+        "normalizedSpawnChanged": true,
+        "targetLayoutChanged": true,
+        "dimensionsChanged": true,
+        "graph": {
+          "floor": 50,
+          "deadEnds": 2,
+          "junctions": 6,
+          "loops": 3
+        }
+      }
+    },
+    {
+      "id": "collapse-3",
+      "size": "19x13",
+      "floor": 149,
+      "deadEnds": 0,
+      "junctions": 119,
+      "loops": 80,
+      "spawn": "0.94,0.50",
+      "targets": [
+        131,
+        123,
+        28,
+        226
+      ],
+      "nearestInCategory": {
+        "id": "collapse-4",
+        "similarity": 0.7743055555555556
+      },
+      "prior": {
+        "exactSameTopology": false,
+        "occupancySimilarity": 0.65625,
+        "spawnChanged": true,
+        "normalizedSpawnChanged": true,
+        "targetLayoutChanged": true,
+        "dimensionsChanged": true,
+        "graph": {
+          "floor": 73,
+          "deadEnds": 2,
+          "junctions": 8,
+          "loops": 4
+        }
+      }
+    },
+    {
+      "id": "collapse-4",
+      "size": "19x15",
+      "floor": 184,
+      "deadEnds": 0,
+      "junctions": 174,
+      "loops": 115,
+      "spawn": "0.50,0.50",
+      "targets": [
+        142,
+        28,
+        264,
+        36
+      ],
+      "nearestInCategory": {
+        "id": "collapse-5",
+        "similarity": 0.7760416666666666
+      },
+      "prior": {
+        "exactSameTopology": false,
+        "occupancySimilarity": 0.6371527777777778,
+        "spawnChanged": true,
+        "normalizedSpawnChanged": true,
+        "targetLayoutChanged": true,
+        "dimensionsChanged": true,
+        "graph": {
+          "floor": 74,
+          "deadEnds": 0,
+          "junctions": 7,
+          "loops": 5
+        }
+      }
+    },
+    {
+      "id": "collapse-5",
+      "size": "23x15",
+      "floor": 209,
+      "deadEnds": 0,
+      "junctions": 179,
+      "loops": 117,
+      "spawn": "0.50,0.07",
+      "targets": [
+        34,
+        320,
+        44,
+        182
+      ],
+      "nearestInCategory": {
+        "id": "collapse-4",
+        "similarity": 0.7760416666666666
+      },
+      "prior": {
+        "exactSameTopology": false,
+        "occupancySimilarity": 0.6701388888888888,
+        "spawnChanged": true,
+        "normalizedSpawnChanged": true,
+        "targetLayoutChanged": true,
+        "dimensionsChanged": true,
+        "graph": {
+          "floor": 101,
+          "deadEnds": 0,
+          "junctions": 10,
+          "loops": 6
+        }
+      }
+    },
+    {
+      "id": "collapse-6",
+      "size": "19x23",
+      "floor": 230,
+      "deadEnds": 10,
+      "junctions": 81,
+      "loops": 43,
+      "spawn": "0.94,0.95",
+      "targets": [
+        416,
+        36,
+        226,
+        20
+      ],
+      "nearestInCategory": {
+        "id": "collapse-4",
+        "similarity": 0.6631944444444444
+      },
+      "prior": {
+        "exactSameTopology": false,
+        "occupancySimilarity": 0.6128472222222222,
+        "spawnChanged": true,
+        "normalizedSpawnChanged": true,
+        "targetLayoutChanged": true,
+        "dimensionsChanged": true,
+        "graph": {
+          "floor": 113,
+          "deadEnds": 0,
+          "junctions": 10,
+          "loops": 6
+        }
+      }
+    },
+    {
+      "id": "collapse-7",
+      "size": "21x25",
+      "floor": 327,
+      "deadEnds": 1,
+      "junctions": 291,
+      "loops": 260,
+      "spawn": "0.90,0.08",
+      "targets": [
+        60,
+        271,
+        44,
+        464
+      ],
+      "nearestInCategory": {
+        "id": "collapse-2",
+        "similarity": 0.6770833333333334
+      },
+      "prior": {
+        "exactSameTopology": false,
+        "occupancySimilarity": 0.4774305555555556,
+        "spawnChanged": true,
+        "normalizedSpawnChanged": true,
+        "targetLayoutChanged": true,
+        "dimensionsChanged": true,
+        "graph": {
+          "floor": 144,
+          "deadEnds": 2,
+          "junctions": 10,
+          "loops": 5
+        }
+      }
+    },
+    {
+      "id": "hunt-1",
+      "size": "15x11",
+      "floor": 98,
+      "deadEnds": 0,
+      "junctions": 88,
+      "loops": 53,
+      "spawn": "0.50,0.10",
+      "targets": [
+        22,
+        148,
+        28,
+        88,
+        34,
+        35,
+        36,
+        51,
+        66,
+        65,
+        64,
+        49
+      ],
+      "nearestInCategory": {
+        "id": "hunt-2",
+        "similarity": 0.8107638888888888
+      },
+      "prior": {
+        "exactSameTopology": false,
+        "occupancySimilarity": 0.8246527777777778,
+        "spawnChanged": true,
+        "normalizedSpawnChanged": true,
+        "targetLayoutChanged": true,
+        "dimensionsChanged": true,
+        "graph": {
+          "floor": 56,
+          "deadEnds": 0,
+          "junctions": 44,
+          "loops": 29
+        }
+      }
+    },
+    {
+      "id": "hunt-2",
+      "size": "13x17",
+      "floor": 134,
+      "deadEnds": 0,
+      "junctions": 111,
+      "loops": 83,
+      "spawn": "0.92,0.94",
+      "targets": [
+        206,
+        24,
+        115,
+        14,
+        98,
+        99,
+        100,
+        101,
+        114,
+        127,
+        126,
+        125,
+        138,
+        151,
+        150,
+        137,
+        124,
+        111
+      ],
+      "nearestInCategory": {
+        "id": "hunt-1",
+        "similarity": 0.8107638888888888
+      },
+      "prior": {
+        "exactSameTopology": false,
+        "occupancySimilarity": 0.8263888888888888,
+        "spawnChanged": true,
+        "normalizedSpawnChanged": true,
+        "targetLayoutChanged": true,
+        "dimensionsChanged": true,
+        "graph": {
+          "floor": 70,
+          "deadEnds": 0,
+          "junctions": 60,
+          "loops": 43
+        }
+      }
+    },
+    {
+      "id": "hunt-3",
+      "size": "15x19",
+      "floor": 154,
+      "deadEnds": 5,
+      "junctions": 73,
+      "loops": 45,
+      "spawn": "0.93,0.06",
+      "targets": [
+        28,
+        148,
+        16,
+        256,
+        123,
+        124,
+        125,
+        140,
+        141,
+        142,
+        157,
+        172,
+        187,
+        186,
+        185,
+        184,
+        169,
+        154,
+        153,
+        138
+      ],
+      "nearestInCategory": {
+        "id": "hunt-1",
+        "similarity": 0.6840277777777778
+      },
+      "prior": {
+        "exactSameTopology": false,
+        "occupancySimilarity": 0.6875,
+        "spawnChanged": true,
+        "normalizedSpawnChanged": true,
+        "targetLayoutChanged": true,
+        "dimensionsChanged": true,
+        "graph": {
+          "floor": 94,
+          "deadEnds": 0,
+          "junctions": 69,
+          "loops": 43
+        }
+      }
+    },
+    {
+      "id": "hunt-4",
+      "size": "17x19",
+      "floor": 193,
+      "deadEnds": 1,
+      "junctions": 174,
+      "loops": 160,
+      "spawn": "0.81,0.50",
+      "targets": [
+        166,
+        37,
+        274,
+        161,
+        155,
+        156,
+        157,
+        174,
+        191,
+        208,
+        225,
+        224,
+        207,
+        190,
+        173,
+        190,
+        207,
+        224,
+        223,
+        206,
+        189,
+        172,
+        43,
+        44,
+        45,
+        62,
+        79,
+        78,
+        77,
+        60,
+        43,
+        60,
+        77,
+        78,
+        79,
+        96,
+        113,
+        112,
+        111,
+        94,
+        77,
+        60
+      ],
+      "nearestInCategory": {
+        "id": "hunt-7",
+        "similarity": 0.6493055555555556
+      },
+      "prior": {
+        "exactSameTopology": false,
+        "occupancySimilarity": 0.6354166666666666,
+        "spawnChanged": true,
+        "normalizedSpawnChanged": true,
+        "targetLayoutChanged": true,
+        "dimensionsChanged": true,
+        "graph": {
+          "floor": 100,
+          "deadEnds": 0,
+          "junctions": 79,
+          "loops": 56
+        }
+      }
+    },
+    {
+      "id": "hunt-5",
+      "size": "25x15",
+      "floor": 248,
+      "deadEnds": 1,
+      "junctions": 210,
+      "loops": 152,
+      "spawn": "0.04,0.07",
+      "targets": [
+        26,
+        326,
+        187,
+        37,
+        66,
+        67,
+        68,
+        69,
+        94,
+        119,
+        118,
+        117,
+        116,
+        91,
+        66,
+        91,
+        116,
+        117,
+        118,
+        119,
+        144,
+        169,
+        168,
+        167,
+        166,
+        141,
+        116,
+        91,
+        180,
+        181,
+        182,
+        183,
+        208,
+        207,
+        206,
+        231,
+        256,
+        257,
+        258,
+        283,
+        282,
+        281,
+        280,
+        255,
+        230,
+        205
+      ],
+      "nearestInCategory": {
+        "id": "hunt-1",
+        "similarity": 0.7864583333333334
+      },
+      "prior": {
+        "exactSameTopology": false,
+        "occupancySimilarity": 0.7118055555555556,
+        "spawnChanged": true,
+        "normalizedSpawnChanged": true,
+        "targetLayoutChanged": true,
+        "dimensionsChanged": true,
+        "graph": {
+          "floor": 120,
+          "deadEnds": 0,
+          "junctions": 62,
+          "loops": 40
+        }
+      }
+    },
+    {
+      "id": "hunt-6",
+      "size": "25x19",
+      "floor": 220,
+      "deadEnds": 0,
+      "junctions": 166,
+      "loops": 124,
+      "spawn": "0.92,0.50",
+      "targets": [
+        247,
+        212,
+        36,
+        347,
+        277,
+        278,
+        279,
+        280,
+        281,
+        306,
+        305,
+        304,
+        303,
+        328,
+        353,
+        354,
+        355,
+        356,
+        381,
+        380,
+        379,
+        378,
+        377,
+        352,
+        327,
+        302,
+        109,
+        110,
+        111,
+        112,
+        113,
+        138,
+        163,
+        188,
+        213,
+        212,
+        211,
+        210,
+        209,
+        184,
+        185,
+        186,
+        187,
+        162,
+        137,
+        136,
+        135,
+        134
+      ],
+      "nearestInCategory": {
+        "id": "hunt-4",
+        "similarity": 0.6128472222222222
+      },
+      "prior": {
+        "exactSameTopology": false,
+        "occupancySimilarity": 0.5572916666666666,
+        "spawnChanged": true,
+        "normalizedSpawnChanged": true,
+        "targetLayoutChanged": true,
+        "dimensionsChanged": true,
+        "graph": {
+          "floor": 134,
+          "deadEnds": 0,
+          "junctions": 69,
+          "loops": 44
+        }
+      }
+    },
+    {
+      "id": "hunt-7",
+      "size": "27x21",
+      "floor": 380,
+      "deadEnds": 0,
+      "junctions": 337,
+      "loops": 235,
+      "spawn": "0.50,0.50",
+      "targets": [
+        283,
+        40,
+        538,
+        52,
+        346,
+        347,
+        348,
+        375,
+        402,
+        429,
+        456,
+        455,
+        454,
+        427,
+        428,
+        401,
+        374,
+        373,
+        89,
+        90,
+        91,
+        118,
+        145,
+        144,
+        143,
+        116,
+        231,
+        232,
+        233,
+        260,
+        287,
+        286,
+        313,
+        340,
+        339,
+        312,
+        285,
+        258
+      ],
+      "nearestInCategory": {
+        "id": "hunt-1",
+        "similarity": 0.7222222222222222
+      },
+      "prior": {
+        "exactSameTopology": false,
+        "occupancySimilarity": 0.6770833333333334,
+        "spawnChanged": true,
+        "normalizedSpawnChanged": true,
+        "targetLayoutChanged": true,
+        "dimensionsChanged": true,
+        "graph": {
+          "floor": 182,
+          "deadEnds": 0,
+          "junctions": 111,
+          "loops": 76
+        }
+      }
+    },
+    {
+      "id": "circuit-1",
+      "size": "13x11",
+      "floor": 58,
+      "deadEnds": 0,
+      "junctions": 48,
+      "loops": 42,
+      "spawn": "0.33,0.20",
+      "targets": [
+        30,
+        93,
+        71,
+        32,
+        98,
+        125,
+        87,
+        125
+      ],
+      "nearestInCategory": {
+        "id": "circuit-3",
+        "similarity": 0.625
+      },
+      "prior": {
+        "exactSameTopology": false,
+        "occupancySimilarity": 0.4878472222222222,
+        "spawnChanged": true,
+        "normalizedSpawnChanged": true,
+        "targetLayoutChanged": true,
+        "dimensionsChanged": true,
+        "graph": {
+          "floor": 53,
+          "deadEnds": 0,
+          "junctions": 40,
+          "loops": 25
+        }
+      }
+    },
+    {
+      "id": "circuit-2",
+      "size": "17x11",
+      "floor": 115,
+      "deadEnds": 1,
+      "junctions": 94,
+      "loops": 68,
+      "spawn": "0.94,0.50",
+      "targets": [
+        100,
+        93,
+        25,
+        168,
+        30,
+        159,
+        121,
+        159
+      ],
+      "nearestInCategory": {
+        "id": "circuit-5",
+        "similarity": 0.7552083333333334
+      },
+      "prior": {
+        "exactSameTopology": false,
+        "occupancySimilarity": 0.7048611111111112,
+        "spawnChanged": true,
+        "normalizedSpawnChanged": true,
+        "targetLayoutChanged": true,
+        "dimensionsChanged": true,
+        "graph": {
+          "floor": 55,
+          "deadEnds": 0,
+          "junctions": 20,
+          "loops": 11
+        }
+      }
+    },
+    {
+      "id": "circuit-3",
+      "size": "19x13",
+      "floor": 95,
+      "deadEnds": 0,
+      "junctions": 69,
+      "loops": 50,
+      "spawn": "0.50,0.50",
+      "targets": [
+        123,
+        28,
+        168,
+        34,
+        109,
+        87,
+        40,
+        155,
+        40,
+        155
+      ],
+      "nearestInCategory": {
+        "id": "circuit-1",
+        "similarity": 0.625
+      },
+      "prior": {
+        "exactSameTopology": false,
+        "occupancySimilarity": 0.5034722222222222,
+        "spawnChanged": true,
+        "normalizedSpawnChanged": true,
+        "targetLayoutChanged": true,
+        "dimensionsChanged": true,
+        "graph": {
+          "floor": 75,
+          "deadEnds": 3,
+          "junctions": 13,
+          "loops": 6
+        }
+      }
+    },
+    {
+      "id": "circuit-4",
+      "size": "15x19",
+      "floor": 175,
+      "deadEnds": 0,
+      "junctions": 152,
+      "loops": 97,
+      "spawn": "0.43,0.06",
+      "targets": [
+        21,
+        268,
+        28,
+        148,
+        76,
+        128,
+        190,
+        199,
+        190,
+        199
+      ],
+      "nearestInCategory": {
+        "id": "circuit-5",
+        "similarity": 0.859375
+      },
+      "prior": {
+        "exactSameTopology": false,
+        "occupancySimilarity": 0.6840277777777778,
+        "spawnChanged": true,
+        "normalizedSpawnChanged": true,
+        "targetLayoutChanged": true,
+        "dimensionsChanged": true,
+        "graph": {
+          "floor": 83,
+          "deadEnds": 0,
+          "junctions": 36,
+          "loops": 21
+        }
+      }
+    },
+    {
+      "id": "circuit-5",
+      "size": "15x23",
+      "floor": 228,
+      "deadEnds": 0,
+      "junctions": 219,
+      "loops": 147,
+      "spawn": "0.93,0.95",
+      "targets": [
+        328,
+        28,
+        178,
+        16,
+        261,
+        287,
+        196,
+        67,
+        171,
+        67,
+        171,
+        67
+      ],
+      "nearestInCategory": {
+        "id": "circuit-4",
+        "similarity": 0.859375
+      },
+      "prior": {
+        "exactSameTopology": false,
+        "occupancySimilarity": 0.6857638888888888,
+        "spawnChanged": true,
+        "normalizedSpawnChanged": true,
+        "targetLayoutChanged": true,
+        "dimensionsChanged": true,
+        "graph": {
+          "floor": 108,
+          "deadEnds": 0,
+          "junctions": 32,
+          "loops": 18
+        }
+      }
+    },
+    {
+      "id": "circuit-6",
+      "size": "19x23",
+      "floor": 272,
+      "deadEnds": 0,
+      "junctions": 235,
+      "loops": 160,
+      "spawn": "0.94,0.05",
+      "targets": [
+        36,
+        226,
+        20,
+        400,
+        179,
+        413,
+        352,
+        105,
+        240,
+        105,
+        240,
+        105
+      ],
+      "nearestInCategory": {
+        "id": "circuit-5",
+        "similarity": 0.7829861111111112
+      },
+      "prior": {
+        "exactSameTopology": false,
+        "occupancySimilarity": 0.640625,
+        "spawnChanged": true,
+        "normalizedSpawnChanged": true,
+        "targetLayoutChanged": true,
+        "dimensionsChanged": true,
+        "graph": {
+          "floor": 119,
+          "deadEnds": 3,
+          "junctions": 31,
+          "loops": 15
+        }
+      }
+    },
+    {
+      "id": "circuit-7",
+      "size": "25x21",
+      "floor": 280,
+      "deadEnds": 10,
+      "junctions": 101,
+      "loops": 52,
+      "spawn": "0.96,0.50",
+      "targets": [
+        273,
+        26,
+        476,
+        262,
+        471,
+        381,
+        135,
+        389,
+        484,
+        242,
+        484,
+        242,
+        484,
+        242
+      ],
+      "nearestInCategory": {
+        "id": "circuit-5",
+        "similarity": 0.6631944444444444
+      },
+      "prior": {
+        "exactSameTopology": false,
+        "occupancySimilarity": 0.5868055555555556,
+        "spawnChanged": true,
+        "normalizedSpawnChanged": true,
+        "targetLayoutChanged": true,
+        "dimensionsChanged": true,
+        "graph": {
+          "floor": 150,
+          "deadEnds": 3,
+          "junctions": 23,
+          "loops": 11
+        }
+      }
+    },
+    {
+      "id": "energy-1",
+      "size": "11x13",
+      "floor": 81,
+      "deadEnds": 0,
+      "junctions": 66,
+      "loops": 43,
+      "spawn": "0.90,0.92",
+      "targets": [
+        130,
+        20,
+        75,
+        12,
+        90,
+        49,
+        130,
+        83,
+        126,
+        122
+      ],
+      "nearestInCategory": {
+        "id": "energy-2",
+        "similarity": 0.8715277777777778
+      },
+      "prior": {
+        "exactSameTopology": false,
+        "occupancySimilarity": 0.8072916666666666,
+        "spawnChanged": true,
+        "normalizedSpawnChanged": true,
+        "targetLayoutChanged": true,
+        "dimensionsChanged": true,
+        "graph": {
+          "floor": 52,
+          "deadEnds": 0,
+          "junctions": 36,
+          "loops": 21
+        }
+      }
+    },
+    {
+      "id": "energy-2",
+      "size": "11x17",
+      "floor": 110,
+      "deadEnds": 0,
+      "junctions": 100,
+      "loops": 59,
+      "spawn": "0.90,0.06",
+      "targets": [
+        20,
+        97,
+        12,
+        166,
+        68,
+        163,
+        20,
+        72,
+        166,
+        125,
+        26,
+        139,
+        170
+      ],
+      "nearestInCategory": {
+        "id": "energy-1",
+        "similarity": 0.8715277777777778
+      },
+      "prior": {
+        "exactSameTopology": false,
+        "occupancySimilarity": 0.7552083333333334,
+        "spawnChanged": true,
+        "normalizedSpawnChanged": true,
+        "targetLayoutChanged": true,
+        "dimensionsChanged": true,
+        "graph": {
+          "floor": 59,
+          "deadEnds": 0,
+          "junctions": 32,
+          "loops": 19
+        }
+      }
+    },
+    {
+      "id": "energy-3",
+      "size": "19x13",
+      "floor": 153,
+      "deadEnds": 0,
+      "junctions": 134,
+      "loops": 96,
+      "spawn": "0.94,0.50",
+      "targets": [
+        131,
+        20,
+        210,
+        123,
+        197,
+        27,
+        98,
+        131,
+        125,
+        223,
+        53,
+        109,
+        139,
+        43,
+        167
+      ],
+      "nearestInCategory": {
+        "id": "energy-1",
+        "similarity": 0.7934027777777778
+      },
+      "prior": {
+        "exactSameTopology": false,
+        "occupancySimilarity": 0.6128472222222222,
+        "spawnChanged": true,
+        "normalizedSpawnChanged": true,
+        "targetLayoutChanged": true,
+        "dimensionsChanged": true,
+        "graph": {
+          "floor": 76,
+          "deadEnds": 0,
+          "junctions": 12,
+          "loops": 7
+        }
+      }
+    },
+    {
+      "id": "energy-4",
+      "size": "19x15",
+      "floor": 144,
+      "deadEnds": 6,
+      "junctions": 53,
+      "loops": 30,
+      "spawn": "0.06,0.07",
+      "targets": [
+        20,
+        248,
+        142,
+        28,
+        259,
+        112,
+        214,
+        20,
+        62,
+        248,
+        30,
+        32,
+        180,
+        155,
+        245,
+        166,
+        255,
+        106,
+        96,
+        54
+      ],
+      "nearestInCategory": {
+        "id": "energy-1",
+        "similarity": 0.6996527777777778
+      },
+      "prior": {
+        "exactSameTopology": false,
+        "occupancySimilarity": 0.6475694444444444,
+        "spawnChanged": true,
+        "normalizedSpawnChanged": true,
+        "targetLayoutChanged": true,
+        "dimensionsChanged": true,
+        "graph": {
+          "floor": 75,
+          "deadEnds": 1,
+          "junctions": 10,
+          "loops": 6
+        }
+      }
+    },
+    {
+      "id": "energy-5",
+      "size": "23x15",
+      "floor": 166,
+      "deadEnds": 4,
+      "junctions": 133,
+      "loops": 110,
+      "spawn": "0.95,0.50",
+      "targets": [
+        182,
+        172,
+        35,
+        250,
+        292,
+        25,
+        143,
+        107,
+        250,
+        195,
+        283,
+        53,
+        209,
+        42,
+        263,
+        95,
+        235,
+        133
+      ],
+      "nearestInCategory": {
+        "id": "energy-7",
+        "similarity": 0.6041666666666666
+      },
+      "prior": {
+        "exactSameTopology": false,
+        "occupancySimilarity": 0.4930555555555556,
+        "spawnChanged": true,
+        "normalizedSpawnChanged": true,
+        "targetLayoutChanged": true,
+        "dimensionsChanged": true,
+        "graph": {
+          "floor": 107,
+          "deadEnds": 0,
+          "junctions": 31,
+          "loops": 17
+        }
+      }
+    },
+    {
+      "id": "energy-6",
+      "size": "19x23",
+      "floor": 274,
+      "deadEnds": 2,
+      "junctions": 209,
+      "loops": 145,
+      "spawn": "0.44,0.50",
+      "targets": [
+        217,
+        27,
+        416,
+        36,
+        350,
+        317,
+        191,
+        149,
+        36,
+        416,
+        27,
+        127,
+        400,
+        195,
+        302,
+        20,
+        29,
+        219,
+        412,
+        307,
+        385,
+        98,
+        243,
+        272,
+        259,
+        140,
+        163
+      ],
+      "nearestInCategory": {
+        "id": "energy-1",
+        "similarity": 0.7430555555555556
+      },
+      "prior": {
+        "exactSameTopology": false,
+        "occupancySimilarity": 0.6336805555555556,
+        "spawnChanged": true,
+        "normalizedSpawnChanged": true,
+        "targetLayoutChanged": true,
+        "dimensionsChanged": true,
+        "graph": {
+          "floor": 120,
+          "deadEnds": 1,
+          "junctions": 31,
+          "loops": 16
+        }
+      }
+    },
+    {
+      "id": "energy-7",
+      "size": "21x25",
+      "floor": 244,
+      "deadEnds": 0,
+      "junctions": 178,
+      "loops": 131,
+      "spawn": "0.45,0.04",
+      "targets": [
+        30,
+        498,
+        37,
+        268,
+        412,
+        338,
+        445,
+        129,
+        162,
+        456,
+        29,
+        240,
+        308,
+        344,
+        43,
+        278,
+        491,
+        232,
+        373,
+        484,
+        175,
+        25,
+        98
+      ],
+      "nearestInCategory": {
+        "id": "energy-5",
+        "similarity": 0.6041666666666666
+      },
+      "prior": {
+        "exactSameTopology": false,
+        "occupancySimilarity": 0.5329861111111112,
+        "spawnChanged": true,
+        "normalizedSpawnChanged": true,
+        "targetLayoutChanged": true,
+        "dimensionsChanged": true,
+        "graph": {
+          "floor": 152,
+          "deadEnds": 4,
+          "junctions": 24,
+          "loops": 11
+        }
+      }
+    },
+    {
+      "id": "bridge-1",
+      "size": "15x11",
+      "floor": 99,
+      "deadEnds": 0,
+      "junctions": 77,
+      "loops": 58,
+      "spawn": "0.93,0.50",
+      "targets": [
+        137,
+        88,
+        23,
+        145,
+        28,
+        88,
+        63,
+        111,
+        51,
+        53,
+        128,
+        130
+      ],
+      "nearestInCategory": {
+        "id": "bridge-4",
+        "similarity": 0.8645833333333334
+      },
+      "prior": {
+        "exactSameTopology": false,
+        "occupancySimilarity": 0.7534722222222222,
+        "spawnChanged": true,
+        "normalizedSpawnChanged": true,
+        "targetLayoutChanged": true,
+        "dimensionsChanged": true,
+        "graph": {
+          "floor": 51,
+          "deadEnds": 0,
+          "junctions": 33,
+          "loops": 23
+        }
+      }
+    },
+    {
+      "id": "bridge-2",
+      "size": "13x17",
+      "floor": 127,
+      "deadEnds": 0,
+      "junctions": 99,
+      "loops": 72,
+      "spawn": "0.50,0.44",
+      "targets": [
+        206,
+        97,
+        24,
+        27,
+        102,
+        97,
+        184,
+        176,
+        94,
+        133,
+        100,
+        139
+      ],
+      "nearestInCategory": {
+        "id": "bridge-1",
+        "similarity": 0.8003472222222222
+      },
+      "prior": {
+        "exactSameTopology": false,
+        "occupancySimilarity": 0.7586805555555556,
+        "spawnChanged": true,
+        "normalizedSpawnChanged": true,
+        "targetLayoutChanged": true,
+        "dimensionsChanged": true,
+        "graph": {
+          "floor": 62,
+          "deadEnds": 0,
+          "junctions": 30,
+          "loops": 19
+        }
+      }
+    },
+    {
+      "id": "bridge-3",
+      "size": "15x19",
+      "floor": 174,
+      "deadEnds": 0,
+      "junctions": 153,
+      "loops": 101,
+      "spawn": "0.50,0.06",
+      "targets": [
+        244,
+        22,
+        238,
+        88,
+        162,
+        22,
+        95,
+        142,
+        37,
+        67,
+        145,
+        147,
+        137,
+        139
+      ],
+      "nearestInCategory": {
+        "id": "bridge-1",
+        "similarity": 0.7083333333333334
+      },
+      "prior": {
+        "exactSameTopology": false,
+        "occupancySimilarity": 0.6979166666666666,
+        "spawnChanged": true,
+        "normalizedSpawnChanged": true,
+        "targetLayoutChanged": true,
+        "dimensionsChanged": true,
+        "graph": {
+          "floor": 91,
+          "deadEnds": 0,
+          "junctions": 63,
+          "loops": 38
+        }
+      }
+    },
+    {
+      "id": "bridge-4",
+      "size": "17x19",
+      "floor": 207,
+      "deadEnds": 0,
+      "junctions": 169,
+      "loops": 132,
+      "spawn": "0.94,0.72",
+      "targets": [
+        106,
+        236,
+        298,
+        180,
+        249,
+        236,
+        256,
+        35,
+        63,
+        208,
+        58,
+        60,
+        262,
+        264,
+        139,
+        173,
+        149,
+        183
+      ],
+      "nearestInCategory": {
+        "id": "bridge-1",
+        "similarity": 0.8645833333333334
+      },
+      "prior": {
+        "exactSameTopology": false,
+        "occupancySimilarity": 0.7048611111111112,
+        "spawnChanged": true,
+        "normalizedSpawnChanged": true,
+        "targetLayoutChanged": true,
+        "dimensionsChanged": true,
+        "graph": {
+          "floor": 92,
+          "deadEnds": 0,
+          "junctions": 73,
+          "loops": 43
+        }
+      }
+    },
+    {
+      "id": "bridge-5",
+      "size": "25x15",
+      "floor": 244,
+      "deadEnds": 0,
+      "junctions": 212,
+      "loops": 163,
+      "spawn": "0.96,0.07",
+      "targets": [
+        327,
+        48,
+        342,
+        117,
+        247,
+        48,
+        203,
+        281,
+        82,
+        101,
+        261,
+        82,
+        85,
+        282,
+        285,
+        190,
+        192
+      ],
+      "nearestInCategory": {
+        "id": "bridge-1",
+        "similarity": 0.7725694444444444
+      },
+      "prior": {
+        "exactSameTopology": false,
+        "occupancySimilarity": 0.6597222222222222,
+        "spawnChanged": true,
+        "normalizedSpawnChanged": true,
+        "targetLayoutChanged": true,
+        "dimensionsChanged": true,
+        "graph": {
+          "floor": 108,
+          "deadEnds": 0,
+          "junctions": 20,
+          "loops": 13
+        }
+      }
+    },
+    {
+      "id": "bridge-6",
+      "size": "25x19",
+      "floor": 259,
+      "deadEnds": 0,
+      "junctions": 202,
+      "loops": 149,
+      "spawn": "0.96,0.44",
+      "targets": [
+        430,
+        223,
+        38,
+        47,
+        143,
+        223,
+        265,
+        352,
+        361,
+        211,
+        180,
+        203,
+        253,
+        221,
+        271,
+        86,
+        88
+      ],
+      "nearestInCategory": {
+        "id": "bridge-4",
+        "similarity": 0.796875
+      },
+      "prior": {
+        "exactSameTopology": false,
+        "occupancySimilarity": 0.6510416666666666,
+        "spawnChanged": true,
+        "normalizedSpawnChanged": true,
+        "targetLayoutChanged": true,
+        "dimensionsChanged": true,
+        "graph": {
+          "floor": 138,
+          "deadEnds": 0,
+          "junctions": 79,
+          "loops": 49
+        }
+      }
+    },
+    {
+      "id": "bridge-7",
+      "size": "27x21",
+      "floor": 359,
+      "deadEnds": 0,
+      "junctions": 316,
+      "loops": 242,
+      "spawn": "0.04,0.05",
+      "targets": [
+        460,
+        28,
+        255,
+        37,
+        167,
+        28,
+        467,
+        457,
+        535,
+        355,
+        239,
+        71,
+        93,
+        96,
+        471,
+        474,
+        246,
+        327,
+        266,
+        347,
+        174,
+        177
+      ],
+      "nearestInCategory": {
+        "id": "bridge-4",
+        "similarity": 0.8385416666666666
+      },
+      "prior": {
+        "exactSameTopology": false,
+        "occupancySimilarity": 0.6597222222222222,
+        "spawnChanged": true,
+        "normalizedSpawnChanged": true,
+        "targetLayoutChanged": true,
+        "dimensionsChanged": true,
+        "graph": {
+          "floor": 179,
+          "deadEnds": 0,
+          "junctions": 128,
+          "loops": 86
+        }
+      }
+    },
+    {
+      "id": "crates-1",
+      "size": "13x11",
+      "floor": 78,
+      "deadEnds": 0,
+      "junctions": 65,
+      "loops": 51,
+      "spawn": "0.92,0.10",
+      "targets": [
+        24,
+        63,
+        14,
+        118,
+        42,
+        16
+      ],
+      "nearestInCategory": {
+        "id": "crates-2",
+        "similarity": 0.7378472222222222
+      },
+      "prior": {
+        "exactSameTopology": false,
+        "occupancySimilarity": 0.7899305555555556,
+        "spawnChanged": true,
+        "normalizedSpawnChanged": true,
+        "targetLayoutChanged": true,
+        "dimensionsChanged": true,
+        "graph": {
+          "floor": 35,
+          "deadEnds": 0,
+          "junctions": 31,
+          "loops": 24
+        }
+      }
+    },
+    {
+      "id": "crates-2",
+      "size": "17x11",
+      "floor": 115,
+      "deadEnds": 0,
+      "junctions": 93,
+      "loops": 68,
+      "spawn": "0.94,0.50",
+      "targets": [
+        100,
+        18,
+        154,
+        93,
+        105,
+        139
+      ],
+      "nearestInCategory": {
+        "id": "crates-3",
+        "similarity": 0.7743055555555556
+      },
+      "prior": {
+        "exactSameTopology": false,
+        "occupancySimilarity": 0.8350694444444444,
+        "spawnChanged": true,
+        "normalizedSpawnChanged": true,
+        "targetLayoutChanged": true,
+        "dimensionsChanged": true,
+        "graph": {
+          "floor": 43,
+          "deadEnds": 0,
+          "junctions": 37,
+          "loops": 27
+        }
+      }
+    },
+    {
+      "id": "crates-3",
+      "size": "19x13",
+      "floor": 159,
+      "deadEnds": 0,
+      "junctions": 150,
+      "loops": 100,
+      "spawn": "0.06,0.08",
+      "targets": [
+        20,
+        210,
+        123,
+        28,
+        174,
+        172
+      ],
+      "nearestInCategory": {
+        "id": "crates-7",
+        "similarity": 0.78125
+      },
+      "prior": {
+        "exactSameTopology": false,
+        "occupancySimilarity": 0.8194444444444444,
+        "spawnChanged": true,
+        "normalizedSpawnChanged": true,
+        "targetLayoutChanged": true,
+        "dimensionsChanged": true,
+        "graph": {
+          "floor": 53,
+          "deadEnds": 0,
+          "junctions": 49,
+          "loops": 37
+        }
+      }
+    },
+    {
+      "id": "crates-4",
+      "size": "15x19",
+      "floor": 184,
+      "deadEnds": 0,
+      "junctions": 164,
+      "loops": 121,
+      "spawn": "0.93,0.50",
+      "targets": [
+        148,
+        142,
+        22,
+        268,
+        183,
+        70,
+        153,
+        72
+      ],
+      "nearestInCategory": {
+        "id": "crates-3",
+        "similarity": 0.7638888888888888
+      },
+      "prior": {
+        "exactSameTopology": false,
+        "occupancySimilarity": 0.8090277777777778,
+        "spawnChanged": true,
+        "normalizedSpawnChanged": true,
+        "targetLayoutChanged": true,
+        "dimensionsChanged": true,
+        "graph": {
+          "floor": 63,
+          "deadEnds": 0,
+          "junctions": 55,
+          "loops": 42
+        }
+      }
+    },
+    {
+      "id": "crates-5",
+      "size": "15x23",
+      "floor": 195,
+      "deadEnds": 5,
+      "junctions": 102,
+      "loops": 69,
+      "spawn": "0.50,0.50",
+      "targets": [
+        172,
+        22,
+        328,
+        28,
+        228,
+        55,
+        230,
+        85
+      ],
+      "nearestInCategory": {
+        "id": "crates-3",
+        "similarity": 0.6909722222222222
+      },
+      "prior": {
+        "exactSameTopology": false,
+        "occupancySimilarity": 0.7013888888888888,
+        "spawnChanged": true,
+        "normalizedSpawnChanged": true,
+        "targetLayoutChanged": true,
+        "dimensionsChanged": true,
+        "graph": {
+          "floor": 73,
+          "deadEnds": 0,
+          "junctions": 67,
+          "loops": 49
+        }
+      }
+    },
+    {
+      "id": "crates-6",
+      "size": "19x23",
+      "floor": 261,
+      "deadEnds": 3,
+      "junctions": 224,
+      "loops": 193,
+      "spawn": "0.61,0.05",
+      "targets": [
+        30,
+        415,
+        32,
+        226,
+        345,
+        128,
+        383,
+        126
+      ],
+      "nearestInCategory": {
+        "id": "crates-1",
+        "similarity": 0.6666666666666666
+      },
+      "prior": {
+        "exactSameTopology": false,
+        "occupancySimilarity": 0.703125,
+        "spawnChanged": true,
+        "normalizedSpawnChanged": true,
+        "targetLayoutChanged": true,
+        "dimensionsChanged": true,
+        "graph": {
+          "floor": 100,
+          "deadEnds": 0,
+          "junctions": 96,
+          "loops": 74
+        }
+      }
+    },
+    {
+      "id": "crates-7",
+      "size": "25x21",
+      "floor": 364,
+      "deadEnds": 2,
+      "junctions": 317,
+      "loops": 236,
+      "spawn": "0.96,0.95",
+      "targets": [
+        498,
+        48,
+        273,
+        26,
+        153,
+        286,
+        419,
+        151,
+        236,
+        421
+      ],
+      "nearestInCategory": {
+        "id": "crates-3",
+        "similarity": 0.78125
+      },
+      "prior": {
+        "exactSameTopology": false,
+        "occupancySimilarity": 0.8107638888888888,
+        "spawnChanged": true,
+        "normalizedSpawnChanged": true,
+        "targetLayoutChanged": true,
+        "dimensionsChanged": true,
+        "graph": {
+          "floor": 129,
+          "deadEnds": 0,
+          "junctions": 124,
+          "loops": 97
+        }
+      }
+    },
+    {
+      "id": "bomb-1",
+      "size": "11x13",
+      "floor": 75,
+      "deadEnds": 2,
+      "junctions": 56,
+      "loops": 41,
+      "spawn": "0.50,0.50",
+      "targets": [
+        71,
+        16,
+        130,
+        20,
+        124,
+        45,
+        106,
+        100
+      ],
+      "nearestInCategory": {
+        "id": "bomb-7",
+        "similarity": 0.7239583333333334
+      },
+      "prior": null
+    },
+    {
+      "id": "bomb-2",
+      "size": "11x17",
+      "floor": 91,
+      "deadEnds": 4,
+      "junctions": 33,
+      "loops": 17,
+      "spawn": "0.50,0.06",
+      "targets": [
+        16,
+        174,
+        20,
+        97,
+        78,
+        147,
+        59,
+        23,
+        104
+      ],
+      "nearestInCategory": {
+        "id": "bomb-6",
+        "similarity": 0.6840277777777778
+      },
+      "prior": null
+    },
+    {
+      "id": "bomb-3",
+      "size": "19x13",
+      "floor": 110,
+      "deadEnds": 4,
+      "junctions": 88,
+      "loops": 72,
+      "spawn": "0.83,0.75",
+      "targets": [
+        186,
+        34,
+        149,
+        41,
+        154,
+        28,
+        196,
+        106,
+        201,
+        119
+      ],
+      "nearestInCategory": {
+        "id": "bomb-4",
+        "similarity": 0.5399305555555556
+      },
+      "prior": null
+    },
+    {
+      "id": "bomb-4",
+      "size": "19x15",
+      "floor": 179,
+      "deadEnds": 2,
+      "junctions": 143,
+      "loops": 99,
+      "spawn": "0.94,0.07",
+      "targets": [
+        36,
+        150,
+        20,
+        248,
+        47,
+        178,
+        242,
+        126,
+        117,
+        213,
+        62
+      ],
+      "nearestInCategory": {
+        "id": "bomb-1",
+        "similarity": 0.7152777777777778
+      },
+      "prior": null
+    },
+    {
+      "id": "bomb-5",
+      "size": "23x15",
+      "floor": 177,
+      "deadEnds": 0,
+      "junctions": 110,
+      "loops": 83,
+      "spawn": "0.95,0.50",
+      "targets": [
+        182,
+        24,
+        300,
+        172,
+        106,
+        266,
+        140,
+        31,
+        319,
+        66,
+        308,
+        214
+      ],
+      "nearestInCategory": {
+        "id": "bomb-1",
+        "similarity": 0.7048611111111112
+      },
+      "prior": null
+    },
+    {
+      "id": "bomb-6",
+      "size": "19x23",
+      "floor": 275,
+      "deadEnds": 3,
+      "junctions": 245,
+      "loops": 154,
+      "spawn": "0.06,0.05",
+      "targets": [
+        20,
+        400,
+        218,
+        28,
+        333,
+        166,
+        54,
+        301,
+        248,
+        139,
+        309,
+        394,
+        407
+      ],
+      "nearestInCategory": {
+        "id": "bomb-7",
+        "similarity": 0.7465277777777778
+      },
+      "prior": null
+    },
+    {
+      "id": "bomb-7",
+      "size": "21x25",
+      "floor": 347,
+      "deadEnds": 0,
+      "junctions": 332,
+      "loops": 210,
+      "spawn": "0.95,0.50",
+      "targets": [
+        271,
+        262,
+        31,
+        502,
+        408,
+        330,
+        382,
+        131,
+        300,
+        64,
+        139,
+        59,
+        254,
+        165
+      ],
+      "nearestInCategory": {
+        "id": "bomb-6",
+        "similarity": 0.7465277777777778
+      },
+      "prior": null
+    },
+    {
+      "id": "snake-1",
+      "size": "15x11",
+      "floor": 98,
+      "deadEnds": 0,
+      "junctions": 79,
+      "loops": 56,
+      "spawn": "0.93,0.50",
+      "targets": [
+        88,
+        16,
+        136,
+        82,
+        25,
+        130,
+        93
+      ],
+      "nearestInCategory": {
+        "id": "snake-2",
+        "similarity": 0.7118055555555556
+      },
+      "prior": null
+    },
+    {
+      "id": "snake-2",
+      "size": "13x17",
+      "floor": 109,
+      "deadEnds": 0,
+      "junctions": 77,
+      "loops": 59,
+      "spawn": "0.08,0.06",
+      "targets": [
+        14,
+        170,
+        110,
+        18,
+        192,
+        102,
+        48
+      ],
+      "nearestInCategory": {
+        "id": "snake-1",
+        "similarity": 0.7118055555555556
+      },
+      "prior": null
+    },
+    {
+      "id": "snake-3",
+      "size": "15x19",
+      "floor": 176,
+      "deadEnds": 1,
+      "junctions": 155,
+      "loops": 100,
+      "spawn": "0.93,0.50",
+      "targets": [
+        148,
+        141,
+        21,
+        268,
+        206,
+        58,
+        245,
+        83
+      ],
+      "nearestInCategory": {
+        "id": "snake-4",
+        "similarity": 0.765625
+      },
+      "prior": null
+    },
+    {
+      "id": "snake-4",
+      "size": "17x19",
+      "floor": 205,
+      "deadEnds": 0,
+      "junctions": 190,
+      "loops": 118,
+      "spawn": "0.50,0.50",
+      "targets": [
+        161,
+        25,
+        304,
+        32,
+        202,
+        37,
+        296,
+        191
+      ],
+      "nearestInCategory": {
+        "id": "snake-5",
+        "similarity": 0.7690972222222222
+      },
+      "prior": null
+    },
+    {
+      "id": "snake-5",
+      "size": "25x15",
+      "floor": 228,
+      "deadEnds": 0,
+      "junctions": 190,
+      "loops": 133,
+      "spawn": "0.50,0.07",
+      "targets": [
+        37,
+        348,
+        48,
+        198,
+        328,
+        156,
+        335,
+        266,
+        201
+      ],
+      "nearestInCategory": {
+        "id": "snake-4",
+        "similarity": 0.7690972222222222
+      },
+      "prior": null
+    },
+    {
+      "id": "snake-6",
+      "size": "25x19",
+      "floor": 251,
+      "deadEnds": 9,
+      "junctions": 90,
+      "loops": 49,
+      "spawn": "0.96,0.94",
+      "targets": [
+        448,
+        48,
+        248,
+        26,
+        177,
+        293,
+        281,
+        86,
+        363
+      ],
+      "nearestInCategory": {
+        "id": "snake-4",
+        "similarity": 0.6788194444444444
+      },
+      "prior": null
+    },
+    {
+      "id": "snake-7",
+      "size": "27x21",
+      "floor": 349,
+      "deadEnds": 1,
+      "junctions": 310,
+      "loops": 278,
+      "spawn": "0.85,0.05",
+      "targets": [
+        49,
+        268,
+        57,
+        487,
+        500,
+        141,
+        120,
+        309,
+        317,
+        259
+      ],
+      "nearestInCategory": {
+        "id": "snake-1",
+        "similarity": 0.6822916666666666
+      },
+      "prior": null
+    },
+    {
+      "id": "flow-1",
+      "size": "13x11",
+      "floor": 82,
+      "deadEnds": 0,
+      "junctions": 72,
+      "loops": 43,
+      "spawn": "0.50,0.10",
+      "targets": [
+        19,
+        128,
+        24,
+        76,
+        59,
+        34,
+        30,
+        101
+      ],
+      "nearestInCategory": {
+        "id": "flow-2",
+        "similarity": 0.7621527777777778
+      },
+      "prior": null
+    },
+    {
+      "id": "flow-2",
+      "size": "17x11",
+      "floor": 103,
+      "deadEnds": 0,
+      "junctions": 83,
+      "loops": 52,
+      "spawn": "0.94,0.90",
+      "targets": [
+        168,
+        32,
+        100,
+        18,
+        80,
+        165,
+        91,
+        133,
+        155
+      ],
+      "nearestInCategory": {
+        "id": "flow-1",
+        "similarity": 0.7621527777777778
+      },
+      "prior": null
+    },
+    {
+      "id": "flow-3",
+      "size": "19x13",
+      "floor": 122,
+      "deadEnds": 6,
+      "junctions": 39,
+      "loops": 22,
+      "spawn": "0.94,0.08",
+      "targets": [
+        36,
+        131,
+        20,
+        210,
+        181,
+        138,
+        174,
+        42,
+        86,
+        184
+      ],
+      "nearestInCategory": {
+        "id": "flow-7",
+        "similarity": 0.71875
+      },
+      "prior": null
+    },
+    {
+      "id": "flow-4",
+      "size": "15x19",
+      "floor": 146,
+      "deadEnds": 1,
+      "junctions": 127,
+      "loops": 114,
+      "spawn": "0.86,0.50",
+      "targets": [
+        147,
+        33,
+        196,
+        142,
+        50,
+        109,
+        193,
+        213,
+        113,
+        170,
+        72
+      ],
+      "nearestInCategory": {
+        "id": "flow-5",
+        "similarity": 0.6111111111111112
+      },
+      "prior": null
+    },
+    {
+      "id": "flow-5",
+      "size": "15x23",
+      "floor": 219,
+      "deadEnds": 3,
+      "junctions": 174,
+      "loops": 123,
+      "spawn": "0.07,0.05",
+      "targets": [
+        16,
+        316,
+        172,
+        22,
+        283,
+        161,
+        304,
+        197,
+        54,
+        126,
+        49,
+        257
+      ],
+      "nearestInCategory": {
+        "id": "flow-1",
+        "similarity": 0.7482638888888888
+      },
+      "prior": null
+    },
+    {
+      "id": "flow-6",
+      "size": "19x23",
+      "floor": 198,
+      "deadEnds": 0,
+      "junctions": 147,
+      "loops": 105,
+      "spawn": "0.94,0.50",
+      "targets": [
+        226,
+        218,
+        28,
+        358,
+        334,
+        229,
+        311,
+        62,
+        23,
+        242,
+        337,
+        287,
+        68
+      ],
+      "nearestInCategory": {
+        "id": "flow-1",
+        "similarity": 0.6423611111111112
+      },
+      "prior": null
+    },
+    {
+      "id": "flow-7",
+      "size": "25x21",
+      "floor": 349,
+      "deadEnds": 3,
+      "junctions": 314,
+      "loops": 215,
+      "spawn": "0.50,0.50",
+      "targets": [
+        262,
+        37,
+        498,
+        48,
+        334,
+        164,
+        317,
+        129,
+        329,
+        231,
+        173,
+        85,
+        433,
+        446
+      ],
+      "nearestInCategory": {
+        "id": "flow-1",
+        "similarity": 0.7204861111111112
+      },
+      "prior": null
+    },
+    {
+      "id": "portal-1",
+      "size": "11x13",
+      "floor": 66,
+      "deadEnds": 2,
+      "junctions": 55,
+      "loops": 47,
+      "spawn": "0.20,0.17",
+      "targets": [
+        24,
+        112,
+        71,
+        27,
+        118,
+        125,
+        94,
+        47
+      ],
+      "nearestInCategory": {
+        "id": "portal-3",
+        "similarity": 0.6319444444444444
+      },
+      "prior": null
+    },
+    {
+      "id": "portal-2",
+      "size": "11x17",
+      "floor": 109,
+      "deadEnds": 4,
+      "junctions": 83,
+      "loops": 59,
+      "spawn": "0.90,0.50",
+      "targets": [
+        97,
+        93,
+        16,
+        174,
+        31,
+        62,
+        69,
+        170,
+        25
+      ],
+      "nearestInCategory": {
+        "id": "portal-5",
+        "similarity": 0.6770833333333334
+      },
+      "prior": null
+    },
+    {
+      "id": "portal-3",
+      "size": "19x13",
+      "floor": 107,
+      "deadEnds": 0,
+      "junctions": 78,
+      "loops": 59,
+      "spawn": "0.50,0.50",
+      "targets": [
+        123,
+        28,
+        188,
+        35,
+        90,
+        172,
+        83,
+        148,
+        61,
+        58
+      ],
+      "nearestInCategory": {
+        "id": "portal-2",
+        "similarity": 0.6510416666666666
+      },
+      "prior": null
+    },
+    {
+      "id": "portal-4",
+      "size": "19x15",
+      "floor": 174,
+      "deadEnds": 0,
+      "junctions": 146,
+      "loops": 94,
+      "spawn": "0.50,0.07",
+      "targets": [
+        28,
+        264,
+        36,
+        150,
+        103,
+        255,
+        21,
+        145,
+        157,
+        248,
+        63
+      ],
+      "nearestInCategory": {
+        "id": "portal-5",
+        "similarity": 0.75
+      },
+      "prior": null
+    },
+    {
+      "id": "portal-5",
+      "size": "23x15",
+      "floor": 228,
+      "deadEnds": 0,
+      "junctions": 218,
+      "loops": 147,
+      "spawn": "0.95,0.93",
+      "targets": [
+        320,
+        44,
+        182,
+        24,
+        215,
+        242,
+        282,
+        225,
+        176,
+        34,
+        100,
+        110
+      ],
+      "nearestInCategory": {
+        "id": "portal-6",
+        "similarity": 0.7743055555555556
+      },
+      "prior": null
+    },
+    {
+      "id": "portal-6",
+      "size": "19x23",
+      "floor": 272,
+      "deadEnds": 0,
+      "junctions": 238,
+      "loops": 161,
+      "spawn": "0.94,0.05",
+      "targets": [
+        36,
+        226,
+        20,
+        400,
+        45,
+        90,
+        260,
+        411,
+        405,
+        131,
+        346,
+        271,
+        191
+      ],
+      "nearestInCategory": {
+        "id": "portal-5",
+        "similarity": 0.7743055555555556
+      },
+      "prior": null
+    },
+    {
+      "id": "portal-7",
+      "size": "21x25",
+      "floor": 293,
+      "deadEnds": 9,
+      "junctions": 125,
+      "loops": 71,
+      "spawn": "0.95,0.46",
+      "targets": [
+        250,
+        22,
+        484,
+        262,
+        330,
+        380,
+        364,
+        156,
+        75,
+        108,
+        376,
+        211,
+        391,
+        501
+      ],
+      "nearestInCategory": {
+        "id": "portal-5",
+        "similarity": 0.6614583333333334
+      },
+      "prior": null
+    },
+    {
+      "id": "tactical-1",
+      "size": "15x11",
+      "floor": 96,
+      "deadEnds": 2,
+      "junctions": 77,
+      "loops": 51,
+      "spawn": "0.93,0.90",
+      "targets": [
+        148,
+        28,
+        88,
+        16,
+        79,
+        53,
+        121,
+        141
+      ],
+      "nearestInCategory": {
+        "id": "tactical-2",
+        "similarity": 0.7881944444444444
+      },
+      "prior": null
+    },
+    {
+      "id": "tactical-2",
+      "size": "13x17",
+      "floor": 136,
+      "deadEnds": 0,
+      "junctions": 126,
+      "loops": 79,
+      "spawn": "0.92,0.06",
+      "targets": [
+        24,
+        115,
+        14,
+        196,
+        32,
+        119,
+        190,
+        85,
+        136
+      ],
+      "nearestInCategory": {
+        "id": "tactical-1",
+        "similarity": 0.7881944444444444
+      },
+      "prior": null
+    },
+    {
+      "id": "tactical-3",
+      "size": "15x19",
+      "floor": 168,
+      "deadEnds": 0,
+      "junctions": 139,
+      "loops": 96,
+      "spawn": "0.93,0.50",
+      "targets": [
+        148,
+        16,
+        256,
+        142,
+        121,
+        247,
+        57,
+        198,
+        268,
+        22
+      ],
+      "nearestInCategory": {
+        "id": "tactical-2",
+        "similarity": 0.7395833333333334
+      },
+      "prior": null
+    },
+    {
+      "id": "tactical-4",
+      "size": "17x19",
+      "floor": 173,
+      "deadEnds": 6,
+      "junctions": 82,
+      "loops": 46,
+      "spawn": "0.06,0.06",
+      "targets": [
+        18,
+        290,
+        161,
+        25,
+        121,
+        287,
+        150,
+        49,
+        281,
+        191,
+        96
+      ],
+      "nearestInCategory": {
+        "id": "tactical-2",
+        "similarity": 0.6944444444444444
+      },
+      "prior": null
+    },
+    {
+      "id": "tactical-5",
+      "size": "25x15",
+      "floor": 214,
+      "deadEnds": 0,
+      "junctions": 185,
+      "loops": 161,
+      "spawn": "0.92,0.50",
+      "targets": [
+        197,
+        162,
+        62,
+        321,
+        279,
+        128,
+        43,
+        334,
+        207,
+        315,
+        141,
+        109
+      ],
+      "nearestInCategory": {
+        "id": "tactical-1",
+        "similarity": 0.6371527777777778
+      },
+      "prior": null
+    },
+    {
+      "id": "tactical-6",
+      "size": "25x19",
+      "floor": 305,
+      "deadEnds": 3,
+      "junctions": 245,
+      "loops": 169,
+      "spawn": "0.50,0.44",
+      "targets": [
+        212,
+        37,
+        448,
+        48,
+        197,
+        434,
+        318,
+        378,
+        202,
+        31,
+        68,
+        182,
+        389
+      ],
+      "nearestInCategory": {
+        "id": "tactical-2",
+        "similarity": 0.7881944444444444
+      },
+      "prior": null
+    },
+    {
+      "id": "tactical-7",
+      "size": "27x21",
+      "floor": 254,
+      "deadEnds": 0,
+      "junctions": 184,
+      "loops": 134,
+      "spawn": "0.50,0.05",
+      "targets": [
+        40,
+        507,
+        49,
+        319,
+        58,
+        308,
+        461,
+        181,
+        203,
+        223,
+        528,
+        325,
+        468,
+        341
+      ],
+      "nearestInCategory": {
+        "id": "tactical-2",
+        "similarity": 0.6388888888888888
+      },
+      "prior": null
+    },
+    {
+      "id": "stealth-1",
+      "size": "13x11",
+      "floor": 76,
+      "deadEnds": 3,
+      "junctions": 45,
+      "loops": 27,
+      "spawn": "0.92,0.50",
+      "targets": [
+        76,
+        71,
+        19,
+        128,
+        46,
+        16,
+        82
+      ],
+      "nearestInCategory": {
+        "id": "stealth-6",
+        "similarity": 0.7413194444444444
+      },
+      "prior": null
+    },
+    {
+      "id": "stealth-2",
+      "size": "17x11",
+      "floor": 78,
+      "deadEnds": 3,
+      "junctions": 63,
+      "loops": 54,
+      "spawn": "0.50,0.50",
+      "targets": [
+        93,
+        43,
+        150,
+        47,
+        128,
+        99,
+        108,
+        70
+      ],
+      "nearestInCategory": {
+        "id": "stealth-4",
+        "similarity": 0.7152777777777778
+      },
+      "prior": null
+    },
+    {
+      "id": "stealth-3",
+      "size": "19x13",
+      "floor": 154,
+      "deadEnds": 1,
+      "junctions": 121,
+      "loops": 88,
+      "spawn": "0.44,0.08",
+      "targets": [
+        27,
+        226,
+        36,
+        131,
+        220,
+        32,
+        22,
+        109,
+        138
+      ],
+      "nearestInCategory": {
+        "id": "stealth-5",
+        "similarity": 0.7847222222222222
+      },
+      "prior": null
+    },
+    {
+      "id": "stealth-4",
+      "size": "15x19",
+      "floor": 105,
+      "deadEnds": 0,
+      "junctions": 79,
+      "loops": 63,
+      "spawn": "0.64,0.72",
+      "targets": [
+        204,
+        25,
+        145,
+        16,
+        200,
+        54,
+        80,
+        112,
+        187,
+        49
+      ],
+      "nearestInCategory": {
+        "id": "stealth-2",
+        "similarity": 0.7152777777777778
+      },
+      "prior": null
+    },
+    {
+      "id": "stealth-5",
+      "size": "15x23",
+      "floor": 216,
+      "deadEnds": 1,
+      "junctions": 193,
+      "loops": 124,
+      "spawn": "0.93,0.05",
+      "targets": [
+        28,
+        178,
+        16,
+        316,
+        91,
+        327,
+        321,
+        79,
+        39,
+        257,
+        199
+      ],
+      "nearestInCategory": {
+        "id": "stealth-3",
+        "similarity": 0.7847222222222222
+      },
+      "prior": null
+    },
+    {
+      "id": "stealth-6",
+      "size": "19x23",
+      "floor": 295,
+      "deadEnds": 0,
+      "junctions": 283,
+      "loops": 188,
+      "spawn": "0.94,0.50",
+      "targets": [
+        226,
+        20,
+        400,
+        218,
+        321,
+        345,
+        278,
+        44,
+        36,
+        97,
+        214,
+        87
+      ],
+      "nearestInCategory": {
+        "id": "stealth-7",
+        "similarity": 0.765625
+      },
+      "prior": null
+    },
+    {
+      "id": "stealth-7",
+      "size": "25x21",
+      "floor": 351,
+      "deadEnds": 0,
+      "junctions": 311,
+      "loops": 231,
+      "spawn": "0.04,0.05",
+      "targets": [
+        26,
+        476,
+        237,
+        37,
+        333,
+        340,
+        135,
+        232,
+        151,
+        243,
+        326,
+        44,
+        348
+      ],
+      "nearestInCategory": {
+        "id": "stealth-6",
+        "similarity": 0.765625
+      },
+      "prior": null
+    }
+  ]
+}

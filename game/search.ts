@@ -329,7 +329,11 @@ export class DStarLiteSearch extends MeteredSearch {
     return [...new Set(this.queue.keys().map((k) => this.nodes.get(k)!.cell))];
   }
   updateDomain(domain: PlanningDomain, changed: ReadonlySet<number> = new Set()) {
-    const reset = domain.target.id !== this.domain.target.id || domain.target.mask !== this.domain.target.mask || domain.start.supply !== this.domain.start.supply;
+    const reset =
+      domain.target.id !== this.domain.target.id ||
+      domain.target.mask !== this.domain.target.mask ||
+      domain.start.supply !== this.domain.start.supply ||
+      domain.navigationVersion !== this.domain.navigationVersion;
     if (!reset && !this.done && this.work) {
       const union = new Set([...(this.pending?.changed ?? []), ...changed]);
       this.pending = { domain, changed: union };
@@ -556,12 +560,213 @@ class BidirectionalSearch extends MeteredSearch {
   }
 }
 export function createDomainSearch(domain: PlanningDomain, algorithm: AlgorithmId, width: number): Search {
-  if (algorithm === "random" || algorithm === "mcts") throw new Error("Algoritma tindakan memerlukan controller keputusan.");
+  if (["random", "mcts", "maxn", "paranoid"].includes(algorithm)) throw new Error("Algoritma tindakan memerlukan controller keputusan.");
+  if (algorithm === "beam") return new BeamSearch(domain, width);
+  if (algorithm === "rtaa") return new RealTimeSearch(domain, width);
+  if (algorithm === "ara") return new AnytimeSearch(domain, width);
   return algorithm === "dstar-lite"
     ? new DStarLiteSearch(domain, width)
     : algorithm === "bidirectional"
       ? new BidirectionalSearch(domain, width)
       : new DomainSearch(domain, algorithm, width);
+}
+
+interface Branch {
+  state: PlanState;
+  actions: Action[];
+  g: number;
+}
+export class BeamSearch extends MeteredSearch {
+  private layer: Branch[] = [];
+  constructor(
+    private domain: PlanningDomain,
+    private width: number
+  ) {
+    super();
+  }
+  frontier() {
+    return this.layer.map((b) => b.state.cell);
+  }
+  protected *run(): Work {
+    for (let i = 0; i < this.domain.preparation; i++) yield;
+    this.layer = [{ state: this.domain.start, actions: [], g: 0 }];
+    const seen = new Map<string, number>();
+    let best: Branch | null = null;
+    for (let depth = 0; this.layer.length && depth < 192; depth++) {
+      const next = new Map<string, Branch>();
+      for (const branch of this.layer) {
+        this.expanded++;
+        this.visited.add(branch.state.cell);
+        yield;
+        if (this.domain.isGoal(branch.state)) {
+          yield* this.complete([...branch.actions, ...this.domain.finish(branch.state)], this.width, this.domain.start.cell);
+          return;
+        }
+        for (const edge of yield* this.domain.successors(branch.state)) {
+          const key = this.domain.key(edge.state),
+            g = branch.g + edge.cost;
+          if (g < (seen.get(key) ?? Infinity) && g < (next.get(key)?.g ?? Infinity)) next.set(key, { state: edge.state, g, actions: [...branch.actions, edge.action] });
+          yield;
+        }
+      }
+      const candidates = [...next.values()];
+      candidates.sort((a, b) => a.g + this.domain.heuristic(a.state) - b.g - this.domain.heuristic(b.state));
+      for (let i = 0; i < candidates.length; i++) yield;
+      this.layer = candidates.slice(0, 8);
+      for (const b of this.layer) {
+        seen.set(this.domain.key(b.state), b.g);
+        if (!best || this.domain.heuristic(b.state) < this.domain.heuristic(best.state)) best = b;
+        yield;
+      }
+      this.memory = Math.max(this.memory, seen.size + candidates.length * (depth + 2));
+    }
+    yield* this.complete(null, this.width, this.domain.start.cell);
+  }
+}
+export class RealTimeSearch extends MeteredSearch {
+  private learned = new Map<string, number>();
+  private open = new IndexedQueue();
+  private nodes = new Map<string, Branch>();
+  constructor(
+    private domain: PlanningDomain,
+    private width: number
+  ) {
+    super();
+  }
+  updateDomain(domain: PlanningDomain, changed: ReadonlySet<number> = new Set()) {
+    if (domain.target.id !== this.domain.target.id || domain.navigationVersion !== this.domain.navigationVersion || changed.size) this.learned.clear();
+    this.domain = domain;
+    this.open = new IndexedQueue();
+    this.nodes.clear();
+    this.work = null;
+    this.done = false;
+    this.actions = null;
+    this.path = null;
+  }
+  frontier() {
+    return this.open.keys().map((k) => this.nodes.get(k)!.state.cell);
+  }
+  protected *run(): Work {
+    for (let i = 0; i < this.domain.preparation; i++) yield;
+    const h = (s: PlanState) => Math.max(this.domain.heuristic(s), this.learned.get(this.domain.key(s)) ?? 0);
+    const start = this.domain.key(this.domain.start),
+      closed = new Set<string>();
+    this.nodes.set(start, { state: this.domain.start, actions: [], g: 0 });
+    yield* this.open.set(start, h(this.domain.start));
+    let chosen: Branch | undefined;
+    while (this.open.size && closed.size < 24) {
+      const key = (yield* this.open.pop())!.key,
+        b = this.nodes.get(key)!;
+      if (this.domain.isGoal(b.state)) {
+        chosen = b;
+        break;
+      }
+      closed.add(key);
+      this.expanded++;
+      this.visited.add(b.state.cell);
+      yield;
+      for (const e of yield* this.domain.successors(b.state)) {
+        const k = this.domain.key(e.state),
+          g = b.g + e.cost;
+        if (!closed.has(k) && g < (this.nodes.get(k)?.g ?? Infinity)) {
+          this.nodes.set(k, { state: e.state, actions: [...b.actions, e.action], g });
+          yield* this.open.set(k, g + h(e.state), h(e.state));
+        }
+        yield;
+      }
+    }
+    chosen ??= this.open.peek() ? this.nodes.get(this.open.peek()!.key) : undefined;
+    if (chosen && !this.domain.isGoal(chosen.state)) {
+      const f = chosen.g + h(chosen.state);
+      for (const key of closed) {
+        const b = this.nodes.get(key)!;
+        this.learned.set(key, Math.max(h(b.state), f - b.g));
+        yield;
+      }
+    }
+    this.memory = this.learned.size + this.nodes.size;
+    yield* this.complete(chosen ? [...chosen.actions, ...(this.domain.isGoal(chosen.state) ? this.domain.finish(chosen.state) : [])] : null, this.width, this.domain.start.cell);
+  }
+}
+export class AnytimeSearch extends MeteredSearch {
+  private open = new IndexedQueue();
+  private nodes = new Map<string, PlanState>();
+  private g = new Map<string, number>();
+  private parents = new Map<string, { key: string; action: Action }>();
+  private closed = new Set<string>();
+  private incons = new Set<string>();
+  private incumbent: string | null = null;
+  private weight = 2.5;
+  constructor(
+    private domain: PlanningDomain,
+    private width: number
+  ) {
+    super();
+  }
+  frontier() {
+    return this.open.keys().map((k) => this.nodes.get(k)!.cell);
+  }
+  protected *run(): Work {
+    for (let i = 0; i < this.domain.preparation; i++) yield;
+    const start = this.domain.key(this.domain.start);
+    this.nodes.set(start, this.domain.start);
+    this.g.set(start, 0);
+    yield* this.open.set(start, this.weight * this.domain.heuristic(this.domain.start));
+    for (;;) {
+      while (this.open.size && (!this.incumbent || this.open.peek()!.a < this.g.get(this.incumbent)!)) {
+        // Improve the first solution for at most 512 further metered operations.
+        if (this.incumbent && this.operations >= this.foundAt + 512) break;
+        const key = (yield* this.open.pop())!.key,
+          state = this.nodes.get(key)!;
+        this.closed.add(key);
+        this.expanded++;
+        this.visited.add(state.cell);
+        yield;
+        if (this.domain.isGoal(state)) {
+          this.incumbent = key;
+          this.foundAt = Math.min(this.foundAt, this.operations);
+          continue;
+        }
+        for (const e of yield* this.domain.successors(state)) {
+          const k = this.domain.key(e.state),
+            score = this.g.get(key)! + e.cost;
+          if (score < (this.g.get(k) ?? Infinity)) {
+            this.g.set(k, score);
+            this.nodes.set(k, e.state);
+            this.parents.set(k, { key, action: e.action });
+            if (this.domain.isGoal(e.state)) {
+              if (!this.incumbent || score < this.g.get(this.incumbent)!) this.incumbent = k;
+              this.foundAt = Math.min(this.foundAt, this.operations);
+            }
+            if (this.closed.has(k)) this.incons.add(k);
+            else yield* this.open.set(k, score + this.weight * this.domain.heuristic(e.state));
+          }
+          yield;
+        }
+        this.memory = Math.max(this.memory, this.nodes.size + this.parents.size + this.open.size + this.incons.size);
+      }
+      if (!this.incumbent || this.weight === 1 || this.operations >= this.foundAt + 512) break;
+      this.weight = Math.max(1, this.weight - 0.5);
+      const keys = new Set([...this.open.keys(), ...this.incons]);
+      this.incons.clear();
+      this.closed.clear();
+      for (const k of keys) yield* this.open.set(k, this.g.get(k)! + this.weight * this.domain.heuristic(this.nodes.get(k)!));
+    }
+    if (!this.incumbent) {
+      yield* this.complete(null, this.width, this.domain.start.cell);
+      return;
+    }
+    const actions: Action[] = [];
+    let current = this.incumbent;
+    while (current !== start) {
+      const p = this.parents.get(current)!;
+      actions.push(p.action);
+      current = p.key;
+      yield;
+    }
+    yield* this.complete([...actions.reverse(), ...this.domain.finish(this.nodes.get(this.incumbent)!)], this.width, this.domain.start.cell);
+  }
+  private foundAt = Infinity;
 }
 export function neighbors(cell: number, width: number, height: number, terrain: Terrain[]) {
   return adjacent(cell, width, height).filter((c) => isWalkable(terrain[c]));
